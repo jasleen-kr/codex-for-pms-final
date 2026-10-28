@@ -24,6 +24,8 @@ prompt library built from your own questions.
 
 ### 1.
 
+Tell me what is my job profile at Rook
+
 ### 2.
 
 ### 3.

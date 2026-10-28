@@ -23,4 +23,40 @@ certification. Everything in it is a fictional teaching scenario.
 
 ## Working context
 
-_You'll fill this in during Module 1._
+### Business and products
+
+Rook sells subscription software per active responder to independent masked responders and their handlers; it does not employ responders. Public positioning: emergency-services logistics/workforce coordination.
+
+- **Dispatch (your product, flagship):** handler web console and responder phone app. Incident → rank available responders → ping highest-ranked → taken assigns incident and marks responder engaged; turned down/missed advances to next responder. Routing config ships with releases.
+- **Supply:** gear requisitions, approvals, fulfillment and maintenance; field failure reports can bring maintenance forward. Dispatch writes the shared **Responder Availability Record**; Supply reads it for maintenance scheduling. Dispatch changes can affect Supply scheduling.
+- Monthly release train, 4.x numbering. Active-callout support tickets bypass the queue. Never infer responder identities: production stores capability tags, availability and callout history, not cover identities or legal-identity mappings. Read Security Policy 4.1 before designing responder-record changes.
+
+### People to work with
+
+- **Helen Achebe, Director of Product:** your director; roadmap, commitments and deferred scope. Commitment changes go through Product.
+- **Marcus Oyelaran, Dispatch engineering manager:** engineering partner; first stop for technical uncertainty and rough numbers.
+- **Wen Li, staff engineer:** built routing; source for ranking behavior. Detailed documentation is missing.
+- **Ravi Menon, data analyst:** weekly acceptance reporting; source for numbers.
+- **Nadia Hoffmann, support lead:** tickets and handler concerns; Priya recommends a standing 15-minute check-in.
+- **Sofia Marino, designer:** console and phone app; ran September interviews.
+- **Priya Raghunathan, predecessor:** predecessor for 14 months; left 21 August 2026.
+
+### Vocabulary and measures
+
+Handler manages responder readiness; quartermaster owns equipment/approvals. Callout = request to attend an incident; ping = offer to one responder. Taken = yes; turned down = explicit no; missed = no response within **ping wait**.
+
+**Acceptance rate** = taken / all pings (including turned down and missed), reported weekly in aggregate. **Time-to-accept** = median seconds from ping sent to taken. **Coverage gap** = no available responder with required capability tags; distinct from rejection. **Routing priority** uses travel-time proximity, availability, capability match and recent acceptance history. Turning down or missing lowers the history component and future ranking. **Mutual aid/shared cover** = responders covering one another across city areas; not supported today.
+
+### Inherited situation and open questions
+
+- **4.1 (16 June 2026):** travel-time proximity, bulk callout, push reliability. Priya describes console/mobile as stable; routing is the risk.
+- **4.2 (12 August):** proximity weighted up relative to acceptance history; ping wait cut **90 → 60 seconds**; persistent console filters and three fixes. 
+- By 18 August, support reported callout tickets about **3× normal**. On 26 August they remained elevated: roughly **two-thirds “phone never goes off,” one-third “gone before I could answer.”** Marcus asked whether the ranking change intentionally applied to responders turning jobs down; no resolution is recorded in Company comments.
+- Priya attributed much of the acceptance decline to August seasonality, expected September recovery and opposed rollback. Treat these as unverified hypotheses/preferences. Validate trends, routing behavior and timeout effects with Ravi, Wen and Nadia. Validate her dismissal of filter tickets as cosmetic too.
+- Roadmap last reviewed **30 June** still labels 4.2 items committed and owned by Priya. Availability Confidence (score beside stated availability) is absent from release notes; confirm delivery and remaining commitments with Helen. Supply approval chains target 4.3; handler app and shared cover are Q4 explorations. Document routing with Wen.
+
+Sources: Company wiki, directory, roadmap, releases/comments; `00-rook/company/notes/handoff-from-priya.docx` (21 August 2026). Sources describe June–September 2026; verify subsequent outcomes.
+
+Ask Priya why routing and timeout changes shipped together and what evidence justified 60 seconds.
+Her “couple” of deferred 4.2 items are unnamed; request the full list and customer promises.
+The handover omits Ravi’s reporting role and the Supply dependency; ask which data informed decisions and whether Supply was consulted.
