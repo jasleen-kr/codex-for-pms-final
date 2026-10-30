@@ -16,6 +16,12 @@ prompt library built from your own questions.
 
 ### 1.
 
+Give me the top 5 consequential to the business
+
 ### 2.
 
+***Based on the interviews, the trouble with 4.2 is \_\_\_.***
+
 ### 3.
+
+Is this happening after August 12, the 4.2 release or a prior release?

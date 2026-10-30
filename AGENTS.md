@@ -60,3 +60,10 @@ Sources: Company wiki, directory, roadmap, releases/comments; `00-rook/company/n
 Ask Priya why routing and timeout changes shipped together and what evidence justified 60 seconds.
 Her “couple” of deferred 4.2 items are unnamed; request the full list and customer promises.
 The handover omits Ravi’s reporting role and the Supply dependency; ask which data informed decisions and whether Supply was consulted.
+
+Read all four September Research interviews and all 147 support_tickets (29 June–7 September 2026); counts are reports, not verified incidents or independent customers.
+Excluding 12 August itself: 40 tickets over 44 days before release versus 105 over 26 days afterward (0.9 → 4.0/day, about 4.4×); 2 release-day tickets were kept separate.
+After 12 August, 32 tickets from 4 handlers describe quiet stretches/fewer pings and 14 from 10 handlers describe offers disappearing before acceptance; 2 overlap, giving 44 distinct tickets (42% of 105). Quiet-phone reports do not establish notification failure; validate actual ping delivery and routing.
+Interviews echo disappearing offers (3/4) and quiet/uneven workloads (2/4); Kip alone explicitly describes overload alongside another responder’s inactivity. Small text (2/4) and handler alert awareness/identification (3/4) are more prominent in interviews; profile/availability controls, sign-in and fulfilment issues surface in tickets instead.
+Filter complaints shift from requesting persistence (2 before release) to resets and saved-filter usability (11 afterward); Ambrose values persistence but distrusts silent resets. Halloran’s improved maintenance experience is not universal: 5 post-release tickets concern maintenance timing/visibility.
+Evidence shows a concentrated post-release pattern, not causation or a proven onset: Ambrose explicitly reports similar incidents earlier in the year. Compare responder-level pings and timing around 12 August with Ravi and Wen before attributing symptoms to 4.2.
