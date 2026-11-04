@@ -1,0 +1,179 @@
+<div id="rook-farlight-gale">
+  <style>
+    #rook-farlight-gale { display:grid; gap:calc(var(--font-size-base) * 1.5); color:var(--foreground); }
+    #rook-farlight-gale section, #rook-farlight-gale .group { display:grid; gap:calc(var(--font-size-base) * .65); min-width:0; }
+    #rook-farlight-gale .heading { display:grid; gap:calc(var(--font-size-base) * .3); padding-right:90px; }
+    #rook-farlight-gale .panels { display:grid; grid-template-columns:minmax(0,1fr) minmax(0,1fr); gap:calc(var(--font-size-base) * 1.4); }
+    #rook-farlight-gale figure { margin:0; display:grid; gap:calc(var(--font-size-base) * .5); align-content:start; min-width:0; }
+    #rook-farlight-gale figcaption { font-weight:500; }
+    #rook-farlight-gale .legend { display:flex; flex-wrap:wrap; gap:calc(var(--font-size-base) * .9); align-items:center; }
+    #rook-farlight-gale .key { display:inline-flex; align-items:center; gap:calc(var(--font-size-base) * .35); }
+    #rook-farlight-gale .swatch { display:inline-block; height:12px; width:12px; background:var(--viz-series-1); }
+    #rook-farlight-gale .declined { background:var(--viz-series-3); }
+    #rook-farlight-gale .missed { background:var(--viz-series-4); }
+    #rook-farlight-gale .weekly { display:grid; gap:calc(var(--font-size-base) * .55); }
+    #rook-farlight-gale .week { display:grid; grid-template-columns:64px minmax(0,1fr) 51px; align-items:center; gap:calc(var(--font-size-base) * .5); }
+    #rook-farlight-gale .release { padding-block:calc(var(--font-size-base) * .45); border-block:1px solid var(--border); }
+    #rook-farlight-gale .track { display:flex; height:21px; background:color-mix(in srgb,var(--foreground) 7%,transparent); }
+    #rook-farlight-gale .segment { display:block; height:100%; background:var(--viz-series-1); }
+    #rook-farlight-gale .segment.declined { background:var(--viz-series-3); }
+    #rook-farlight-gale .segment.missed { background:var(--viz-series-4); }
+    #rook-farlight-gale .number { text-align:right; font-variant-numeric:tabular-nums; white-space:nowrap; }
+    #rook-farlight-gale .period { display:grid; gap:calc(var(--font-size-base) * .35); }
+    #rook-farlight-gale .period-head { display:flex; align-items:baseline; flex-wrap:wrap; justify-content:space-between; gap:calc(var(--font-size-base) * .5); }
+    #rook-farlight-gale .percent-track { display:flex; height:25px; }
+    #rook-farlight-gale .value-labels { display:flex; flex-wrap:wrap; gap:calc(var(--font-size-base) * .6); font-variant-numeric:tabular-nums; }
+    #rook-farlight-gale .bar-row { display:grid; grid-template-columns:53px minmax(0,1fr) 49px; align-items:center; gap:calc(var(--font-size-base) * .5); }
+    #rook-farlight-gale .selector { display:grid; gap:calc(var(--font-size-base) * .35); }
+    #rook-farlight-gale .selector select { width:100%; min-width:0; }
+    #rook-farlight-gale .summary-table { min-width:510px; }
+    #rook-farlight-gale .reason-table { min-width:600px; }
+    #rook-farlight-gale .selected-summary { display:grid; gap:calc(var(--font-size-base) * .4); }
+    @media(max-width:650px) { #rook-farlight-gale .panels { grid-template-columns:1fr; } }
+    @media(max-width:450px) { #rook-farlight-gale .heading { padding-right:0; } }
+  </style>
+
+  <div class="heading">
+    <h2>Farlight versus The Gale</h2>
+    <span>Similar starting workloads, sharply different paths after 4.2</span>
+    <span class="text-small text-muted">Farlight: Uptown · Linda Pruitt. The Gale: Eastgate · Kip.</span>
+  </div>
+
+  <section aria-labelledby="fg-week-title">
+    <h3 id="fg-week-title">Every week · offers received and outcomes</h3>
+    <div class="legend text-small"><span class="key"><i class="swatch" aria-hidden="true"></i>Taken</span><span class="key"><i class="swatch declined" aria-hidden="true"></i>Turned down</span><span class="key"><i class="swatch missed" aria-hidden="true"></i>Missed</span></div>
+    <span class="text-small text-muted">Both charts use the same 0–21 pings/week scale. Right-hand values show taken / pings.</span>
+    <div class="panels"><figure><figcaption>Farlight</figcaption><div class="weekly" id="fg-farlight-weeks"></div></figure><figure><figcaption>The Gale</figcaption><div class="weekly" id="fg-gale-weeks"></div></figure></div>
+    <span class="text-small text-muted">*Week of 10 August includes the 12 August release. Weeks are Monday–Sunday, ending 6 September. Zero pings means no offers recorded, not a measured acceptance rate.</span>
+  </section>
+
+  <section aria-labelledby="fg-summary-title">
+    <h3 id="fg-summary-title">Before → after · comparable complete weeks</h3>
+    <span class="text-small text-muted">Before: 6 weeks, 29 Jun–9 Aug. After: 3 weeks, 17 Aug–6 Sep. Mixed release week excluded.</span>
+    <div class="table-responsive"><table class="table table-sm summary-table"><thead><tr><th>Measure</th><th>Farlight</th><th>The Gale</th></tr></thead><tbody id="fg-summary-rows"></tbody></table></div>
+    <span class="text-small">Farlight’s post-release acceptance and missed shares are based on just four pings; The Gale’s are based on 58.</span>
+  </section>
+
+  <section aria-labelledby="fg-outcome-title">
+    <h3 id="fg-outcome-title">The release-week difference: missed offers</h3>
+    <span class="text-small">Mixed release week: Farlight misses 4/10 (40%); The Gale misses 3/15 (20%). Both are affected, but the burden differs.</span>
+    <div class="panels"><figure><figcaption>Farlight · outcome shares</figcaption><div class="group" id="fg-farlight-outcomes"></div></figure><figure><figcaption>The Gale · outcome shares</figcaption><div class="group" id="fg-gale-outcomes"></div></figure></div>
+  </section>
+
+  <section aria-labelledby="fg-week-detail-title">
+    <h3 id="fg-week-detail-title">Week-by-week interpretation</h3>
+    <div class="selector"><label class="form-label" for="fg-week-select">Week starting</label><select class="form-select" id="fg-week-select"></select></div>
+    <div class="selected-summary" id="fg-week-story" aria-live="polite"></div>
+  </section>
+
+  <section aria-labelledby="fg-demand-title">
+    <h3 id="fg-demand-title">Could local demand explain it?</h3>
+    <span class="text-small text-muted">Usual-area callouts per week · same 0–20 scale · same complete-week periods</span>
+    <div class="panels"><figure><figcaption>Uptown · Farlight</figcaption><div class="group" id="fg-uptown"></div><span class="text-small">Demand −5.3%; Farlight’s pings −88.9%.</span></figure><figure><figcaption>Eastgate · The Gale</figcaption><div class="group" id="fg-eastgate"></div><span class="text-small">Demand −14.3%; The Gale’s pings +48.7%.</span></figure></div>
+    <span class="text-small text-muted">Different usual areas and handlers: this is a contrast, not a matched control. Historical eligibility, capability and travel-time differences are unknown.</span>
+  </section>
+
+  <section aria-labelledby="fg-analysis-title">
+    <h3 id="fg-analysis-title">Reasons and analysis · evidence versus inference</h3>
+    <div class="table-responsive"><table class="table table-sm reason-table"><thead><tr><th>Factor</th><th>What this comparison shows</th><th>What we can conclude</th></tr></thead><tbody>
+      <tr><td>Local demand</td><td>Demand falls in both usual areas, while the responders’ pings move in opposite directions.</td><td>These local demand changes alone do not explain the divergence.</td></tr>
+      <tr><td>Shorter answer window</td><td>4.2 cuts 90 seconds to 60. Farlight’s release-week missed share is 40%; The Gale’s is 20%.</td><td>Timeout is a plausible contributor. Delivery and response timing are needed to establish why they miss offers.</td></tr>
+      <tr><td>Acceptance-history feedback</td><td>Code subtracts 0.12 for a miss or decline, adds 0.08 for acceptance, and has no time-based recovery. After the mixed week, Farlight takes 0/4; The Gale takes 42/58.</td><td>Farlight has few chances to rebuild score; Gale has many accepted offers. Actual scores and ranks are not available.</td></tr>
+      <tr><td>Proximity reweighting</td><td>4.2 raises proximity weight 0.45 → 0.60 and lowers history weight 0.40 → 0.25.</td><td>Ranking could change independently of misses. We cannot infer that The Gale was closer to callouts.</td></tr>
+      <tr><td>Availability and eligibility</td><td>Linda reports Farlight’s availability and tags appear correct. We have no historical candidate lists.</td><td>Her account may look available without proving eligibility for any particular incident.</td></tr>
+      <tr><td>Direct transfer of work</td><td>Farlight’s offers fall and The Gale’s rise; they usually cover different areas.</td><td>We cannot say that Farlight’s particular offers were reassigned to The Gale.</td></tr>
+    </tbody></table></div>
+  </section>
+
+  <section aria-labelledby="fg-human-title">
+    <h3 id="fg-human-title">The people’s accounts agree with the direction</h3>
+    <table class="table table-sm"><thead><tr><th>Farlight</th><th>The Gale</th></tr></thead><tbody>
+      <tr><td>17 Aug: Linda first reports the phone going quiet despite availability appearing correct.</td><td>4 Sep interview: Kip describes The Gale as exhausted while Meteor Mite is quiet.</td></tr>
+      <tr><td>20 Aug: Linda reports four pings in the preceding seven days; the database records four.</td><td>Final three weeks: 17 → 20 → 21 pings and 12 → 14 → 16 taken.</td></tr>
+      <tr><td>28 Aug: last recorded ping, missed. No pings in the week of 31 Aug.</td><td>No support tickets about The Gale appear in this dataset; the workload account comes from the interview.</td></tr>
+    </tbody></table>
+  </section>
+
+  <section aria-labelledby="fg-check-title">
+    <h3 id="fg-check-title">What would establish why</h3>
+    <table class="table table-sm"><thead><tr><th>Check</th><th>Evidence needed</th></tr></thead><tbody>
+      <tr><td>Did ranking prevent Farlight receiving offers?</td><td>Wen and Ravi: historical eligibility, candidate rank, score components and the point where dispatch stopped for relevant callouts.</td></tr>
+      <tr><td>Did 60 seconds cause more missed offers?</td><td>Nadia and engineering: sent, delivered, displayed, answered and withdrawn times; pre-release acceptances at 60–90 seconds.</td></tr>
+      <tr><td>Which release change matters?</td><td>Replay old/new weights on the same historical candidates; assess timeout separately. Confirm that the repository matches deployed behavior.</td></tr>
+    </tbody></table>
+  </section>
+
+  <details><summary>Source rows and comparison definitions</summary><div class="group text-small">
+    <span>Fresh database reads: 20 responder-week rows, including Farlight’s zero week; six area/period demand rows; two responder roster rows. All outcomes are included in acceptance denominators.</span>
+    <span>Period totals: Farlight before 72 pings/53 taken, mixed 10/4, after 4/0. The Gale before 78/61, mixed 15/9, after 58/42.</span>
+    <span>Code: config.py, offer.py, history.py and routing.py in 00-rook/code/dispatch-routing. History penalties are not shown as a new 4.2 change; their weight actually decreases.</span>
+    <span>Source rows and exact SQL: farlight-gale-source-rows.json and farlight-gale-queries.sql in 03-rewind/dispatch-4.2-analysis. Support and interview reports do not establish causation.</span>
+  </div></details>
+</div>
+<script type="application/json" id="rook-farlight-gale-data">{"weekly":[{"week_start":"2026-06-29T00:00:00.000Z","responder":"Farlight","pings":"12","taken":"9","turned_down":"3","missed":"0"},{"week_start":"2026-06-29T00:00:00.000Z","responder":"The Gale","pings":"13","taken":"10","turned_down":"2","missed":"1"},{"week_start":"2026-07-06T00:00:00.000Z","responder":"Farlight","pings":"12","taken":"9","turned_down":"3","missed":"0"},{"week_start":"2026-07-06T00:00:00.000Z","responder":"The Gale","pings":"12","taken":"9","turned_down":"3","missed":"0"},{"week_start":"2026-07-13T00:00:00.000Z","responder":"Farlight","pings":"11","taken":"8","turned_down":"2","missed":"1"},{"week_start":"2026-07-13T00:00:00.000Z","responder":"The Gale","pings":"13","taken":"10","turned_down":"3","missed":"0"},{"week_start":"2026-07-20T00:00:00.000Z","responder":"Farlight","pings":"12","taken":"9","turned_down":"2","missed":"1"},{"week_start":"2026-07-20T00:00:00.000Z","responder":"The Gale","pings":"14","taken":"11","turned_down":"2","missed":"1"},{"week_start":"2026-07-27T00:00:00.000Z","responder":"Farlight","pings":"13","taken":"10","turned_down":"3","missed":"0"},{"week_start":"2026-07-27T00:00:00.000Z","responder":"The Gale","pings":"13","taken":"11","turned_down":"1","missed":"1"},{"week_start":"2026-08-03T00:00:00.000Z","responder":"Farlight","pings":"12","taken":"8","turned_down":"3","missed":"1"},{"week_start":"2026-08-03T00:00:00.000Z","responder":"The Gale","pings":"13","taken":"10","turned_down":"3","missed":"0"},{"week_start":"2026-08-10T00:00:00.000Z","responder":"Farlight","pings":"10","taken":"4","turned_down":"2","missed":"4"},{"week_start":"2026-08-10T00:00:00.000Z","responder":"The Gale","pings":"15","taken":"9","turned_down":"3","missed":"3"},{"week_start":"2026-08-17T00:00:00.000Z","responder":"Farlight","pings":"3","taken":"0","turned_down":"1","missed":"2"},{"week_start":"2026-08-17T00:00:00.000Z","responder":"The Gale","pings":"17","taken":"12","turned_down":"3","missed":"2"},{"week_start":"2026-08-24T00:00:00.000Z","responder":"Farlight","pings":"1","taken":"0","turned_down":"0","missed":"1"},{"week_start":"2026-08-24T00:00:00.000Z","responder":"The Gale","pings":"20","taken":"14","turned_down":"4","missed":"2"},{"week_start":"2026-08-31T00:00:00.000Z","responder":"Farlight","pings":"0","taken":"0","turned_down":"0","missed":"0"},{"week_start":"2026-08-31T00:00:00.000Z","responder":"The Gale","pings":"21","taken":"16","turned_down":"3","missed":"2"}],"demand":[{"area":"Eastgate","period":"after","callouts":"48"},{"area":"Eastgate","period":"before","callouts":"112"},{"area":"Eastgate","period":"mixed","callouts":"15"},{"area":"Uptown","period":"after","callouts":"27"},{"area":"Uptown","period":"before","callouts":"57"},{"area":"Uptown","period":"mixed","callouts":"6"}],"responders":[{"name":"Farlight","handler":"Linda Pruitt","area":"Uptown"},{"name":"The Gale","handler":"Kip","area":"Eastgate"}]}</script>
+<script>
+(() => {
+  const root=document.getElementById('rook-farlight-gale');
+  const data=JSON.parse(document.getElementById('rook-farlight-gale-data').textContent);
+  const q=id=>root.querySelector('#'+id);
+  const el=(tag,cls,text)=>{const n=document.createElement(tag);if(cls)n.className=cls;if(text!==undefined)n.textContent=text;return n;};
+  const date=s=>s.slice(8,10).replace(/^0/,'')+' '+['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'][+s.slice(5,7)-1];
+  const pct=n=>n.toFixed(1)+'%';
+  const names=['Farlight','The Gale'];
+  const weeks=[...new Set(data.weekly.map(r=>r.week_start.slice(0,10)))];
+  const counts=Object.fromEntries(names.map(name=>[name,data.weekly.filter(r=>r.responder===name)]));
+  const max=Math.max(...data.weekly.map(r=>+r.pings));
+  const stages=Object.fromEntries(names.map(name=>[name,[0,1,2].map(i=>counts[name].filter((r,index)=>i===0?index<6:i===1?index===6:index>6).reduce((a,r)=>a.map((v,j)=>v+(+r[['pings','taken','turned_down','missed'][j]])),[0,0,0,0]))]));
+  function segment(cls,width,label) {const s=el('span','segment '+cls);s.style.width=width+'%';s.setAttribute('data-tooltip',label);return s;}
+  function bar(label,value,ceiling) {const row=el('div','bar-row'),track=el('div','track');track.append(segment('',100*value/ceiling,label+': '+value.toFixed(1)+' callouts/week'));row.append(el('span','text-small',label),track,el('span','number',value.toFixed(1)));return row;}
+  names.forEach((name,k)=>{
+    const target=q(k===0?'fg-farlight-weeks':'fg-gale-weeks');
+    const head=el('div','week text-small text-muted');head.append(el('span',null,'Week of'),el('span',null,'Pings · 0–'+max),el('span','number','Yes / all'));target.append(head);
+    counts[name].forEach((r,i)=>{
+      const row=el('div','week'+(i===6?' release':'')),track=el('div','track');
+      [['taken',''],['turned_down','declined'],['missed','missed']].forEach(([field,cls])=>track.append(segment(cls,100*r[field]/max,name+' · '+date(r.week_start)+' · '+field.replace('_',' ')+': '+r[field])));
+      track.setAttribute('role','img');track.setAttribute('aria-label',name+', week of '+date(r.week_start)+': '+r.pings+' pings, '+r.taken+' taken, '+r.turned_down+' turned down, '+r.missed+' missed.');
+      row.append(el('span',null,date(r.week_start)+(i===6?'*':'')),track,el('span','number',r.taken+' / '+r.pings));target.append(row);
+    });
+    stages[name].forEach((s,i)=>{
+      const group=el('div','period'),head=el('div','period-head'),track=el('div','percent-track'),labels=el('div','value-labels text-small');
+      head.append(el('span',null,['Before · 6 weeks','Mixed · 1 week','After · 3 weeks'][i]),el('span','text-small text-muted',s[0]+' pings'));
+      [['Taken',''],['Turned down','declined'],['Missed','missed']].forEach(([label,cls],j)=>{
+        track.append(segment(cls,100*s[j+1]/s[0],label+': '+s[j+1]+'/'+s[0]));labels.append(el('span',null,label+' '+pct(100*s[j+1]/s[0])));
+      });track.setAttribute('role','img');track.setAttribute('aria-label',name+' '+['before','mixed','after'][i]+': '+s[1]+' taken, '+s[2]+' turned down, '+s[3]+' missed out of '+s[0]);
+      group.append(head,track,labels);q(k===0?'fg-farlight-outcomes':'fg-gale-outcomes').append(group);
+    });
+  });
+  const metrics=[
+    ['Pings per week',(b,a)=>(b[0]/6).toFixed(1)+' → '+(a[0]/3).toFixed(1)],
+    ['Ping change',(b,a)=>(2*a[0]/b[0]-1<0?'−':'+')+Math.abs((2*a[0]/b[0]-1)*100).toFixed(1)+'%'],
+    ['Taken per week',(b,a)=>(b[1]/6).toFixed(1)+' → '+(a[1]/3).toFixed(1)],
+    ['Acceptance',(b,a)=>pct(100*b[1]/b[0])+' → '+pct(100*a[1]/a[0])],
+    ['Missed share',(b,a)=>pct(100*b[3]/b[0])+' → '+pct(100*a[3]/a[0])],
+    ['Total pings / taken in each period',(b,a)=>b[0]+' / '+b[1]+' → '+a[0]+' / '+a[1]]
+  ];
+  metrics.forEach(([label,fn])=>{const tr=el('tr'),th=el('th',null,label);th.scope='row';tr.append(th,...names.map(name=>el('td',null,fn(stages[name][0],stages[name][2]))));q('fg-summary-rows').append(tr);});
+  [['Uptown','fg-uptown'],['Eastgate','fg-eastgate']].forEach(([area,id])=>{
+    const b=data.demand.find(d=>d.area===area&&d.period==='before'),a=data.demand.find(d=>d.area===area&&d.period==='after');
+    q(id).append(bar('Before',b.callouts/6,20),bar('After',a.callouts/3,20));
+  });
+  const stories=[
+    'Both receive a similar number of offers and accept most: Farlight takes 9 of 12; The Gale takes 10 of 13.',
+    'They have identical weeks: 12 offers, 9 taken, 3 declined and no misses each.',
+    'Farlight receives 11 offers and misses one. The Gale receives 13 and misses none; both continue accepting work regularly.',
+    'Both are busy: Farlight takes 9 of 12; The Gale takes 11 of 14. Each misses one offer.',
+    'Both receive 13 offers. Farlight takes 10 and The Gale 11. There is no large allocation gap yet.',
+    'Their workloads are still similar: 12 offers for Farlight and 13 for The Gale. Farlight takes 8, Gale 10.',
+    'Release 4.2 ships on 12 August. Farlight takes 4 of 10 and misses 4; The Gale takes 9 of 15 and misses 3. Both see more misses, but Farlight’s share is higher.',
+    'The paths separate sharply: Farlight receives 3 offers and takes none; The Gale receives 17 and takes 12. Farlight’s handler begins reporting the quiet phone.',
+    'The gap widens: Farlight gets one offer, on 28 August, and misses it. The Gale gets 20 and takes 14.',
+    'Farlight receives no recorded offers. The Gale receives 21 and takes 16. Farlight has no opportunity to improve her acceptance history through a new acceptance.'
+  ];
+  weeks.forEach((w,i)=>{const o=el('option',null,date(w)+(i===6?' · mixed release week':''));o.value=String(i);q('fg-week-select').append(o);});
+  function selectWeek(index) {
+    const i=Number(index),target=q('fg-week-story');target.replaceChildren(el('span',null,stories[i]));
+    names.forEach(name=>{const r=counts[name][i];target.append(el('span','text-small',name+': '+r.pings+' pings · '+r.taken+' taken · '+r.turned_down+' turned down · '+r.missed+' missed'));});
+  }
+  q('fg-week-select').value='7';q('fg-week-select').addEventListener('change',e=>selectWeek(e.target.value));selectWeek(7);
+})();
+</script>

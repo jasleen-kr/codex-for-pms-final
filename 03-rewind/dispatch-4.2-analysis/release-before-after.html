@@ -1,0 +1,155 @@
+<div id="rook-release-aug12">
+  <style>
+    #rook-release-aug12 { color:var(--foreground); display:grid; gap:calc(var(--font-size-base) * 1.4); }
+    #rook-release-aug12 section { display:grid; gap:calc(var(--font-size-base) * .65); }
+    #rook-release-aug12 .title-group { display:grid; gap:calc(var(--font-size-base) * .3); padding-right:90px; }
+    #rook-release-aug12 .legend { display:flex; flex-wrap:wrap; gap:calc(var(--font-size-base) * 1); align-items:center; }
+    #rook-release-aug12 .key { display:inline-flex; align-items:center; gap:calc(var(--font-size-base) * .4); }
+    #rook-release-aug12 .swatch { width:10px; height:10px; display:inline-block; background:var(--viz-series-1); }
+    #rook-release-aug12 .after { background:var(--viz-series-2); }
+    #rook-release-aug12 .mixed { background:var(--muted-foreground); }
+    #rook-release-aug12 .decline { background:var(--viz-series-3); }
+    #rook-release-aug12 .miss { background:var(--viz-series-4); }
+    #rook-release-aug12 .weekly { display:grid; gap:calc(var(--font-size-base) * .5); }
+    #rook-release-aug12 .week { display:grid; grid-template-columns:76px minmax(0,1fr) 52px 90px; align-items:center; gap:calc(var(--font-size-base) * .65); }
+    #rook-release-aug12 .track { background:color-mix(in srgb,var(--foreground) 7%,transparent); height:18px; position:relative; }
+    #rook-release-aug12 .bar { height:100%; background:var(--viz-series-1); }
+    #rook-release-aug12 .bar.after { background:var(--viz-series-2); }
+    #rook-release-aug12 .bar.mixed { background:var(--muted-foreground); }
+    #rook-release-aug12 .number { text-align:right; font-variant-numeric:tabular-nums; white-space:nowrap; }
+    #rook-release-aug12 .week.release { padding-block:calc(var(--font-size-base) * .5); border-block:1px solid var(--border); }
+    #rook-release-aug12 .period { display:grid; gap:calc(var(--font-size-base) * .3); }
+    #rook-release-aug12 .period-head { display:flex; align-items:baseline; flex-wrap:wrap; justify-content:space-between; gap:calc(var(--font-size-base) * .5); }
+    #rook-release-aug12 .stack { display:flex; height:22px; width:100%; background:var(--muted); }
+    #rook-release-aug12 .stack span { display:block; height:100%; }
+    #rook-release-aug12 .taken { background:var(--viz-series-1); }
+    #rook-release-aug12 .stack-values { display:flex; flex-wrap:wrap; gap:calc(var(--font-size-base) * 1); font-variant-numeric:tabular-nums; }
+    #rook-release-aug12 .group { display:grid; gap:calc(var(--font-size-base) * .4); }
+    #rook-release-aug12 .allocation-row { display:grid; grid-template-columns:52px minmax(0,1fr) 64px; align-items:center; gap:calc(var(--font-size-base) * .65); }
+    #rook-release-aug12 .comparison-label { display:flex; flex-wrap:wrap; justify-content:space-between; gap:calc(var(--font-size-base) * .5); }
+    #rook-release-aug12 details { margin-top:calc(var(--font-size-base) * .3); }
+    #rook-release-aug12 summary { color:var(--foreground); }
+    #rook-release-aug12 .sr-data { margin-top:calc(var(--font-size-base) * .6); }
+    @media (max-width:460px) {
+      #rook-release-aug12 .week { grid-template-columns:68px minmax(0,1fr) 46px; gap:calc(var(--font-size-base) * .4); }
+      #rook-release-aug12 .counts { display:none; }
+      #rook-release-aug12 .title-group { padding-right:0; }
+    }
+  </style>
+
+  <div class="title-group">
+    <h2>Dispatch before &amp; after 12 August</h2>
+    <span class="text-small text-muted">Rook database · 1,696 pings · 29 June–6 September 2026</span>
+    <span class="text-small">Release 4.2: ping wait 90 → 60 seconds; routing weights changed</span>
+  </div>
+
+  <section aria-labelledby="rook-week-title">
+    <h3 id="rook-week-title">1. Acceptance drops in the release week</h3>
+    <div class="legend text-small" aria-label="Weekly chart legend">
+      <span class="key"><i class="swatch" aria-hidden="true"></i>Before</span>
+      <span class="key"><i class="swatch mixed" aria-hidden="true"></i>Mixed release week</span>
+      <span class="key"><i class="swatch after" aria-hidden="true"></i>After</span>
+    </div>
+    <div class="weekly" role="img" aria-label="Weekly acceptance rates. Before release, 75.0 to 77.9 percent. Mixed release week, 54.2 percent. After release, 65.8, 66.7 and 72.7 percent. Bars use a common scale from 0 to 100 percent.">
+      <div class="week text-small text-muted"><span>Week of</span><span>Acceptance · 0–100%</span><span></span><span class="number counts">Taken / pings</span></div>
+      <div class="week"><span>29 Jun</span><div class="track" data-tooltip="29 June–5 July: 132 taken out of 172 pings, 76.7%"><div class="bar" style="width:76.7442%"></div></div><span class="number">76.7%</span><span class="number counts text-small">132 / 172</span></div>
+      <div class="week"><span>6 Jul</span><div class="track" data-tooltip="6–12 July: 131 taken out of 170 pings, 77.1%"><div class="bar" style="width:77.0588%"></div></div><span class="number">77.1%</span><span class="number counts text-small">131 / 170</span></div>
+      <div class="week"><span>13 Jul</span><div class="track" data-tooltip="13–19 July: 133 taken out of 174 pings, 76.4%"><div class="bar" style="width:76.4368%"></div></div><span class="number">76.4%</span><span class="number counts text-small">133 / 174</span></div>
+      <div class="week"><span>20 Jul</span><div class="track" data-tooltip="20–26 July: 132 taken out of 176 pings, 75.0%"><div class="bar" style="width:75%"></div></div><span class="number">75.0%</span><span class="number counts text-small">132 / 176</span></div>
+      <div class="week"><span>27 Jul</span><div class="track" data-tooltip="27 July–2 August: 132 taken out of 170 pings, 77.6%"><div class="bar" style="width:77.6471%"></div></div><span class="number">77.6%</span><span class="number counts text-small">132 / 170</span></div>
+      <div class="week"><span>3 Aug</span><div class="track" data-tooltip="3–9 August: 134 taken out of 172 pings, 77.9%"><div class="bar" style="width:77.907%"></div></div><span class="number">77.9%</span><span class="number counts text-small">134 / 172</span></div>
+      <div class="week release"><span>10 Aug*</span><div class="track" data-tooltip="10–16 August includes the 12 August release: 96 taken out of 177 pings, 54.2%"><div class="bar mixed" style="width:54.2373%"></div></div><span class="number">54.2%</span><span class="number counts text-small">96 / 177</span></div>
+      <div class="week"><span>17 Aug</span><div class="track" data-tooltip="17–23 August: 104 taken out of 158 pings, 65.8%"><div class="bar after" style="width:65.8228%"></div></div><span class="number">65.8%</span><span class="number counts text-small">104 / 158</span></div>
+      <div class="week"><span>24 Aug</span><div class="track" data-tooltip="24–30 August: 108 taken out of 162 pings, 66.7%"><div class="bar after" style="width:66.6667%"></div></div><span class="number">66.7%</span><span class="number counts text-small">108 / 162</span></div>
+      <div class="week"><span>31 Aug</span><div class="track" data-tooltip="31 August–6 September: 120 taken out of 165 pings, 72.7%"><div class="bar after" style="width:72.7273%"></div></div><span class="number">72.7%</span><span class="number counts text-small">120 / 165</span></div>
+    </div>
+    <span class="text-small text-muted">*10–16 August spans both sides of release. Acceptance = taken ÷ all pings.</span>
+  </section>
+
+  <section aria-labelledby="rook-outcomes-title">
+    <h3 id="rook-outcomes-title">2. Missed offers rise from 2.3% to 17.6%</h3>
+    <div class="legend text-small">
+      <span class="key"><i class="swatch" aria-hidden="true"></i>Taken</span>
+      <span class="key"><i class="swatch decline" aria-hidden="true"></i>Turned down</span>
+      <span class="key"><i class="swatch miss" aria-hidden="true"></i>Missed</span>
+    </div>
+    <div class="period">
+      <div class="period-head"><span>Before · 29 Jun–11 Aug</span><span class="text-small text-muted">1,085 pings</span></div>
+      <div class="stack" role="img" aria-label="Before: 76.6% taken, 21.1% turned down, 2.3% missed."><span class="taken" style="width:76.5899%" data-tooltip="Taken: 831 of 1,085, 76.6%"></span><span class="decline" style="width:21.106%" data-tooltip="Turned down: 229 of 1,085, 21.1%"></span><span class="miss" style="width:2.3041%" data-tooltip="Missed: 25 of 1,085, 2.3%"></span></div>
+      <div class="stack-values text-small"><span>Taken 76.6%</span><span>Turned down 21.1%</span><span>Missed 2.3%</span></div>
+    </div>
+    <div class="period">
+      <div class="period-head"><span>Release day · 12 Aug</span><span class="text-small text-muted">25 pings</span></div>
+      <div class="stack" role="img" aria-label="Release day: 44% taken, 28% turned down, 28% missed."><span class="taken" style="width:44%" data-tooltip="Taken: 11 of 25, 44.0%"></span><span class="decline" style="width:28%" data-tooltip="Turned down: 7 of 25, 28.0%"></span><span class="miss" style="width:28%" data-tooltip="Missed: 7 of 25, 28.0%"></span></div>
+      <div class="stack-values text-small"><span>Taken 44.0%</span><span>Turned down 28.0%</span><span>Missed 28.0%</span></div>
+    </div>
+    <div class="period">
+      <div class="period-head"><span>After · 13 Aug–6 Sep</span><span class="text-small text-muted">586 pings</span></div>
+      <div class="stack" role="img" aria-label="After: 64.8% taken, 17.6% turned down, 17.6% missed."><span class="taken" style="width:64.8464%" data-tooltip="Taken: 380 of 586, 64.8%"></span><span class="decline" style="width:17.5768%" data-tooltip="Turned down: 103 of 586, 17.6%"></span><span class="miss" style="width:17.5768%" data-tooltip="Missed: 103 of 586, 17.6%"></span></div>
+      <div class="stack-values text-small"><span>Taken 64.8%</span><span>Turned down 17.6%</span><span>Missed 17.6%</span></div>
+    </div>
+    <span class="text-small text-muted">Missed = no answer within the wait period. Release-day deployment time unknown.</span>
+  </section>
+
+  <section aria-labelledby="rook-allocation-title">
+    <h3 id="rook-allocation-title">3. Pings shift away from four responders</h3>
+    <span class="text-small text-muted">Average pings per week · shared scale, 0–160</span>
+    <div class="group">
+      <div class="comparison-label"><span>Farlight, Meteor Mite, The Undertow &amp; Vesper</span><span class="number">−83.0%</span></div>
+      <div class="allocation-row"><span class="text-small">Before</span><div class="track" data-tooltip="Four responders, before: 294 pings across six weeks, 49.0 per week"><div class="bar" style="width:30.625%"></div></div><span class="number">49.0</span></div>
+      <div class="allocation-row"><span class="text-small">After</span><div class="track" data-tooltip="Four responders, after: 25 pings across three weeks, 8.3 per week"><div class="bar after" style="width:5.20833%"></div></div><span class="number">8.3</span></div>
+    </div>
+    <div class="group">
+      <div class="comparison-label"><span>Other 12 responders</span><span class="number">+24.3%</span></div>
+      <div class="allocation-row"><span class="text-small">Before</span><div class="track" data-tooltip="Other 12 responders, before: 740 pings across six weeks, 123.3 per week"><div class="bar" style="width:77.08333%"></div></div><span class="number">123.3</span></div>
+      <div class="allocation-row"><span class="text-small">After</span><div class="track" data-tooltip="Other 12 responders, after: 460 pings across three weeks, 153.3 per week"><div class="bar after" style="width:95.83333%"></div></div><span class="number">153.3</span></div>
+    </div>
+    <span class="text-small text-muted">Complete weeks only: before 29 Jun–9 Aug (6 weeks); after 17 Aug–6 Sep (3 weeks). Groups identified from observed changes.</span>
+    <details>
+      <summary>All 16 responders · average pings/week</summary>
+      <span class="text-small text-muted">Responder bars share a 0–20 pings/week scale.</span>
+      <div class="sr-data" id="rook-responder-detail"></div>
+    </details>
+  </section>
+</div>
+<script>
+(() => {
+  const root = document.getElementById('rook-release-aug12');
+  const data = [
+    ['Captain Vantage',72,50],['Cindermark',54,35],['Corporal Ashgrove',60,22],['Farlight',72,4],
+    ['Halfmoon',66,25],['Ironvale',48,33],['Meteor Mite',67,7],['Nightwell',90,59],
+    ['Sgt. Bulwark',54,32],['Sgt. Falkirk',60,44],['Stormwrack',78,53],['The Drift',37,23],
+    ['The Gale',78,58],['The Longcast',43,26],['The Undertow',72,6],['Vesper',83,8]
+  ];
+  const target = root.querySelector('#rook-responder-detail');
+  const max = Math.ceil(Math.max(...data.flatMap(d => [d[1]/6,d[2]/3])) / 5) * 5;
+  target.style.display = 'grid';
+  target.style.gap = 'calc(var(--font-size-base) * .8)';
+  for (const [name,pre,post] of data) {
+    const group = document.createElement('div');
+    group.className = 'group';
+    const label = document.createElement('span');
+    label.textContent = name;
+    group.append(label);
+    for (const [period,value] of [['Before',pre/6],['After',post/3]]) {
+      const row = document.createElement('div');
+      row.className = 'allocation-row';
+      const periodLabel = document.createElement('span');
+      periodLabel.className = 'text-small';
+      periodLabel.textContent = period;
+      const track = document.createElement('div');
+      track.className = 'track';
+      const bar = document.createElement('div');
+      bar.className = period === 'After' ? 'bar after' : 'bar';
+      bar.style.width = (value/max*100) + '%';
+      track.append(bar);
+      const number = document.createElement('span');
+      number.className = 'number';
+      number.textContent = value.toFixed(1);
+      row.append(periodLabel,track,number);
+      group.append(row);
+    }
+    target.append(group);
+  }
+})();
+</script>

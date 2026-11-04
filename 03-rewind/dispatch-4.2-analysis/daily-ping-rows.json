@@ -1,0 +1,492 @@
+[
+  {
+    "date": "2026-06-29T00:00:00.000Z",
+    "pings": "23",
+    "taken": "19",
+    "turned_down": "4",
+    "missed": "0"
+  },
+  {
+    "date": "2026-06-30T00:00:00.000Z",
+    "pings": "22",
+    "taken": "15",
+    "turned_down": "6",
+    "missed": "1"
+  },
+  {
+    "date": "2026-07-01T00:00:00.000Z",
+    "pings": "35",
+    "taken": "26",
+    "turned_down": "9",
+    "missed": "0"
+  },
+  {
+    "date": "2026-07-02T00:00:00.000Z",
+    "pings": "23",
+    "taken": "22",
+    "turned_down": "1",
+    "missed": "0"
+  },
+  {
+    "date": "2026-07-03T00:00:00.000Z",
+    "pings": "25",
+    "taken": "21",
+    "turned_down": "4",
+    "missed": "0"
+  },
+  {
+    "date": "2026-07-04T00:00:00.000Z",
+    "pings": "25",
+    "taken": "16",
+    "turned_down": "7",
+    "missed": "2"
+  },
+  {
+    "date": "2026-07-05T00:00:00.000Z",
+    "pings": "19",
+    "taken": "13",
+    "turned_down": "6",
+    "missed": "0"
+  },
+  {
+    "date": "2026-07-06T00:00:00.000Z",
+    "pings": "26",
+    "taken": "22",
+    "turned_down": "3",
+    "missed": "1"
+  },
+  {
+    "date": "2026-07-07T00:00:00.000Z",
+    "pings": "33",
+    "taken": "24",
+    "turned_down": "7",
+    "missed": "2"
+  },
+  {
+    "date": "2026-07-08T00:00:00.000Z",
+    "pings": "27",
+    "taken": "20",
+    "turned_down": "6",
+    "missed": "1"
+  },
+  {
+    "date": "2026-07-09T00:00:00.000Z",
+    "pings": "21",
+    "taken": "16",
+    "turned_down": "5",
+    "missed": "0"
+  },
+  {
+    "date": "2026-07-10T00:00:00.000Z",
+    "pings": "12",
+    "taken": "6",
+    "turned_down": "6",
+    "missed": "0"
+  },
+  {
+    "date": "2026-07-11T00:00:00.000Z",
+    "pings": "21",
+    "taken": "16",
+    "turned_down": "5",
+    "missed": "0"
+  },
+  {
+    "date": "2026-07-12T00:00:00.000Z",
+    "pings": "30",
+    "taken": "27",
+    "turned_down": "3",
+    "missed": "0"
+  },
+  {
+    "date": "2026-07-13T00:00:00.000Z",
+    "pings": "26",
+    "taken": "21",
+    "turned_down": "3",
+    "missed": "2"
+  },
+  {
+    "date": "2026-07-14T00:00:00.000Z",
+    "pings": "19",
+    "taken": "15",
+    "turned_down": "3",
+    "missed": "1"
+  },
+  {
+    "date": "2026-07-15T00:00:00.000Z",
+    "pings": "21",
+    "taken": "18",
+    "turned_down": "3",
+    "missed": "0"
+  },
+  {
+    "date": "2026-07-16T00:00:00.000Z",
+    "pings": "27",
+    "taken": "19",
+    "turned_down": "8",
+    "missed": "0"
+  },
+  {
+    "date": "2026-07-17T00:00:00.000Z",
+    "pings": "29",
+    "taken": "18",
+    "turned_down": "9",
+    "missed": "2"
+  },
+  {
+    "date": "2026-07-18T00:00:00.000Z",
+    "pings": "24",
+    "taken": "19",
+    "turned_down": "4",
+    "missed": "1"
+  },
+  {
+    "date": "2026-07-19T00:00:00.000Z",
+    "pings": "28",
+    "taken": "23",
+    "turned_down": "5",
+    "missed": "0"
+  },
+  {
+    "date": "2026-07-20T00:00:00.000Z",
+    "pings": "24",
+    "taken": "16",
+    "turned_down": "8",
+    "missed": "0"
+  },
+  {
+    "date": "2026-07-21T00:00:00.000Z",
+    "pings": "20",
+    "taken": "12",
+    "turned_down": "8",
+    "missed": "0"
+  },
+  {
+    "date": "2026-07-22T00:00:00.000Z",
+    "pings": "30",
+    "taken": "23",
+    "turned_down": "6",
+    "missed": "1"
+  },
+  {
+    "date": "2026-07-23T00:00:00.000Z",
+    "pings": "27",
+    "taken": "21",
+    "turned_down": "5",
+    "missed": "1"
+  },
+  {
+    "date": "2026-07-24T00:00:00.000Z",
+    "pings": "28",
+    "taken": "17",
+    "turned_down": "8",
+    "missed": "3"
+  },
+  {
+    "date": "2026-07-25T00:00:00.000Z",
+    "pings": "25",
+    "taken": "24",
+    "turned_down": "1",
+    "missed": "0"
+  },
+  {
+    "date": "2026-07-26T00:00:00.000Z",
+    "pings": "22",
+    "taken": "19",
+    "turned_down": "3",
+    "missed": "0"
+  },
+  {
+    "date": "2026-07-27T00:00:00.000Z",
+    "pings": "29",
+    "taken": "27",
+    "turned_down": "2",
+    "missed": "0"
+  },
+  {
+    "date": "2026-07-28T00:00:00.000Z",
+    "pings": "25",
+    "taken": "19",
+    "turned_down": "5",
+    "missed": "1"
+  },
+  {
+    "date": "2026-07-29T00:00:00.000Z",
+    "pings": "20",
+    "taken": "16",
+    "turned_down": "4",
+    "missed": "0"
+  },
+  {
+    "date": "2026-07-30T00:00:00.000Z",
+    "pings": "21",
+    "taken": "18",
+    "turned_down": "2",
+    "missed": "1"
+  },
+  {
+    "date": "2026-07-31T00:00:00.000Z",
+    "pings": "21",
+    "taken": "15",
+    "turned_down": "5",
+    "missed": "1"
+  },
+  {
+    "date": "2026-08-01T00:00:00.000Z",
+    "pings": "23",
+    "taken": "17",
+    "turned_down": "6",
+    "missed": "0"
+  },
+  {
+    "date": "2026-08-02T00:00:00.000Z",
+    "pings": "31",
+    "taken": "20",
+    "turned_down": "10",
+    "missed": "1"
+  },
+  {
+    "date": "2026-08-03T00:00:00.000Z",
+    "pings": "20",
+    "taken": "14",
+    "turned_down": "6",
+    "missed": "0"
+  },
+  {
+    "date": "2026-08-04T00:00:00.000Z",
+    "pings": "17",
+    "taken": "16",
+    "turned_down": "1",
+    "missed": "0"
+  },
+  {
+    "date": "2026-08-05T00:00:00.000Z",
+    "pings": "38",
+    "taken": "27",
+    "turned_down": "10",
+    "missed": "1"
+  },
+  {
+    "date": "2026-08-06T00:00:00.000Z",
+    "pings": "28",
+    "taken": "23",
+    "turned_down": "5",
+    "missed": "0"
+  },
+  {
+    "date": "2026-08-07T00:00:00.000Z",
+    "pings": "30",
+    "taken": "25",
+    "turned_down": "5",
+    "missed": "0"
+  },
+  {
+    "date": "2026-08-08T00:00:00.000Z",
+    "pings": "23",
+    "taken": "16",
+    "turned_down": "6",
+    "missed": "1"
+  },
+  {
+    "date": "2026-08-09T00:00:00.000Z",
+    "pings": "16",
+    "taken": "13",
+    "turned_down": "3",
+    "missed": "0"
+  },
+  {
+    "date": "2026-08-10T00:00:00.000Z",
+    "pings": "32",
+    "taken": "24",
+    "turned_down": "8",
+    "missed": "0"
+  },
+  {
+    "date": "2026-08-11T00:00:00.000Z",
+    "pings": "19",
+    "taken": "13",
+    "turned_down": "5",
+    "missed": "1"
+  },
+  {
+    "date": "2026-08-12T00:00:00.000Z",
+    "pings": "25",
+    "taken": "11",
+    "turned_down": "7",
+    "missed": "7"
+  },
+  {
+    "date": "2026-08-13T00:00:00.000Z",
+    "pings": "25",
+    "taken": "10",
+    "turned_down": "3",
+    "missed": "12"
+  },
+  {
+    "date": "2026-08-14T00:00:00.000Z",
+    "pings": "30",
+    "taken": "16",
+    "turned_down": "6",
+    "missed": "8"
+  },
+  {
+    "date": "2026-08-15T00:00:00.000Z",
+    "pings": "24",
+    "taken": "11",
+    "turned_down": "7",
+    "missed": "6"
+  },
+  {
+    "date": "2026-08-16T00:00:00.000Z",
+    "pings": "22",
+    "taken": "11",
+    "turned_down": "7",
+    "missed": "4"
+  },
+  {
+    "date": "2026-08-17T00:00:00.000Z",
+    "pings": "24",
+    "taken": "19",
+    "turned_down": "4",
+    "missed": "1"
+  },
+  {
+    "date": "2026-08-18T00:00:00.000Z",
+    "pings": "25",
+    "taken": "17",
+    "turned_down": "6",
+    "missed": "2"
+  },
+  {
+    "date": "2026-08-19T00:00:00.000Z",
+    "pings": "24",
+    "taken": "15",
+    "turned_down": "3",
+    "missed": "6"
+  },
+  {
+    "date": "2026-08-20T00:00:00.000Z",
+    "pings": "19",
+    "taken": "11",
+    "turned_down": "4",
+    "missed": "4"
+  },
+  {
+    "date": "2026-08-21T00:00:00.000Z",
+    "pings": "25",
+    "taken": "17",
+    "turned_down": "1",
+    "missed": "7"
+  },
+  {
+    "date": "2026-08-22T00:00:00.000Z",
+    "pings": "16",
+    "taken": "9",
+    "turned_down": "5",
+    "missed": "2"
+  },
+  {
+    "date": "2026-08-23T00:00:00.000Z",
+    "pings": "25",
+    "taken": "16",
+    "turned_down": "3",
+    "missed": "6"
+  },
+  {
+    "date": "2026-08-24T00:00:00.000Z",
+    "pings": "25",
+    "taken": "15",
+    "turned_down": "4",
+    "missed": "6"
+  },
+  {
+    "date": "2026-08-25T00:00:00.000Z",
+    "pings": "18",
+    "taken": "11",
+    "turned_down": "4",
+    "missed": "3"
+  },
+  {
+    "date": "2026-08-26T00:00:00.000Z",
+    "pings": "23",
+    "taken": "18",
+    "turned_down": "3",
+    "missed": "2"
+  },
+  {
+    "date": "2026-08-27T00:00:00.000Z",
+    "pings": "20",
+    "taken": "12",
+    "turned_down": "6",
+    "missed": "2"
+  },
+  {
+    "date": "2026-08-28T00:00:00.000Z",
+    "pings": "22",
+    "taken": "15",
+    "turned_down": "5",
+    "missed": "2"
+  },
+  {
+    "date": "2026-08-29T00:00:00.000Z",
+    "pings": "22",
+    "taken": "14",
+    "turned_down": "3",
+    "missed": "5"
+  },
+  {
+    "date": "2026-08-30T00:00:00.000Z",
+    "pings": "32",
+    "taken": "23",
+    "turned_down": "5",
+    "missed": "4"
+  },
+  {
+    "date": "2026-08-31T00:00:00.000Z",
+    "pings": "19",
+    "taken": "12",
+    "turned_down": "5",
+    "missed": "2"
+  },
+  {
+    "date": "2026-09-01T00:00:00.000Z",
+    "pings": "25",
+    "taken": "17",
+    "turned_down": "4",
+    "missed": "4"
+  },
+  {
+    "date": "2026-09-02T00:00:00.000Z",
+    "pings": "17",
+    "taken": "12",
+    "turned_down": "2",
+    "missed": "3"
+  },
+  {
+    "date": "2026-09-03T00:00:00.000Z",
+    "pings": "25",
+    "taken": "20",
+    "turned_down": "3",
+    "missed": "2"
+  },
+  {
+    "date": "2026-09-04T00:00:00.000Z",
+    "pings": "30",
+    "taken": "24",
+    "turned_down": "3",
+    "missed": "3"
+  },
+  {
+    "date": "2026-09-05T00:00:00.000Z",
+    "pings": "30",
+    "taken": "26",
+    "turned_down": "2",
+    "missed": "2"
+  },
+  {
+    "date": "2026-09-06T00:00:00.000Z",
+    "pings": "19",
+    "taken": "9",
+    "turned_down": "5",
+    "missed": "5"
+  }
+]

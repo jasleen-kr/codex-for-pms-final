@@ -1,0 +1,295 @@
+<div id="rook-issue-dashboard">
+  <style>
+    #rook-issue-dashboard { display:grid; gap:calc(var(--font-size-base) * 1.6); color:var(--foreground); position:relative; }
+    #rook-issue-dashboard section, #rook-issue-dashboard .group { display:grid; gap:calc(var(--font-size-base) * .65); min-width:0; }
+    #rook-issue-dashboard .heading { display:grid; gap:calc(var(--font-size-base) * .3); padding-right:90px; }
+    #rook-issue-dashboard .plots { display:grid; grid-template-columns:minmax(0,1fr) minmax(0,1fr); gap:calc(var(--font-size-base) * 1.4); }
+    #rook-issue-dashboard figure { margin:0; min-width:0; display:grid; gap:calc(var(--font-size-base) * .35); align-content:start; }
+    #rook-issue-dashboard figcaption { font-weight:500; }
+    #rook-issue-dashboard .chart { min-width:0; }
+    #rook-issue-dashboard .plot-svg { display:block; width:100%; }
+    #rook-issue-dashboard .plot-svg text { fill:var(--foreground); font-size:12px; }
+    #rook-issue-dashboard .plot-svg .domain, #rook-issue-dashboard .plot-svg .tick line { stroke:var(--border); }
+    #rook-issue-dashboard .legend, #rook-issue-dashboard .meta { display:flex; align-items:center; flex-wrap:wrap; gap:calc(var(--font-size-base) * .8); }
+    #rook-issue-dashboard .key { display:inline-flex; align-items:center; gap:calc(var(--font-size-base) * .35); }
+    #rook-issue-dashboard .swatch { display:inline-block; width:12px; height:12px; background:var(--viz-series-1); }
+    #rook-issue-dashboard .s2 { background:var(--viz-series-2); }
+    #rook-issue-dashboard .s3 { background:var(--viz-series-3); }
+    #rook-issue-dashboard .s4 { background:var(--viz-series-4); }
+    #rook-issue-dashboard .s5 { background:var(--viz-series-5); }
+    #rook-issue-dashboard .mixed { background:color-mix(in srgb,var(--foreground) 10%,transparent); }
+    #rook-issue-dashboard .number { text-align:right; font-variant-numeric:tabular-nums; white-space:nowrap; }
+    #rook-issue-dashboard .losses { display:grid; gap:calc(var(--font-size-base) * .9); }
+    #rook-issue-dashboard .loss { display:grid; gap:calc(var(--font-size-base) * .3); }
+    #rook-issue-dashboard .bar-row { display:grid; grid-template-columns:60px minmax(0,1fr) 59px; align-items:center; gap:calc(var(--font-size-base) * .4); }
+    #rook-issue-dashboard .track { height:16px; display:flex; background:color-mix(in srgb,var(--foreground) 7%,transparent); }
+    #rook-issue-dashboard .fill { height:100%; background:var(--viz-series-1); display:block; }
+    #rook-issue-dashboard .fill.s2 { background:var(--viz-series-2); }
+    #rook-issue-dashboard .fill.s3 { background:var(--viz-series-3); }
+    #rook-issue-dashboard .fill.s4 { background:var(--viz-series-4); }
+    #rook-issue-dashboard .fill.s5 { background:var(--viz-series-5); }
+    #rook-issue-dashboard .period { display:grid; gap:calc(var(--font-size-base) * .35); }
+    #rook-issue-dashboard .period-head { display:flex; align-items:baseline; flex-wrap:wrap; justify-content:space-between; gap:calc(var(--font-size-base) * .5); }
+    #rook-issue-dashboard .outcome-stack { display:flex; height:24px; width:100%; }
+    #rook-issue-dashboard .outcome-labels { display:flex; flex-wrap:wrap; gap:calc(var(--font-size-base) * .65); font-variant-numeric:tabular-nums; }
+    #rook-issue-dashboard .chooser { display:grid; gap:calc(var(--font-size-base) * .4); }
+    #rook-issue-dashboard .chooser select { width:100%; min-width:0; }
+    #rook-issue-dashboard .flow { display:grid; grid-template-columns:repeat(5,minmax(0,1fr)); gap:calc(var(--font-size-base) * .9); }
+    #rook-issue-dashboard .flow-step { display:grid; align-content:start; gap:calc(var(--font-size-base) * .35); }
+    #rook-issue-dashboard .step-head { padding-bottom:calc(var(--font-size-base) * .4); border-bottom:1px solid var(--border); }
+    #rook-issue-dashboard .chart-tip { position:absolute; pointer-events:none; max-width:260px; background:var(--popover); color:var(--popover-foreground); padding:calc(var(--font-size-base) * .6); z-index:10; }
+    #rook-issue-dashboard .source-table { min-width:680px; }
+    #rook-issue-dashboard .case-table { min-width:520px; }
+    #rook-issue-dashboard .fallback { display:grid; gap:calc(var(--font-size-base) * .3); }
+    #rook-issue-dashboard .fallback-row { display:grid; grid-template-columns:100px minmax(0,1fr) 55px; gap:calc(var(--font-size-base) * .5); align-items:center; }
+    @media(max-width:760px) { #rook-issue-dashboard .plots { grid-template-columns:1fr; } }
+    @media(max-width:580px) { #rook-issue-dashboard .flow { grid-template-columns:1fr; } #rook-issue-dashboard .heading { padding-right:0; } }
+  </style>
+
+  <div class="heading">
+    <h2>Dispatch 4.2 · issue analysis</h2>
+    <span class="text-small">Measured decline, uneven allocation, and a possible routing feedback loop</span>
+    <span class="text-small text-muted">Rook course scenario · 1,696 pings · 16 responders · 147 tickets · data ends 6–7 September 2026</span>
+  </div>
+
+  <div class="viz-grid">
+    <div class="card viz-stat"><div>Acceptance · complete weeks</div><div class="viz-stat-value">−8.3 pp</div><div class="text-small">76.8% → 68.5% · 794/1,034 → 332/485</div></div>
+    <div class="card viz-stat"><div>Taken per week</div><div class="viz-stat-value">−16.4%</div><div class="text-small">132.3 → 110.7 · complete weeks</div></div>
+    <div class="card viz-stat"><div>Four responders’ pings/week</div><div class="viz-stat-value">−83.0%</div><div class="text-small">49.0 → 8.3 · Farlight, Mite, Undertow, Vesper</div></div>
+  </div>
+  <span class="text-small text-muted">Main comparison: six complete weeks, 29 Jun–9 Aug, versus three, 17 Aug–6 Sep. Mixed release week excluded from before/after summaries; retained in trend charts.</span>
+
+  <section aria-labelledby="di-trends-title">
+    <h3 id="di-trends-title">1 · When the numbers move</h3>
+    <div class="legend text-small"><span class="key"><i class="swatch mixed" aria-hidden="true"></i>Shaded week contains 12 August release</span><span class="text-muted">Every point summarizes a Monday–Sunday week</span></div>
+    <div class="plots">
+      <figure><figcaption>Weekly acceptance</figcaption><div class="chart" id="di-accept"></div><span class="text-small text-muted">Final week 72.7% remains below every complete pre-release week.</span></figure>
+      <figure><figcaption>Weekly missed-offer share</figcaption><div class="chart" id="di-missed"></div><span class="text-small text-muted">Release-week misses rise to 38/177 (21.5%).</span></figure>
+      <figure><figcaption>Pings to the four severely affected responders</figcaption><div class="chart" id="di-four"></div><span class="text-small text-muted">Farlight, Meteor Mite, The Undertow and Vesper: 43 → 16 → 6 → 3.</span></figure>
+      <figure><figcaption>All support tickets</figcaption><div class="chart" id="di-tickets"></div><span class="text-small text-muted">Includes non-routing issues. Four further tickets on 7 Sep; no comparable ping coverage.</span></figure>
+    </div>
+    <details><summary>Exact weekly values behind all four graphs</summary><div class="table-responsive"><table class="table table-sm source-table"><thead><tr><th>Week of</th><th class="text-end">Pings</th><th class="text-end">Taken</th><th class="text-end">Missed</th><th class="text-end">Accepted %</th><th class="text-end">Four’s pings</th><th class="text-end">Tickets</th><th class="text-end">Quiet</th><th class="text-end">Disappearing</th></tr></thead><tbody id="di-week-rows"></tbody></table></div></details>
+  </section>
+
+  <section aria-labelledby="di-break-title">
+    <h3 id="di-break-title">2 · Release-day break and reporting sequence</h3>
+    <div class="table-responsive"><table class="table table-sm case-table"><thead><tr><th>Window</th><th class="text-end">Taken / pings</th><th class="text-end">Missed / pings</th><th>Support signal</th></tr></thead><tbody>
+      <tr><td>29 Jun–11 Aug</td><td class="number">831/1,085 · 76.6%</td><td class="number">25/1,085 · 2.3%</td><td>Earlier signal/device complaints already existed.</td></tr>
+      <tr><td>12 Aug · release day</td><td class="number">11/25 · 44.0%</td><td class="number">7/25 · 28.0%</td><td>3041 · The Drift, filed that afternoon.</td></tr>
+      <tr><td>13 Aug</td><td class="number">10/25 · 40.0%</td><td class="number">12/25 · 48.0%</td><td>3043 · Captain Vantage, about the previous evening.</td></tr>
+      <tr><td>13–16 Aug</td><td class="number">48/101 · 47.5%</td><td class="number">30/101 · 29.7%</td><td>Disappearing-offer reports continue.</td></tr>
+      <tr><td>13 Aug–6 Sep</td><td class="number">380/586 · 64.8%</td><td class="number">103/586 · 17.6%</td><td>17 Aug: first quiet report; others follow 20–23 Aug.</td></tr>
+    </tbody></table></div>
+    <span class="text-small text-muted">These exact-date windows differ from the complete-week summaries. Deployment time unknown; release day is separate. Individual daily samples are small.</span>
+  </section>
+
+  <section aria-labelledby="di-distribution-title">
+    <h3 id="di-distribution-title">3 · The impact is highly uneven</h3>
+    <div class="plots">
+      <figure><figcaption>All responders · change in pings per week</figcaption><div class="chart" id="di-all-responders"></div><span class="text-small text-muted">Six receive fewer pings; four declines are much larger than the others.</span></figure>
+      <figure><figcaption>Six declines versus local callout demand</figcaption><div class="legend text-small"><span class="key"><i class="swatch" aria-hidden="true"></i>Ping decline</span><span class="key"><i class="swatch s2" aria-hidden="true"></i>Usual-area demand decline</span></div><span class="text-small text-muted">Shared scale · 0–100% decline</span><div class="losses" id="di-demand-losses"></div><span class="text-small text-muted">Usual area is context, not a control for availability, capabilities or travel time.</span></figure>
+    </div>
+    <div class="table-responsive"><table class="table table-sm"><thead><tr><th>Comparison</th><th>Before → after</th><th>Implication</th></tr></thead><tbody>
+      <tr><td>All callouts/week</td><td>139.5 → 124.0 · −11.1%</td><td>Some overall demand reduction is present.</td></tr>
+      <tr><td>All pings/week</td><td>172.3 → 161.7 · −6.2%</td><td>Overall ping volume does not explain an 83% decline for four responders.</td></tr>
+      <tr><td>Other 12 responders’ pings/week</td><td>123.3 → 153.3 · +24.3%</td><td>Workload allocation shifts toward other responders.</td></tr>
+      <tr><td>Same area and handler</td><td>Meteor Mite −79.1%; The Gale +48.7%</td><td>Eastgate demand fell 14.3%; Kip reports Mite quiet while Gale is exhausted.</td></tr>
+    </tbody></table></div>
+  </section>
+
+  <section aria-labelledby="di-person-title">
+    <h3 id="di-person-title">4 · Inspect each responder</h3>
+    <div class="chooser"><label class="form-label" for="di-person-select">Responder</label><select class="form-select" id="di-person-select"></select></div>
+    <div class="heading" aria-live="polite"><h3 id="di-person-name"></h3><span class="text-small" id="di-person-summary"></span></div>
+    <div class="plots">
+      <figure><figcaption>Weekly pings received</figcaption><div class="chart" id="di-person-chart"></div><span class="text-small text-muted">Zero pings does not establish unavailability.</span></figure>
+      <figure><figcaption>Offer outcomes</figcaption><div class="legend text-small"><span class="key"><i class="swatch s5" aria-hidden="true"></i>Taken</span><span class="key"><i class="swatch s3" aria-hidden="true"></i>Turned down</span><span class="key"><i class="swatch s4" aria-hidden="true"></i>Missed</span></div><div class="group" id="di-person-outcomes"></div></figure>
+    </div>
+    <table class="table table-sm"><tbody id="di-person-evidence"></tbody></table>
+    <details><summary>Selected responder’s exact weekly rows</summary><div class="table-responsive"><table class="table table-sm"><thead><tr><th>Week of</th><th class="text-end">Pings</th><th class="text-end">Taken</th><th class="text-end">Missed</th></tr></thead><tbody id="di-person-week-rows"></tbody></table></div></details>
+  </section>
+
+  <section aria-labelledby="di-recovery-title">
+    <h3 id="di-recovery-title">5 · Why aggregate recovery can hide continued harm</h3>
+    <div class="plots">
+      <figure><figcaption>Share of all pings reaching each group</figcaption><div class="legend text-small"><span class="key"><i class="swatch" aria-hidden="true"></i>Four severely affected</span><span class="key"><i class="swatch s2" aria-hidden="true"></i>Other 12</span></div><div class="group" id="di-cohort-shares"></div></figure>
+      <figure><figcaption>Acceptance within each group</figcaption><span class="text-small text-muted">Shared scale · 0–100% accepted</span><div class="group" id="di-cohort-rates"></div></figure>
+    </div>
+    <span class="text-small">Final week: the four receive 3/165 pings and take none; other responders take 120/162. Aggregate acceptance is 120/165 (72.7%).</span>
+    <span class="text-small text-muted">Post-release group acceptance estimates have a small denominator: only 25 pings to the four over three complete weeks.</span>
+  </section>
+
+  <section aria-labelledby="di-support-title">
+    <h3 id="di-support-title">6 · Independent support evidence and blind spots</h3>
+    <div class="plots">
+      <figure><figcaption>Tickets per calendar day</figcaption><span class="text-small text-muted">Shared scale · 0–5 tickets/day</span><div class="group" id="di-ticket-rates"></div><span class="text-small text-muted">Before: 40 tickets/44 days. After: 105/26 days through 7 Sep. Release day excluded.</span></figure>
+      <figure><figcaption>Explicit seven-day count checks</figcaption><div class="group" id="di-count-checks"></div><span class="text-small text-muted">15/15 fully covered claims match. Two further claims on 7 Sep match available records, but coverage is partial.</span></figure>
+    </div>
+    <div class="table-responsive"><table class="table table-sm case-table"><thead><tr><th>Support finding</th><th>Database comparison</th><th>Limit</th></tr></thead><tbody>
+      <tr><td>32 quiet reports from four handlers</td><td>Farlight, Undertow, Ashgrove and Halfmoon all receive fewer pings/week.</td><td>Repeat reports, not 32 independent incidents.</td></tr>
+      <tr><td>14 disappearing-offer reports after release day</td><td>Missed share increases; reports also come from responders receiving more pings.</td><td>Disappearing and quiet are distinct symptoms.</td></tr>
+      <tr><td>Two reports describe both symptoms</td><td>32 + 14 − 2 = 44 distinct post-release tickets.</td><td>The remaining 61 concern other subjects.</td></tr>
+      <tr><td>No tickets for Meteor Mite or Vesper</td><td>Both have severe measured ping declines.</td><td>Support alone undercounts affected responders.</td></tr>
+      <tr><td>Rare offer after a long quiet stretch</td><td>Farlight: missed after ~5.2 days; Undertow: missed after ~8.7 days.</td><td>Compatible timestamps, not proven device-event joins.</td></tr>
+    </tbody></table></div>
+    <details><summary>All 17 count checks</summary><div class="table-responsive"><table class="table table-sm"><thead><tr><th>Ticket / date</th><th>Responder</th><th class="text-end">Reported</th><th class="text-end">Recorded</th><th>Coverage</th></tr></thead><tbody id="di-claim-rows"></tbody></table></div></details>
+  </section>
+
+  <section aria-labelledby="di-cause-title">
+    <h3 id="di-cause-title">7 · A plausible mechanism, not an established root cause</h3>
+    <div class="flow" role="img" aria-label="Hypothesis: shorter wait increases misses, misses lower history, lower rank can prevent pings, fewer pings mean fewer chances to earn score back.">
+      <div class="flow-step"><span class="step-head">1 · Shorter wait</span><span>90 → 60 seconds</span><span class="text-small text-muted">Confirmed configuration change</span></div>
+      <div class="flow-step"><span class="step-head">2 · Missed offer</span><span>History score −0.12</span><span class="text-small text-muted">Same penalty as explicit decline</span></div>
+      <div class="flow-step"><span class="step-head">3 · Lower future rank</span><span>Possible consequence</span><span class="text-small text-muted">Proximity and capabilities also contribute</span></div>
+      <div class="flow-step"><span class="step-head">4 · Dispatch stops</span><span>Someone earlier accepts</span><span class="text-small text-muted">Available responder can receive no offer</span></div>
+      <div class="flow-step"><span class="step-head">5 · Slow recovery</span><span>Fewer chances to earn +0.08</span><span class="text-small text-muted">No time-based recovery in code</span></div>
+    </div>
+    <div class="table-responsive"><table class="table table-sm case-table"><thead><tr><th>Candidate explanation</th><th>Supporting evidence</th><th>What remains unproven</th></tr></thead><tbody>
+      <tr><td>Shorter timeout</td><td>90 → 60 seconds; misses jump on release day; offers reported disappearing.</td><td>Actual delivery/display latency and time responders needed to answer.</td></tr>
+      <tr><td>Ranking feedback</td><td>Misses lower persistent history score; dispatch stops at first acceptance.</td><td>Actual scores, candidate order and whether dispatch reached these responders.</td></tr>
+      <tr><td>Greater proximity weighting</td><td>Proximity 0.45 → 0.60; history 0.40 → 0.25; allocation shifts.</td><td>Historical travel times, capability matches and rank under old/new weights.</td></tr>
+      <tr><td>Lower demand / seasonality</td><td>Overall callouts/week decrease 11.1%.</td><td>Why four lose 83% of pings while others gain; no longer-term seasonal control.</td></tr>
+      <tr><td>Availability or device failures</td><td>Earlier signal/older-phone complaints; handlers report availability looks correct.</td><td>Historical eligibility and device delivery records are absent.</td></tr>
+    </tbody></table></div>
+    <span class="text-small text-muted">History penalties were not shown as a new 4.2 change. The history weight decreased. Repository behavior still needs confirmation against deployed code.</span>
+  </section>
+
+  <section aria-labelledby="di-next-title">
+    <h3 id="di-next-title">8 · Evidence that would distinguish the causes</h3>
+    <table class="table table-sm"><thead><tr><th>Owner</th><th>Check</th><th>Decision it informs</th></tr></thead><tbody>
+      <tr><td>Wen + Ravi</td><td>For matched callouts, inspect eligibility, candidate rank, score components and dispatch stop point; replay old/new weights on the same candidate inputs.</td><td>Whether allocation changes come from ranking or availability.</td></tr>
+      <tr><td>Nadia + engineering</td><td>Trace reported offers through sent, delivered, displayed, answered and withdrawn times; examine pre-release acceptances at 60–90 seconds.</td><td>Whether timeout or notification latency explains missed offers.</td></tr>
+      <tr><td>Marcus + Product</td><td>Evaluate timeout, weights and score-recovery changes separately after validation.</td><td>Targeted remedy and rollout plan; avoid assuming one change fixes both symptoms.</td></tr>
+    </tbody></table>
+    <span class="text-small text-muted">A longer timeout alone does not add score recovery. Monitor responder-level ping allocation and missed shares alongside aggregate acceptance.</span>
+  </section>
+
+  <details><summary>Data, definitions and reproducibility</summary><div class="group text-small">
+    <span>Sources: rook.pings, rook.callouts, rook.responders and rook.support_tickets; routing repository; September interviews. All pings and ticket records were previously retrieved and reconciled.</span>
+    <span>Acceptance = taken / all pings. Missed = no answer before timeout; not proof of delivery failure. Usual area does not establish per-callout eligibility. Rates are weighted by pings.</span>
+    <span>Main before/after comparison uses 6 and 3 complete weeks. Mixed week remains in graphs. Exact-date comparison excludes 12 August itself; the two analyses intentionally have different denominators.</span>
+    <span>No historical availability, ranking scores, travel-time snapshots or device timing fields are present in these tables. Earlier incidents existed. Observational timing cannot establish causation.</span>
+    <span>Source rows and SQL: 03-rewind/dispatch-4.2-analysis/all-pings.csv, responder-week-rows.csv, deeper-source-rows.json, ticket-ping-audit.json and the accompanying query files.</span>
+  </div></details>
+  <div class="tooltip chart-tip" id="di-tip" role="tooltip" hidden></div>
+</div>
+<script type="application/json" id="rook-issue-dashboard-data">{"responders":[{"name":"Captain Vantage","area":"Hillcrest","before":72,"after":50,"change":38.888888888888886,"demandChange":-10.71428571428571,"weeks":[[12,10,0],[13,10,1],[12,8,0],[11,7,1],[12,9,0],[12,9,0],[13,8,1],[15,11,2],[17,13,1],[18,13,2]],"outcomes":[[72,53,17,2],[13,8,4,1],[50,37,8,5]]},{"name":"Cindermark","area":"Mill District","before":54,"after":35,"change":29.629629629629626,"demandChange":-11.627906976744185,"weeks":[[9,7,0],[9,8,0],[8,6,1],[10,7,0],[9,7,0],[9,8,0],[10,6,1],[11,8,1],[12,8,2],[12,9,1]],"outcomes":[[54,43,10,1],[10,6,3,1],[35,25,6,4]]},{"name":"Corporal Ashgrove","area":"Northfield","before":60,"after":22,"change":-26.66666666666667,"demandChange":-30.612244897959183,"weeks":[[10,8,0],[11,9,0],[10,7,1],[9,7,0],[10,8,0],[10,8,0],[10,6,1],[8,5,1],[7,5,1],[7,5,1]],"outcomes":[[60,47,12,1],[10,6,3,1],[22,15,4,3]]},{"name":"Farlight","area":"Uptown","before":72,"after":4,"change":-88.88888888888889,"demandChange":-5.263157894736848,"weeks":[[12,9,0],[12,9,0],[11,8,1],[12,9,1],[13,10,0],[12,8,1],[10,4,4],[3,0,2],[1,0,1],[0,0,0]],"outcomes":[[72,53,16,3],[10,4,2,4],[4,0,1,3]]},{"name":"Halfmoon","area":"Westbury","before":66,"after":25,"change":-24.242424242424242,"demandChange":-29.629629629629626,"weeks":[[11,8,0],[10,7,0],[11,8,0],[12,8,0],[11,9,0],[11,8,0],[11,6,2],[9,5,2],[8,5,1],[8,7,0]],"outcomes":[[66,48,18,0],[11,6,3,2],[25,17,5,3]]},{"name":"Ironvale","area":"Riverside","before":48,"after":33,"change":37.5,"demandChange":-2.564102564102566,"weeks":[[8,6,0],[8,5,0],[9,8,0],[8,6,0],[7,5,1],[8,7,0],[9,5,1],[10,6,2],[11,8,2],[12,9,2]],"outcomes":[[48,37,10,1],[9,5,3,1],[33,23,4,6]]},{"name":"Meteor Mite","area":"Eastgate","before":67,"after":7,"change":-79.10447761194031,"demandChange":-14.28571428571429,"weeks":[[11,7,0],[12,9,0],[10,6,0],[11,7,1],[12,9,1],[11,8,0],[10,4,4],[4,1,2],[2,0,1],[1,0,1]],"outcomes":[[67,46,19,2],[10,4,2,4],[7,1,2,4]]},{"name":"Nightwell","area":"Midtown","before":90,"after":59,"change":31.11111111111111,"demandChange":-11.111111111111116,"weeks":[[15,11,1],[14,10,0],[15,12,1],[16,12,1],[15,11,0],[15,12,0],[16,9,2],[18,14,2],[20,13,2],[21,15,2]],"outcomes":[[90,68,19,3],[16,9,5,2],[59,42,11,6]]},{"name":"Sgt. Bulwark","area":"Foundry Row","before":54,"after":32,"change":18.518518518518512,"demandChange":-9.523809523809524,"weeks":[[9,7,0],[9,7,0],[10,8,0],[9,7,0],[8,5,0],[9,7,0],[10,5,2],[10,8,1],[11,7,2],[11,8,2]],"outcomes":[[54,41,13,0],[10,5,3,2],[32,23,4,5]]},{"name":"Sgt. Falkirk","area":"Kingsbridge","before":60,"after":44,"change":46.66666666666666,"demandChange":-11.538461538461542,"weeks":[[10,9,1],[10,8,1],[11,8,0],[10,8,0],[9,7,0],[10,8,0],[11,7,2],[13,9,2],[15,11,2],[16,11,2]],"outcomes":[[60,48,10,2],[11,7,2,2],[44,31,7,6]]},{"name":"Stormwrack","area":"Southport","before":78,"after":53,"change":35.897435897435905,"demandChange":0.0,"weeks":[[13,10,0],[13,11,0],[12,9,0],[14,12,0],[13,10,0],[13,10,0],[14,8,3],[16,12,2],[18,13,2],[19,15,2]],"outcomes":[[78,62,16,0],[14,8,3,3],[53,40,7,6]]},{"name":"The Drift","area":"Greenway","before":37,"after":23,"change":24.32432432432432,"demandChange":-17.647058823529417,"weeks":[[6,5,0],[6,5,0],[7,6,0],[6,5,0],[6,5,0],[6,5,1],[7,4,2],[7,5,1],[8,6,1],[8,5,1]],"outcomes":[[37,31,5,1],[7,4,1,2],[23,16,4,3]]},{"name":"The Gale","area":"Eastgate","before":78,"after":58,"change":48.71794871794872,"demandChange":-14.28571428571429,"weeks":[[13,10,1],[12,9,0],[13,10,0],[14,11,1],[13,11,1],[13,10,0],[15,9,3],[17,12,2],[20,14,2],[21,16,2]],"outcomes":[[78,61,14,3],[15,9,3,3],[58,42,10,6]]},{"name":"The Longcast","area":"Lakeshore","before":43,"after":26,"change":20.93023255813953,"demandChange":-3.0303030303030276,"weeks":[[7,5,0],[7,5,1],[8,7,0],[7,5,0],[7,5,0],[7,5,0],[8,5,1],[8,6,1],[9,5,2],[9,7,1]],"outcomes":[[43,32,10,1],[8,5,2,1],[26,18,4,4]]},{"name":"The Undertow","area":"Harborside","before":72,"after":6,"change":-83.33333333333334,"demandChange":-8.196721311475407,"weeks":[[12,9,0],[11,9,0],[12,9,1],[13,10,0],[12,10,0],[12,9,0],[11,4,5],[4,1,2],[1,0,1],[1,0,1]],"outcomes":[[72,56,15,1],[11,4,2,5],[6,1,1,4]]},{"name":"Vesper","area":"Old Town","before":83,"after":8,"change":-80.72289156626506,"demandChange":-1.449275362318836,"weeks":[[14,11,0],[13,10,1],[15,13,1],[14,11,0],[13,11,1],[14,12,0],[12,6,4],[5,1,3],[2,0,1],[1,0,1]],"outcomes":[[83,68,12,3],[12,6,2,4],[8,1,2,5]]}],"weeks":[{"date":"2026-06-29","tickets":6,"quiet":0,"vanishing":0,"pings":172,"turned down":37,"taken":132,"missed":3,"four":49},{"date":"2026-07-06","tickets":6,"quiet":0,"vanishing":0,"pings":170,"taken":131,"missed":4,"turned down":35,"four":48},{"date":"2026-07-13","tickets":8,"quiet":0,"vanishing":0,"pings":174,"taken":133,"turned down":35,"missed":6,"four":48},{"date":"2026-07-20","tickets":5,"quiet":0,"vanishing":0,"pings":176,"taken":132,"turned down":39,"missed":5,"four":50},{"date":"2026-07-27","tickets":7,"quiet":0,"vanishing":0,"pings":170,"taken":132,"turned down":34,"missed":4,"four":50},{"date":"2026-08-03","tickets":7,"quiet":0,"vanishing":0,"pings":172,"taken":134,"turned down":36,"missed":2,"four":49},{"date":"2026-08-10","tickets":20,"quiet":0,"vanishing":7,"pings":177,"taken":96,"turned down":43,"missed":38,"four":43},{"date":"2026-08-17","tickets":27,"quiet":8,"vanishing":3,"pings":158,"taken":104,"missed":28,"turned down":26,"four":16},{"date":"2026-08-24","tickets":32,"quiet":13,"vanishing":3,"pings":162,"taken":108,"missed":24,"turned down":30,"four":6},{"date":"2026-08-31","tickets":25,"quiet":9,"vanishing":2,"pings":165,"turned down":24,"taken":120,"missed":21,"four":3}],"cohorts":[{"fourP":294,"fourT":223,"otherP":740,"otherT":571,"total":1034},{"fourP":43,"fourT":18,"otherP":134,"otherT":78,"total":177},{"fourP":25,"fourT":3,"otherP":460,"otherT":329,"total":485}],"claims":[{"ticket_number":3071,"filed_at":"2026-08-20T11:22:34.000Z","responder":"Farlight","reported_pings":4,"recorded_pings":4,"matches_export":true,"window_start_local":"2026-08-13T11:22:34","window_end_local_exclusive":"2026-08-20T11:22:34","coverage":"within covered dates","events":[{"callout_number":"40998","responder":"Farlight","sent_at":"2026-08-13T14:51:31.000Z","outcome":"missed"},{"callout_number":"41016","responder":"Farlight","sent_at":"2026-08-14T16:32:44.000Z","outcome":"missed"},{"callout_number":"41021","responder":"Farlight","sent_at":"2026-08-14T21:22:33.000Z","outcome":"taken"},{"callout_number":"41092","responder":"Farlight","sent_at":"2026-08-19T13:28:40.000Z","outcome":"missed"}]},{"ticket_number":3073,"filed_at":"2026-08-20T19:26:19.000Z","responder":"The Undertow","reported_pings":6,"recorded_pings":6,"matches_export":true,"window_start_local":"2026-08-13T19:26:19","window_end_local_exclusive":"2026-08-20T19:26:19","coverage":"within covered dates","events":[{"callout_number":"41005","responder":"The Undertow","sent_at":"2026-08-14T02:53:00.000Z","outcome":"missed"},{"callout_number":"41011","responder":"The Undertow","sent_at":"2026-08-14T10:22:29.000Z","outcome":"missed"},{"callout_number":"41041","responder":"The Undertow","sent_at":"2026-08-16T13:46:27.000Z","outcome":"turned down"},{"callout_number":"41054","responder":"The Undertow","sent_at":"2026-08-17T14:10:18.000Z","outcome":"turned down"},{"callout_number":"41059","responder":"The Undertow","sent_at":"2026-08-17T19:07:03.000Z","outcome":"taken"},{"callout_number":"41079","responder":"The Undertow","sent_at":"2026-08-18T16:18:10.000Z","outcome":"missed"}]},{"ticket_number":3080,"filed_at":"2026-08-22T14:49:08.000Z","responder":"The Undertow","reported_pings":5,"recorded_pings":5,"matches_export":true,"window_start_local":"2026-08-15T14:49:08","window_end_local_exclusive":"2026-08-22T14:49:08","coverage":"within covered dates","events":[{"callout_number":"41041","responder":"The Undertow","sent_at":"2026-08-16T13:46:27.000Z","outcome":"turned down"},{"callout_number":"41054","responder":"The Undertow","sent_at":"2026-08-17T14:10:18.000Z","outcome":"turned down"},{"callout_number":"41059","responder":"The Undertow","sent_at":"2026-08-17T19:07:03.000Z","outcome":"taken"},{"callout_number":"41079","responder":"The Undertow","sent_at":"2026-08-18T16:18:10.000Z","outcome":"missed"},{"callout_number":"41130","responder":"The Undertow","sent_at":"2026-08-21T16:45:07.000Z","outcome":"missed"}]},{"ticket_number":3081,"filed_at":"2026-08-22T16:55:10.000Z","responder":"Farlight","reported_pings":2,"recorded_pings":2,"matches_export":true,"window_start_local":"2026-08-15T16:55:10","window_end_local_exclusive":"2026-08-22T16:55:10","coverage":"within covered dates","events":[{"callout_number":"41092","responder":"Farlight","sent_at":"2026-08-19T13:28:40.000Z","outcome":"missed"},{"callout_number":"41142","responder":"Farlight","sent_at":"2026-08-22T11:13:54.000Z","outcome":"turned down"}]},{"ticket_number":3083,"filed_at":"2026-08-23T12:47:36.000Z","responder":"Corporal Ashgrove","reported_pings":6,"recorded_pings":6,"matches_export":true,"window_start_local":"2026-08-16T12:47:36","window_end_local_exclusive":"2026-08-23T12:47:36","coverage":"within covered dates","events":[{"callout_number":"41051","responder":"Corporal Ashgrove","sent_at":"2026-08-17T09:32:02.000Z","outcome":"taken"},{"callout_number":"41052","responder":"Corporal Ashgrove","sent_at":"2026-08-17T11:33:33.000Z","outcome":"turned down"},{"callout_number":"41057","responder":"Corporal Ashgrove","sent_at":"2026-08-17T18:59:30.000Z","outcome":"taken"},{"callout_number":"41118","responder":"Corporal Ashgrove","sent_at":"2026-08-20T18:37:55.000Z","outcome":"taken"},{"callout_number":"41120","responder":"Corporal Ashgrove","sent_at":"2026-08-20T22:36:52.000Z","outcome":"missed"},{"callout_number":"41158","responder":"Corporal Ashgrove","sent_at":"2026-08-23T11:04:37.000Z","outcome":"turned down"}]},{"ticket_number":3086,"filed_at":"2026-08-23T18:32:30.000Z","responder":"Halfmoon","reported_pings":8,"recorded_pings":8,"matches_export":true,"window_start_local":"2026-08-16T18:32:30","window_end_local_exclusive":"2026-08-23T18:32:30","coverage":"within covered dates","events":[{"callout_number":"41063","responder":"Halfmoon","sent_at":"2026-08-17T20:09:15.000Z","outcome":"taken"},{"callout_number":"41088","responder":"Halfmoon","sent_at":"2026-08-19T04:22:40.000Z","outcome":"turned down"},{"callout_number":"41091","responder":"Halfmoon","sent_at":"2026-08-19T12:48:15.000Z","outcome":"missed"},{"callout_number":"41101","responder":"Halfmoon","sent_at":"2026-08-19T18:41:47.000Z","outcome":"taken"},{"callout_number":"41116","responder":"Halfmoon","sent_at":"2026-08-20T17:28:51.000Z","outcome":"taken"},{"callout_number":"41120","responder":"Halfmoon","sent_at":"2026-08-20T22:37:53.000Z","outcome":"taken"},{"callout_number":"41123","responder":"Halfmoon","sent_at":"2026-08-21T06:30:29.000Z","outcome":"turned down"},{"callout_number":"41125","responder":"Halfmoon","sent_at":"2026-08-21T11:07:14.000Z","outcome":"taken"}]},{"ticket_number":3089,"filed_at":"2026-08-24T16:30:33.000Z","responder":"Farlight","reported_pings":3,"recorded_pings":3,"matches_export":true,"window_start_local":"2026-08-17T16:30:33","window_end_local_exclusive":"2026-08-24T16:30:33","coverage":"within covered dates","events":[{"callout_number":"41092","responder":"Farlight","sent_at":"2026-08-19T13:28:40.000Z","outcome":"missed"},{"callout_number":"41142","responder":"Farlight","sent_at":"2026-08-22T11:13:54.000Z","outcome":"turned down"},{"callout_number":"41160","responder":"Farlight","sent_at":"2026-08-23T13:51:03.000Z","outcome":"missed"}]},{"ticket_number":3097,"filed_at":"2026-08-26T11:55:43.000Z","responder":"Corporal Ashgrove","reported_pings":7,"recorded_pings":7,"matches_export":true,"window_start_local":"2026-08-19T11:55:43","window_end_local_exclusive":"2026-08-26T11:55:43","coverage":"within covered dates","events":[{"callout_number":"41118","responder":"Corporal Ashgrove","sent_at":"2026-08-20T18:37:55.000Z","outcome":"taken"},{"callout_number":"41120","responder":"Corporal Ashgrove","sent_at":"2026-08-20T22:36:52.000Z","outcome":"missed"},{"callout_number":"41158","responder":"Corporal Ashgrove","sent_at":"2026-08-23T11:04:37.000Z","outcome":"turned down"},{"callout_number":"41161","responder":"Corporal Ashgrove","sent_at":"2026-08-23T16:50:13.000Z","outcome":"taken"},{"callout_number":"41162","responder":"Corporal Ashgrove","sent_at":"2026-08-23T18:07:34.000Z","outcome":"taken"},{"callout_number":"41170","responder":"Corporal Ashgrove","sent_at":"2026-08-24T07:08:46.000Z","outcome":"missed"},{"callout_number":"41188","responder":"Corporal Ashgrove","sent_at":"2026-08-25T01:06:47.000Z","outcome":"taken"}]},{"ticket_number":3098,"filed_at":"2026-08-26T12:41:56.000Z","responder":"Halfmoon","reported_pings":8,"recorded_pings":8,"matches_export":true,"window_start_local":"2026-08-19T12:41:56","window_end_local_exclusive":"2026-08-26T12:41:56","coverage":"within covered dates","events":[{"callout_number":"41091","responder":"Halfmoon","sent_at":"2026-08-19T12:48:15.000Z","outcome":"missed"},{"callout_number":"41101","responder":"Halfmoon","sent_at":"2026-08-19T18:41:47.000Z","outcome":"taken"},{"callout_number":"41116","responder":"Halfmoon","sent_at":"2026-08-20T17:28:51.000Z","outcome":"taken"},{"callout_number":"41120","responder":"Halfmoon","sent_at":"2026-08-20T22:37:53.000Z","outcome":"taken"},{"callout_number":"41123","responder":"Halfmoon","sent_at":"2026-08-21T06:30:29.000Z","outcome":"turned down"},{"callout_number":"41125","responder":"Halfmoon","sent_at":"2026-08-21T11:07:14.000Z","outcome":"taken"},{"callout_number":"41165","responder":"Halfmoon","sent_at":"2026-08-23T20:14:35.000Z","outcome":"missed"},{"callout_number":"41208","responder":"Halfmoon","sent_at":"2026-08-26T09:21:35.000Z","outcome":"taken"}]},{"ticket_number":3104,"filed_at":"2026-08-28T09:14:16.000Z","responder":"The Undertow","reported_pings":2,"recorded_pings":2,"matches_export":true,"window_start_local":"2026-08-21T09:14:16","window_end_local_exclusive":"2026-08-28T09:14:16","coverage":"within covered dates","events":[{"callout_number":"41130","responder":"The Undertow","sent_at":"2026-08-21T16:45:07.000Z","outcome":"missed"},{"callout_number":"41235","responder":"The Undertow","sent_at":"2026-08-27T23:18:46.000Z","outcome":"missed"}]},{"ticket_number":3108,"filed_at":"2026-08-29T08:12:05.000Z","responder":"Halfmoon","reported_pings":7,"recorded_pings":7,"matches_export":true,"window_start_local":"2026-08-22T08:12:05","window_end_local_exclusive":"2026-08-29T08:12:05","coverage":"within covered dates","events":[{"callout_number":"41165","responder":"Halfmoon","sent_at":"2026-08-23T20:14:35.000Z","outcome":"missed"},{"callout_number":"41208","responder":"Halfmoon","sent_at":"2026-08-26T09:21:35.000Z","outcome":"taken"},{"callout_number":"41213","responder":"Halfmoon","sent_at":"2026-08-26T17:27:46.000Z","outcome":"taken"},{"callout_number":"41221","responder":"Halfmoon","sent_at":"2026-08-26T22:07:39.000Z","outcome":"taken"},{"callout_number":"41222","responder":"Halfmoon","sent_at":"2026-08-26T22:34:48.000Z","outcome":"turned down"},{"callout_number":"41229","responder":"Halfmoon","sent_at":"2026-08-27T18:24:07.000Z","outcome":"taken"},{"callout_number":"41240","responder":"Halfmoon","sent_at":"2026-08-28T10:03:59.000Z","outcome":"turned down"}]},{"ticket_number":3114,"filed_at":"2026-08-30T11:28:17.000Z","responder":"Farlight","reported_pings":2,"recorded_pings":2,"matches_export":true,"window_start_local":"2026-08-23T11:28:17","window_end_local_exclusive":"2026-08-30T11:28:17","coverage":"within covered dates","events":[{"callout_number":"41160","responder":"Farlight","sent_at":"2026-08-23T13:51:03.000Z","outcome":"missed"},{"callout_number":"41245","responder":"Farlight","sent_at":"2026-08-28T19:28:20.000Z","outcome":"missed"}]},{"ticket_number":3118,"filed_at":"2026-08-30T18:42:36.000Z","responder":"Corporal Ashgrove","reported_pings":7,"recorded_pings":7,"matches_export":true,"window_start_local":"2026-08-23T18:42:36","window_end_local_exclusive":"2026-08-30T18:42:36","coverage":"within covered dates","events":[{"callout_number":"41170","responder":"Corporal Ashgrove","sent_at":"2026-08-24T07:08:46.000Z","outcome":"missed"},{"callout_number":"41188","responder":"Corporal Ashgrove","sent_at":"2026-08-25T01:06:47.000Z","outcome":"taken"},{"callout_number":"41222","responder":"Corporal Ashgrove","sent_at":"2026-08-26T22:35:12.000Z","outcome":"taken"},{"callout_number":"41233","responder":"Corporal Ashgrove","sent_at":"2026-08-27T20:50:47.000Z","outcome":"taken"},{"callout_number":"41240","responder":"Corporal Ashgrove","sent_at":"2026-08-28T10:04:24.000Z","outcome":"taken"},{"callout_number":"41265","responder":"Corporal Ashgrove","sent_at":"2026-08-29T20:41:44.000Z","outcome":"turned down"},{"callout_number":"41271","responder":"Corporal Ashgrove","sent_at":"2026-08-30T09:36:04.000Z","outcome":"taken"}]},{"ticket_number":3129,"filed_at":"2026-09-03T08:26:43.000Z","responder":"Halfmoon","reported_pings":7,"recorded_pings":7,"matches_export":true,"window_start_local":"2026-08-27T08:26:43","window_end_local_exclusive":"2026-09-03T08:26:43","coverage":"within covered dates","events":[{"callout_number":"41229","responder":"Halfmoon","sent_at":"2026-08-27T18:24:07.000Z","outcome":"taken"},{"callout_number":"41240","responder":"Halfmoon","sent_at":"2026-08-28T10:03:59.000Z","outcome":"turned down"},{"callout_number":"41281","responder":"Halfmoon","sent_at":"2026-08-30T17:09:39.000Z","outcome":"taken"},{"callout_number":"41292","responder":"Halfmoon","sent_at":"2026-08-30T21:16:05.000Z","outcome":"missed"},{"callout_number":"41307","responder":"Halfmoon","sent_at":"2026-09-01T09:16:45.000Z","outcome":"taken"},{"callout_number":"41314","responder":"Halfmoon","sent_at":"2026-09-01T14:35:24.000Z","outcome":"taken"},{"callout_number":"41335","responder":"Halfmoon","sent_at":"2026-09-02T21:04:30.000Z","outcome":"taken"}]},{"ticket_number":3135,"filed_at":"2026-09-04T10:19:41.000Z","responder":"Corporal Ashgrove","reported_pings":7,"recorded_pings":7,"matches_export":true,"window_start_local":"2026-08-28T10:19:41","window_end_local_exclusive":"2026-09-04T10:19:41","coverage":"within covered dates","events":[{"callout_number":"41265","responder":"Corporal Ashgrove","sent_at":"2026-08-29T20:41:44.000Z","outcome":"turned down"},{"callout_number":"41271","responder":"Corporal Ashgrove","sent_at":"2026-08-30T09:36:04.000Z","outcome":"taken"},{"callout_number":"41307","responder":"Corporal Ashgrove","sent_at":"2026-09-01T09:15:44.000Z","outcome":"missed"},{"callout_number":"41314","responder":"Corporal Ashgrove","sent_at":"2026-09-01T14:34:59.000Z","outcome":"turned down"},{"callout_number":"41320","responder":"Corporal Ashgrove","sent_at":"2026-09-01T20:06:32.000Z","outcome":"taken"},{"callout_number":"41322","responder":"Corporal Ashgrove","sent_at":"2026-09-01T21:39:57.000Z","outcome":"taken"},{"callout_number":"41339","responder":"Corporal Ashgrove","sent_at":"2026-09-03T10:44:56.000Z","outcome":"taken"}]},{"ticket_number":3145,"filed_at":"2026-09-07T09:23:25.000Z","responder":"The Undertow","reported_pings":1,"recorded_pings":1,"matches_export":true,"window_start_local":"2026-08-31T09:23:25","window_end_local_exclusive":"2026-09-07T09:23:25","coverage":"partial: ticket filed after final covered date","events":[{"callout_number":"41394","responder":"The Undertow","sent_at":"2026-09-05T15:17:47.000Z","outcome":"missed"}]},{"ticket_number":3147,"filed_at":"2026-09-07T18:09:53.000Z","responder":"Halfmoon","reported_pings":8,"recorded_pings":8,"matches_export":true,"window_start_local":"2026-08-31T18:09:53","window_end_local_exclusive":"2026-09-07T18:09:53","coverage":"partial: ticket filed after final covered date","events":[{"callout_number":"41307","responder":"Halfmoon","sent_at":"2026-09-01T09:16:45.000Z","outcome":"taken"},{"callout_number":"41314","responder":"Halfmoon","sent_at":"2026-09-01T14:35:24.000Z","outcome":"taken"},{"callout_number":"41335","responder":"Halfmoon","sent_at":"2026-09-02T21:04:30.000Z","outcome":"taken"},{"callout_number":"41346","responder":"Halfmoon","sent_at":"2026-09-03T14:35:48.000Z","outcome":"turned down"},{"callout_number":"41351","responder":"Halfmoon","sent_at":"2026-09-03T20:06:40.000Z","outcome":"taken"},{"callout_number":"41363","responder":"Halfmoon","sent_at":"2026-09-04T11:45:33.000Z","outcome":"taken"},{"callout_number":"41375","responder":"Halfmoon","sent_at":"2026-09-04T18:44:24.000Z","outcome":"taken"},{"callout_number":"41398","responder":"Halfmoon","sent_at":"2026-09-05T16:58:56.000Z","outcome":"taken"}]}]}</script>
+<script src="https://cdn.jsdelivr.net/npm/d3@7.9.0/dist/d3.min.js"></script>
+<script>
+(() => {
+  const root=document.getElementById('rook-issue-dashboard');
+  const data=JSON.parse(document.getElementById('rook-issue-dashboard-data').textContent);
+  const D=window.d3;
+  const q=id=>root.querySelector('#'+id);
+  const el=(tag,cls,text)=>{const n=document.createElement(tag);if(cls)n.className=cls;if(text!==undefined)n.textContent=text;return n;};
+  const pct=n=>n.toFixed(1)+'%';
+  const signed=n=>(n<0?'−':'+')+Math.abs(n).toFixed(1)+'%';
+  const date=s=>s.slice(8,10).replace(/^0/,'')+' '+['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'][+s.slice(5,7)-1];
+  const severe=new Set(['Farlight','Meteor Mite','The Undertow','Vesper']);
+  const observers=new Map();
+  function bar(label,value,max,cls,formatted) {
+    const row=el('div','bar-row');const track=el('div','track');const fill=el('span','fill '+cls);fill.style.width=(Math.max(0,value)/max*100)+'%';track.append(fill);row.append(el('span','text-small',label),track,el('span','number',formatted));row.setAttribute('role','img');row.setAttribute('aria-label',label+': '+formatted);return row;
+  }
+  function rows(target,values) {const tr=el('tr');values.forEach((v,i)=>tr.append(el('td',i?'number':'',v)));q(target).append(tr);}
+  function showTip(event,title,lines) {
+    const tip=q('di-tip');tip.replaceChildren(el('div',null,title),...lines.map(s=>el('div','text-small',s)));tip.hidden=false;
+    const box=root.getBoundingClientRect();const w=tip.offsetWidth;tip.style.left=Math.max(0,Math.min(event.clientX-box.left+12,box.width-w))+'px';tip.style.top=Math.max(0,event.clientY-box.top-tip.offsetHeight-12)+'px';
+  }
+  function fallback(id,values,labels,unit) {
+    const node=q(id);node.replaceChildren();const max=Math.max(1,...values.map(Math.abs));const group=el('div','fallback');
+    values.forEach((v,i)=>{const row=el('div','fallback-row');const track=el('div','track');const mark=el('span','fill');mark.style.width=(Math.abs(v)/max*100)+'%';track.append(mark);row.append(el('span','text-small',labels[i]),track,el('span','number text-small',unit==='%'?signed(v):v.toFixed(1)));group.append(row);});node.append(group);
+  }
+  function lineChart(id,values,opts={}) {
+    const node=q(id);
+    if(observers.has(id)){observers.get(id).disconnect();observers.delete(id);}
+    if(!D){fallback(id,values,data.weeks.map(w=>date(w.date)),opts.unit);return;}
+    const draw=()=>{
+      const width=Math.max(300,Math.round(node.getBoundingClientRect().width));const height=245;const left=64,right=22,top=24,bottom=43;
+      node.replaceChildren();
+      const svg=D.select(node).append('svg').attr('class','plot-svg').attr('viewBox','0 0 '+width+' '+height).attr('role','img').attr('aria-label',opts.title+'; weekly values '+values.map(v=>v.toFixed(1)).join(', '));
+      svg.append('title').text(opts.title);
+      const x=D.scaleLinear().domain(D.extent([-.25,values.length-1+.25])).range([left+5,width-right-5]);
+      const domain=D.extent([0,...values,...(opts.ceiling?[opts.ceiling]:[])]);const span=domain[1]-domain[0]||1;
+      const y=D.scaleLinear().domain([domain[0],domain[1]+(opts.ceiling?0:span*.2)]).nice(4).range([height-bottom-5,top+5]);
+      svg.append('rect').attr('data-chart-frame','').attr('x',left).attr('y',top).attr('width',width-left-right).attr('height',height-top-bottom).attr('fill','none').attr('stroke','var(--border)');
+      svg.append('rect').attr('x',x(5.5)).attr('y',top+1).attr('width',x(6.5)-x(5.5)).attr('height',height-top-bottom-2).attr('fill','var(--foreground)').attr('opacity',.055);
+      svg.append('g').attr('transform','translate(0,'+(height-bottom)+')').call(D.axisBottom(x).tickValues([0,3,6,9]).tickFormat(i=>date(data.weeks[i].date)).tickSizeOuter(0));
+      svg.append('g').attr('transform','translate('+left+',0)').call(D.axisLeft(y).ticks(4).tickFormat(v=>v+(opts.unit==='%'?'%':'')).tickSizeOuter(0));
+      svg.append('text').attr('class','axis-title').attr('data-axis','x').attr('x',(left+width-right)/2).attr('y',height-5).attr('text-anchor','middle').text('Week starting · 2026');
+      svg.append('text').attr('class','axis-title').attr('data-axis','y').attr('transform','translate(16,'+((top+height-bottom)/2)+') rotate(-90)').attr('text-anchor','middle').text(opts.axis);
+      const pairs=values.map((v,i)=>({i,v}));
+      svg.append('path').datum(pairs).attr('d',D.line().x(d=>x(d.i)).y(d=>y(d.v))).attr('fill','none').attr('stroke','var(--viz-series-'+(opts.series||1)+')').attr('stroke-width',2);
+      svg.selectAll('circle.point').data(pairs).join('circle').attr('class','point').attr('cx',d=>x(d.i)).attr('cy',d=>y(d.v)).attr('r',3.5).attr('fill','var(--viz-series-'+(opts.series||1)+')');
+      const labels=width>=470?[0,6,7,9]:[0,6,9];
+      const annotations=svg.selectAll('text.value').data(pairs.filter(d=>labels.includes(d.i))).join('text').attr('class','value').attr('x',d=>x(d.i)).attr('y',d=>Math.max(top+14,y(d.v)-9)).attr('text-anchor',d=>d.i===0?'start':d.i===9?'end':'middle').text(d=>opts.unit==='%'?pct(d.v):d.v);
+      // Remove optional value annotations if their measured bounds collide with ticks or one another.
+      const boxes=svg.selectAll('.tick text,.axis-title').nodes().map(n=>({n,b:n.getBoundingClientRect()}));
+      annotations.each(function(){const b=this.getBoundingClientRect();if(boxes.some(o=>b.left<o.b.right+4&&b.right+4>o.b.left&&b.top<o.b.bottom+4&&b.bottom+4>o.b.top)){this.remove();}else boxes.push({n:this,b});});
+      const guide=svg.append('line').attr('y1',top).attr('y2',height-bottom).attr('stroke','var(--border)').attr('visibility','hidden');
+      const hit=svg.append('rect').attr('data-chart-hit','').attr('x',left).attr('y',top).attr('width',width-left-right).attr('height',height-top-bottom).attr('fill','transparent');
+      let pinned=false;
+      const show=event=>{const px=D.pointer(event,svg.node())[0];const at=D.bisector(d=>d.i).center(pairs,x.invert(px));guide.attr('x1',x(at)).attr('x2',x(at)).attr('visibility','visible');const w=data.weeks[at];const detail=opts.details?opts.details[at]:['All responders: '+w.taken+'/'+w.pings+' taken; '+w.missed+' missed',w.tickets+' support tickets'];showTip(event,date(w.date)+(at===6?' · mixed release week':''),[opts.title+': '+(opts.unit==='%'?pct(values[at]):values[at]),...detail]);};
+      hit.on('pointermove',event=>{if(!pinned)show(event);}).on('pointerdown',event=>{pinned=!pinned;show(event);}).on('pointerleave',()=>{if(!pinned){guide.attr('visibility','hidden');q('di-tip').hidden=true;}});
+    };
+    draw();if(typeof ResizeObserver!=='undefined'){const observer=new ResizeObserver(draw);observer.observe(node);observers.set(id,observer);}
+  }
+  function responderBars() {
+    const rs=[...data.responders].sort((a,b)=>a.change-b.change);const id='di-all-responders',node=q(id);
+    if(!D){fallback(id,rs.map(r=>r.change),rs.map(r=>r.name),'%');return;}
+    const draw=()=>{
+      const width=Math.max(300,Math.round(node.getBoundingClientRect().width)),height=590,left=151,right=23,top=25,bottom=44;
+      node.replaceChildren();const svg=D.select(node).append('svg').attr('class','plot-svg').attr('viewBox','0 0 '+width+' '+height).attr('role','img').attr('aria-label','Change in weekly pings for all 16 responders, sorted from largest decline to largest increase.');
+      svg.append('title').text('Responder changes in average pings per week');
+      const extent=D.extent([0,...rs.map(r=>r.change)]),pad=(extent[1]-extent[0])*.1;
+      const x=D.scaleLinear().domain([extent[0]-pad,extent[1]+pad]).nice().range([left+5,width-right-5]);
+      const y=D.scaleBand().domain(rs.map(r=>r.name)).range([top+5,height-bottom-5]).padding(.3);
+      svg.append('rect').attr('data-chart-frame','').attr('x',left).attr('y',top).attr('width',width-left-right).attr('height',height-top-bottom).attr('fill','none').attr('stroke','var(--border)');
+      svg.append('g').attr('transform','translate(0,'+(height-bottom)+')').call(D.axisBottom(x).ticks(width<400?3:4).tickFormat(v=>v+'%').tickSizeOuter(0));
+      svg.append('g').attr('transform','translate('+left+',0)').call(D.axisLeft(y).tickSize(0)).select('.domain').remove();
+      svg.append('line').attr('x1',x(0)).attr('x2',x(0)).attr('y1',top).attr('y2',height-bottom).attr('stroke','var(--border)');
+      svg.append('text').attr('class','axis-title').attr('data-axis','x').attr('x',(left+width-right)/2).attr('y',height-5).attr('text-anchor','middle').text('Weekly pings · change (%)');
+      svg.append('text').attr('class','axis-title').attr('data-axis','y').attr('x',0).attr('y',14).text('Responder');
+      svg.selectAll('rect.mark').data(rs).join('rect').attr('class','mark').attr('x',r=>Math.min(x(0),x(r.change))).attr('y',r=>y(r.name)).attr('width',r=>Math.abs(x(r.change)-x(0))).attr('height',y.bandwidth()).attr('fill','var(--viz-series-1)');
+      svg.selectAll('text.value').data(rs).join('text').attr('class','value').attr('x',r=>r.change<0?x(r.change)+4:x(r.change)-4).attr('y',r=>y(r.name)+y.bandwidth()/2+4).attr('text-anchor',r=>r.change<0?'start':'end').text(r=>signed(r.change));
+      svg.selectAll('rect.hit').data(rs).join('rect').attr('class','hit').attr('data-chart-hit','').attr('x',left).attr('y',r=>y(r.name)-4).attr('width',width-left-right).attr('height',y.step()).attr('fill','transparent').attr('data-tooltip',r=>r.name+': '+(r.before/6).toFixed(1)+' → '+(r.after/3).toFixed(1)+' pings/week ('+signed(r.change)+')');
+    };draw();if(typeof ResizeObserver!=='undefined'){const o=new ResizeObserver(draw);o.observe(node);observers.set(id,o);}
+  }
+
+  lineChart('di-accept',data.weeks.map(w=>100*w.taken/w.pings),{title:'Acceptance',axis:'Taken / pings (%)',unit:'%',series:5,ceiling:100});
+  lineChart('di-missed',data.weeks.map(w=>100*w.missed/w.pings),{title:'Missed share',axis:'Missed / pings (%)',unit:'%',series:4});
+  lineChart('di-four',data.weeks.map(w=>w.four),{title:'Four responders’ pings',axis:'Pings / week',unit:'pings',series:1});
+  lineChart('di-tickets',data.weeks.map(w=>w.tickets),{title:'All support tickets',axis:'Tickets / week',unit:'tickets',series:3});
+  responderBars();
+  for(const w of data.weeks)rows('di-week-rows',[date(w.date),w.pings,w.taken,w.missed,pct(100*w.taken/w.pings),w.four,w.tickets,w.quiet,w.vanishing]);
+  for(const r of [...data.responders].filter(r=>r.change<0).sort((a,b)=>a.change-b.change)) {
+    const group=el('div','loss');group.append(el('span',null,r.name));group.append(bar('Pings',-r.change,100,'',signed(r.change)),bar('Demand',-r.demandChange,100,'s2',signed(r.demandChange)),el('span','text-small text-muted',severe.has(r.name)?'Large gap · routing / timeout hypothesis':'Demand may contribute · unconfirmed'));q('di-demand-losses').append(group);
+  }
+  for(const r of data.responders){const option=el('option',null,r.name);option.value=r.name;q('di-person-select').append(option);}
+  function selectPerson(name) {
+    const r=data.responders.find(r=>r.name===name);q('di-person-name').textContent=r.name+' · '+r.area;
+    q('di-person-summary').textContent=(r.before/6).toFixed(1)+' → '+(r.after/3).toFixed(1)+' pings/week ('+signed(r.change)+'); usual-area demand '+signed(r.demandChange);
+    lineChart('di-person-chart',r.weeks.map(w=>w[0]),{title:r.name+' pings',axis:'Pings / week',unit:'pings',series:1,details:r.weeks.map(w=>[r.name+': '+w[1]+' taken; '+w[2]+' missed'])});
+    q('di-person-outcomes').replaceChildren();q('di-person-week-rows').replaceChildren();
+    r.outcomes.forEach((o,i)=>{
+      const group=el('div','period'),head=el('div','period-head');head.append(el('span',null,['Before · 6 weeks','Mixed · 1 week','After · 3 weeks'][i]),el('span','text-small text-muted',o[0]+' pings'));const stack=el('div','outcome-stack'),labels=el('div','outcome-labels text-small');
+      ['Taken','Turned down','Missed'].forEach((label,j)=>{const mark=el('span','fill '+['s5','s3','s4'][j]);mark.style.width=(100*o[j+1]/o[0])+'%';mark.setAttribute('data-tooltip',label+': '+o[j+1]+'/'+o[0]);stack.append(mark);labels.append(el('span',null,label+' '+o[j+1]+' · '+pct(100*o[j+1]/o[0])));});group.append(head,stack,labels);q('di-person-outcomes').append(group);
+    });
+    const ev=q('di-person-evidence');ev.replaceChildren();
+    const add=(label,text)=>{const tr=el('tr');const th=el('th',null,label);th.scope='row';tr.append(th,el('td',null,text));ev.append(tr);};
+    add('Evidence',r.name==='Meteor Mite'?'Kip reports Mite quiet while The Gale is exhausted; same handler and usual area.':r.name==='Vesper'?'Interview describes disappearing offers and quiet stretches.':r.name==='Farlight'?'Tickets report correct availability and tags, fewer pings and a rare offer disappearing.':r.name==='The Undertow'?'Tickets report correct availability and tags, fewer pings and a rare offer disappearing.':r.name==='The Gale'?'Kip reports heavy workload; recorded pings rise while Mite’s fall.':r.change<0?'Quiet-workload reports agree with fewer recorded pings.':'Higher recorded ping volume; individual causal explanation not established.');
+    add('Candidate explanation',severe.has(r.name)?'Timeout and ranking interactions merit investigation. Actual rank, availability and delivery logs are missing.':r.change<0?'Usual-area demand decline may contribute; availability, capability and travel-time differences remain unmeasured.':'Ranking, availability and demand mix could affect allocation; the current data does not isolate them.');
+    r.weeks.forEach((w,i)=>rows('di-person-week-rows',[date(data.weeks[i].date),w[0],w[1],w[2]]));
+  }
+  q('di-person-select').value='Farlight';q('di-person-select').addEventListener('change',e=>selectPerson(e.target.value));selectPerson('Farlight');
+
+  data.cohorts.forEach((c,i)=>{
+    const label=['Before · 6 weeks','Mixed · 1 week','After · 3 weeks'][i];
+    const group=el('div','period');group.append(el('span',null,label));const stack=el('div','outcome-stack');
+    const a=el('span','fill'),b=el('span','fill s2');a.style.width=(c.fourP/c.total*100)+'%';b.style.width=(c.otherP/c.total*100)+'%';stack.append(a,b);group.append(stack,el('span','text-small','Four: '+c.fourP+'/'+c.total+' · '+pct(100*c.fourP/c.total)+'; other 12: '+pct(100*c.otherP/c.total)));q('di-cohort-shares').append(group);
+    const rates=el('div','period');rates.append(el('span',null,label),bar('Four',100*c.fourT/c.fourP,100,'',pct(100*c.fourT/c.fourP)),bar('Other 12',100*c.otherT/c.otherP,100,'s2',pct(100*c.otherT/c.otherP)));q('di-cohort-rates').append(rates);
+  });
+  q('di-ticket-rates').append(bar('Before',40/44,5,'s3',(40/44).toFixed(2)),bar('After',105/26,5,'s3',(105/26).toFixed(2)));
+  q('di-count-checks').append(bar('Matched',15,15,'s5','15 / 15'),bar('Partial',2,15,'s3','2'));
+  for(const c of data.claims){const tr=el('tr');tr.append(el('td',null,'#'+c.ticket_number+' · '+date(c.filed_at)),el('td',null,c.responder),el('td','number',c.reported_pings),el('td','number',c.recorded_pings),el('td',null,c.coverage==='within covered dates'?'Covered · exact':'Partial'));q('di-claim-rows').append(tr);}
+})();
+</script>

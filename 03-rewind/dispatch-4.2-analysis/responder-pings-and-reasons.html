@@ -1,0 +1,242 @@
+<div id="rook-responder-explorer">
+  <style>
+    #rook-responder-explorer { display:grid; gap:calc(var(--font-size-base) * 1.6); color:var(--foreground); }
+    #rook-responder-explorer section, #rook-responder-explorer .group { display:grid; gap:calc(var(--font-size-base) * .65); min-width:0; }
+    #rook-responder-explorer .heading { display:grid; gap:calc(var(--font-size-base) * .3); padding-right:90px; }
+    #rook-responder-explorer .legend { display:flex; flex-wrap:wrap; align-items:center; gap:calc(var(--font-size-base) * .8); }
+    #rook-responder-explorer .key { display:inline-flex; align-items:center; gap:calc(var(--font-size-base) * .35); }
+    #rook-responder-explorer .swatch { width:12px; height:12px; display:inline-block; background:var(--viz-series-1); }
+    #rook-responder-explorer .swatch.declined, #rook-responder-explorer .seg.declined { background:var(--viz-series-3); }
+    #rook-responder-explorer .swatch.missed, #rook-responder-explorer .seg.missed { background:var(--viz-series-4); }
+    #rook-responder-explorer .swatch.demand, #rook-responder-explorer .fill.demand { background:var(--viz-series-2); }
+    #rook-responder-explorer .heat-table { min-width:940px; }
+    #rook-responder-explorer .heat-table th, #rook-responder-explorer .heat-table td { vertical-align:middle; }
+    #rook-responder-explorer .heat-table .heat { text-align:center; min-width:41px; font-variant-numeric:tabular-nums; }
+    #rook-responder-explorer .heat-table .boundary { border-left:1px solid var(--border); }
+    #rook-responder-explorer .heat-table thead th { font-weight:500; }
+    #rook-responder-explorer .number { text-align:right; font-variant-numeric:tabular-nums; white-space:nowrap; }
+    #rook-responder-explorer .detail-grid { display:grid; grid-template-columns:1fr 1fr; gap:calc(var(--font-size-base) * 1.5); }
+    #rook-responder-explorer .period { display:grid; gap:calc(var(--font-size-base) * .3); }
+    #rook-responder-explorer .row-heading { display:flex; flex-wrap:wrap; align-items:baseline; justify-content:space-between; gap:calc(var(--font-size-base) * .5); }
+    #rook-responder-explorer .stack { display:flex; height:22px; width:100%; background:color-mix(in srgb,var(--foreground) 7%,transparent); }
+    #rook-responder-explorer .seg { background:var(--viz-series-1); height:100%; }
+    #rook-responder-explorer .stack-labels { display:flex; flex-wrap:wrap; gap:calc(var(--font-size-base) * .6); font-variant-numeric:tabular-nums; }
+    #rook-responder-explorer .bar-row { display:grid; grid-template-columns:54px minmax(0,1fr) 70px; align-items:center; gap:calc(var(--font-size-base) * .5); }
+    #rook-responder-explorer .track { height:17px; background:color-mix(in srgb,var(--foreground) 7%,transparent); }
+    #rook-responder-explorer .fill { height:100%; background:var(--viz-series-1); }
+    #rook-responder-explorer .losses { display:grid; grid-template-columns:1fr 1fr; gap:calc(var(--font-size-base) * 1.3); }
+    #rook-responder-explorer .loss { display:grid; gap:calc(var(--font-size-base) * .35); }
+    #rook-responder-explorer .loss .bar-row { grid-template-columns:60px minmax(0,1fr) 62px; }
+    #rook-responder-explorer .mechanism { display:flex; flex-wrap:wrap; gap:calc(var(--font-size-base) * .65); align-items:stretch; }
+    #rook-responder-explorer .step { display:flex; flex-direction:column; gap:calc(var(--font-size-base) * .3); flex:1 1 125px; }
+    #rook-responder-explorer .step-label { border-bottom:1px solid var(--border); padding-bottom:calc(var(--font-size-base) * .4); }
+    #rook-responder-explorer .evidence-table { width:100%; }
+    #rook-responder-explorer .verified, #rook-responder-explorer .sources { display:grid; gap:calc(var(--font-size-base) * .4); }
+    #rook-responder-explorer .evidence-table td:first-child { width:30%; }
+    @media (max-width:580px) {
+      #rook-responder-explorer .detail-grid, #rook-responder-explorer .losses { grid-template-columns:1fr; }
+      #rook-responder-explorer .heading { padding-right:0; }
+    }
+  </style>
+
+  <div class="heading">
+    <h2>Every responder’s pings around release 4.2</h2>
+    <span class="text-small text-muted">16 responders · 10 weeks · 1,696 pings · 29 June–6 September 2026</span>
+  </div>
+
+  <section aria-labelledby="rr-week-heading">
+    <h3 id="rr-week-heading">Weekly pings · exact counts</h3>
+    <div class="legend text-small" id="rr-intensity" aria-label="Cell shade represents ping count"></div>
+    <div class="table-responsive">
+      <table class="table table-sm heat-table" aria-label="Weekly ping counts for all 16 responders, ordered from largest decrease to largest increase. Before averages use six complete weeks; after averages use three. Responder names select outcome and evidence details below.">
+        <thead>
+          <tr><th scope="col" rowspan="2">Responder details</th><th scope="col" rowspan="2" class="number">Before<br>/week</th><th scope="col" rowspan="2" class="number">After<br>/week</th><th scope="col" rowspan="2" class="number">Change</th><th scope="colgroup" colspan="6" class="text-center boundary">Before · six full weeks</th><th scope="colgroup" colspan="1" class="text-center boundary">Mixed</th><th scope="colgroup" colspan="3" class="text-center boundary">After · three full weeks</th></tr>
+          <tr id="rr-week-labels"></tr>
+        </thead>
+        <tbody id="rr-week-rows"></tbody>
+      </table>
+    </div>
+    <span class="text-small text-muted">Week-start dates, Monday–Sunday. *10 August week includes the 12 August release. Before: 29 Jun–9 Aug. After: 17 Aug–6 Sep. Zero means no ping, not verified unavailability.</span>
+  </section>
+
+  <section id="rr-detail" aria-labelledby="rr-person-name">
+    <div class="heading" aria-live="polite"><h3 id="rr-person-name">Farlight</h3><span class="text-small" id="rr-person-context"></span></div>
+    <div class="legend text-small"><span class="key"><i class="swatch" aria-hidden="true"></i>Taken</span><span class="key"><i class="swatch declined" aria-hidden="true"></i>Turned down</span><span class="key"><i class="swatch missed" aria-hidden="true"></i>Missed</span></div>
+    <div class="detail-grid">
+      <div class="group"><h3>Offer outcomes · share of pings</h3><div class="group" id="rr-person-outcomes"></div></div>
+      <div class="group"><h3 id="rr-demand-title">Usual-area callouts per week</h3><div class="group" id="rr-person-demand"></div><span class="text-small text-muted" id="rr-demand-change"></span></div>
+    </div>
+    <table class="table table-sm evidence-table"><tbody id="rr-person-evidence"></tbody></table>
+  </section>
+
+  <section aria-labelledby="rr-loss-heading">
+    <h3 id="rr-loss-heading">All six responders with fewer pings</h3>
+    <div class="legend text-small"><span class="key"><i class="swatch" aria-hidden="true"></i>Ping decline</span><span class="key"><i class="swatch demand" aria-hidden="true"></i>Usual-area demand decline</span><span class="text-muted">Shared scale · 0–100% decline</span></div>
+    <div class="losses" id="rr-losses"></div>
+    <span class="text-small text-muted">Usual-area demand is context: availability, capability match and travel time are not controlled.</span>
+  </section>
+
+  <section aria-labelledby="rr-mechanism-heading">
+    <h3 id="rr-mechanism-heading">Possible feedback loop · individual causes unconfirmed</h3>
+    <div class="mechanism" role="img" aria-label="Hypothesis: the shorter answer window increases missed offers; misses reduce history score; this can lower future rank; dispatch may stop before reaching that responder; fewer pings mean fewer opportunities to recover score.">
+      <div class="step"><span class="step-label">1 · Answer window</span><span>90 → 60 seconds</span><span class="text-small text-muted">4.2 setting</span></div>
+      <div class="step"><span class="step-label">2 · Missed offer</span><span>History score −0.12</span><span class="text-small text-muted">Same as an explicit no</span></div>
+      <div class="step"><span class="step-label">3 · Future rank</span><span>Can move lower</span><span class="text-small text-muted">Proximity and capabilities also count</span></div>
+      <div class="step"><span class="step-label">4 · Earlier acceptance</span><span>Dispatch stops</span><span class="text-small text-muted">Lower-ranked responder gets no ping</span></div>
+      <div class="step"><span class="step-label">5 · Recovery</span><span>Fewer chances to earn +0.08</span><span class="text-small text-muted">No time-based recovery in code</span></div>
+    </div>
+    <div class="table-responsive"><table class="table table-sm"><thead><tr><th>Evidence level</th><th>What it establishes</th></tr></thead><tbody>
+      <tr><td>Measured</td><td>Four severe declines; missed offers spike in the mixed release week.</td></tr>
+      <tr><td>Code behavior</td><td>Misses lower history score; dispatch stops at the first acceptance.</td></tr>
+      <tr><td>Customer reports</td><td>Quiet stretches, disappearing offers, availability appearing correct.</td></tr>
+      <tr><td>Still needed</td><td>Historical eligibility, rank and score components; delivery and response timestamps; deployed-code confirmation.</td></tr>
+    </tbody></table></div>
+    <span class="text-small text-muted">4.2 also changed proximity weight 0.45 → 0.60 and history weight 0.40 → 0.25. Increased proximity weighting is a separate candidate explanation.</span>
+  </section>
+
+  <details class="sources">
+    <summary>Data and comparison definitions</summary>
+    <div class="text-small">Source: Rook database, pings, responders and callouts. All 160 responder-week rows reconcile to 1,696 pings and 1,222 taken. No records earlier than 29 June or later than 6 September were returned for pings. Farlight’s last zero-ping week is explicitly included.</div>
+    <div class="text-small">Outcome counts: before 29 Jun–9 Aug; mixed 10–16 Aug; after 17 Aug–6 Sep. Volume comparisons divide before by 6 weeks and after by 3. Acceptance includes all outcomes. Area is usual area, not confirmed callout eligibility.</div>
+    <div class="text-small">Routing evidence: config.py, routing.py, offer.py and history.py in 00-rook/code/dispatch-routing. Reports: support tickets 3071, 3073, 3110 and 3140; 3 September Vesper interview; 4 September Kip interview.</div>
+  </details>
+</div>
+<script>
+(() => {
+  const root = document.getElementById('rook-responder-explorer');
+  const data = [
+    {n:'Captain Vantage',a:'Hillcrest',w:[[12,10],[13,10],[12,8],[11,7],[12,9],[12,9],[13,8],[15,11],[17,13],[18,13]],o:[[72,53,17,2],[13,8,4,1],[50,37,8,5]],d:[56,8,25]},
+    {n:'Cindermark',a:'Mill District',w:[[9,7],[9,8],[8,6],[10,7],[9,7],[9,8],[10,6],[11,8],[12,8],[12,9]],o:[[54,43,10,1],[10,6,3,1],[35,25,6,4]],d:[43,6,19]},
+    {n:'Corporal Ashgrove',a:'Northfield',w:[[10,8],[11,9],[10,7],[9,7],[10,8],[10,8],[10,6],[8,5],[7,5],[7,5]],o:[[60,47,12,1],[10,6,3,1],[22,15,4,3]],d:[49,7,17]},
+    {n:'Farlight',a:'Uptown',w:[[12,9],[12,9],[11,8],[12,9],[13,10],[12,8],[10,4],[3,0],[1,0],[0,0]],o:[[72,53,16,3],[10,4,2,4],[4,0,1,3]],d:[57,6,27]},
+    {n:'Halfmoon',a:'Westbury',w:[[11,8],[10,7],[11,8],[12,8],[11,9],[11,8],[11,6],[9,5],[8,5],[8,7]],o:[[66,48,18,0],[11,6,3,2],[25,17,5,3]],d:[54,6,19]},
+    {n:'Ironvale',a:'Riverside',w:[[8,6],[8,5],[9,8],[8,6],[7,5],[8,7],[9,5],[10,6],[11,8],[12,9]],o:[[48,37,10,1],[9,5,3,1],[33,23,4,6]],d:[39,6,19]},
+    {n:'Meteor Mite',a:'Eastgate',w:[[11,7],[12,9],[10,6],[11,7],[12,9],[11,8],[10,4],[4,1],[2,0],[1,0]],o:[[67,46,19,2],[10,4,2,4],[7,1,2,4]],d:[112,15,48]},
+    {n:'Nightwell',a:'Midtown',w:[[15,11],[14,10],[15,12],[16,12],[15,11],[15,12],[16,9],[18,14],[20,13],[21,15]],o:[[90,68,19,3],[16,9,5,2],[59,42,11,6]],d:[72,10,32]},
+    {n:'Sgt. Bulwark',a:'Foundry Row',w:[[9,7],[9,7],[10,8],[9,7],[8,5],[9,7],[10,5],[10,8],[11,7],[11,8]],o:[[54,41,13,0],[10,5,3,2],[32,23,4,5]],d:[42,5,19]},
+    {n:'Sgt. Falkirk',a:'Kingsbridge',w:[[10,9],[10,8],[11,8],[10,8],[9,7],[10,8],[11,7],[13,9],[15,11],[16,11]],o:[[60,48,10,2],[11,7,2,2],[44,31,7,6]],d:[52,7,23]},
+    {n:'Stormwrack',a:'Southport',w:[[13,10],[13,11],[12,9],[14,12],[13,10],[13,10],[14,8],[16,12],[18,13],[19,15]],o:[[78,62,16,0],[14,8,3,3],[53,40,7,6]],d:[64,12,32]},
+    {n:'The Drift',a:'Greenway',w:[[6,5],[6,5],[7,6],[6,5],[6,5],[6,5],[7,4],[7,5],[8,6],[8,5]],o:[[37,31,5,1],[7,4,1,2],[23,16,4,3]],d:[34,4,14]},
+    {n:'The Gale',a:'Eastgate',w:[[13,10],[12,9],[13,10],[14,11],[13,11],[13,10],[15,9],[17,12],[20,14],[21,16]],o:[[78,61,14,3],[15,9,3,3],[58,42,10,6]],d:[112,15,48]},
+    {n:'The Longcast',a:'Lakeshore',w:[[7,5],[7,5],[8,7],[7,5],[7,5],[7,5],[8,5],[8,6],[9,5],[9,7]],o:[[43,32,10,1],[8,5,2,1],[26,18,4,4]],d:[33,5,16]},
+    {n:'The Undertow',a:'Harborside',w:[[12,9],[11,9],[12,9],[13,10],[12,10],[12,9],[11,4],[4,1],[1,0],[1,0]],o:[[72,56,15,1],[11,4,2,5],[6,1,1,4]],d:[61,6,28]},
+    {n:'Vesper',a:'Old Town',w:[[14,11],[13,10],[15,13],[14,11],[13,11],[14,12],[12,6],[5,1],[2,0],[1,0]],o:[[83,68,12,3],[12,6,2,4],[8,1,2,5]],d:[69,7,34]}
+  ];
+  const dates = ['29 Jun','6 Jul','13 Jul','20 Jul','27 Jul','3 Aug','10 Aug*','17 Aug','24 Aug','31 Aug'];
+  const severe = new Set(['Farlight','Meteor Mite','The Undertow','Vesper']);
+  const periodLabels = ['Before · 6 weeks','Mixed · 1 week','After · 3 weeks'];
+  const periods = [6,1,3];
+  const buttons = new Map();
+  const q = id => root.querySelector('#'+id);
+  const el = (tag,cls,text) => { const node=document.createElement(tag);if(cls)node.className=cls;if(text!==undefined)node.textContent=text;return node; };
+  const percent = value => value.toFixed(1)+'%';
+  const signed = value => (Math.abs(value)<0.05?'':value>0?'+':'−')+Math.abs(value).toFixed(1)+'%';
+  const change = r => (2*r.o[2][0]/r.o[0][0]-1)*100;
+  const demandChange = r => (2*r.d[2]/r.d[0]-1)*100;
+  const maxPings = Math.max(...data.flatMap(r=>r.w.map(w=>w[0])));
+  const maxDemand = Math.ceil(Math.max(...data.flatMap(r=>r.d.map((n,i)=>n/periods[i])))/5)*5;
+  let selected = 'Farlight';
+
+  for (const n of [0,5,10,15,maxPings]) {
+    const item=el('span','key');
+    const mark=el('i','swatch');
+    mark.style.background = 'color-mix(in srgb,var(--viz-series-1) '+(n/maxPings*48)+'%,transparent)';
+    mark.setAttribute('aria-hidden','true');
+    item.append(mark,document.createTextNode(n+' pings'));
+    q('rr-intensity').append(item);
+  }
+  dates.forEach((date,i)=>{const th=el('th','heat'+([0,6,7].includes(i)?' boundary':''),date);th.scope='col';q('rr-week-labels').append(th);});
+
+  function barRow(label,value,max,kind,display) {
+    const row=el('div','bar-row');
+    const track=el('div','track');
+    const fill=el('div','fill'+(kind?' '+kind:''));
+    fill.style.width=Math.max(0,value/max*100)+'%';
+    track.append(fill);
+    row.append(el('span','text-small',label),track,el('span','number',display));
+    row.setAttribute('aria-label',label+': '+display);
+    return row;
+  }
+
+  function evidenceRow(label,text) {
+    const tr=el('tr');
+    const th=el('th',null,label);th.scope='row';
+    tr.append(th,el('td',null,text));return tr;
+  }
+
+  function select(name) {
+    selected=name;
+    const r=data.find(d=>d.n===name);
+    for (const [n,b] of buttons)b.setAttribute('aria-pressed',String(n===name));
+    q('rr-person-name').textContent=name+' · outcome and evidence detail';
+    q('rr-person-context').textContent=r.a+' · '+(r.o[0][0]/6).toFixed(1)+' → '+(r.o[2][0]/3).toFixed(1)+' pings/week ('+signed(change(r))+')';
+    q('rr-person-outcomes').replaceChildren();
+    r.o.forEach((o,i)=>{
+      const group=el('div','period');
+      const heading=el('div','row-heading');
+      heading.append(el('span',null,periodLabels[i]),el('span','text-small text-muted',o[0]+' pings'));
+      const stack=el('div','stack');
+      stack.setAttribute('role','img');
+      stack.setAttribute('aria-label',periodLabels[i]+': '+o[1]+' taken, '+o[2]+' turned down, '+o[3]+' missed, out of '+o[0]+' pings.');
+      const labels=el('div','stack-labels text-small');
+      ['Taken','Turned down','Missed'].forEach((label,j)=>{
+        const seg=el('span','seg '+['taken','declined','missed'][j]);
+        seg.style.width=(o[j+1]/o[0]*100)+'%';
+        seg.setAttribute('data-tooltip',name+' · '+periodLabels[i]+' · '+label+': '+o[j+1]+'/'+o[0]+' ('+percent(o[j+1]/o[0]*100)+')');
+        stack.append(seg);
+        labels.append(el('span',null,label+' '+o[j+1]+' ('+percent(o[j+1]/o[0]*100)+')'));
+      });
+      group.append(heading,stack,labels);q('rr-person-outcomes').append(group);
+    });
+    q('rr-demand-title').textContent=r.a+' · callouts/week';
+    q('rr-person-demand').replaceChildren();
+    ['Before','Mixed','After'].forEach((p,i)=>{
+      const row=barRow(p,r.d[i]/periods[i],maxDemand,'demand',(r.d[i]/periods[i]).toFixed(1));
+      row.setAttribute('data-tooltip',r.d[i]+' callouts over '+periods[i]+' week'+(periods[i]===1?'':'s'));
+      q('rr-person-demand').append(row);
+    });
+    q('rr-demand-change').textContent='Area demand '+signed(demandChange(r))+' · shared scale 0–'+maxDemand+' callouts/week across all responders.';
+    const ev=q('rr-person-evidence');ev.replaceChildren();
+    const severity=severe.has(name);
+    const explanation=severity?'Routing / timeout feedback is a candidate explanation; the ping decline greatly exceeds the decline in usual-area callouts.':change(r)<0?'Local demand decline may contribute; it broadly matches this responder’s smaller ping decline.':'More pings observed; a ranking or availability change is possible, but individual cause is not established.';
+    ev.append(evidenceRow('Candidate explanation',explanation));
+    const reports={
+      'Farlight':'Tickets 3071 and 3110: availability and tags appeared correct; a rare offer disappeared before acceptance. Handler reports, not verified event traces.',
+      'The Undertow':'Tickets 3073 and 3140: availability and tags appeared correct; a rare offer disappeared before acceptance. Handler reports, not verified event traces.',
+      'Meteor Mite':'Kip’s 4 September interview: Mite quiet while The Gale was exhausted. Same handler and usual area; Gale’s pings/week rose 48.7%.',
+      'Vesper':'3 September interview: offers disappearing before acceptance and stretches with few pings. Timing and cause not independently established.',
+      'The Gale':'Kip’s 4 September interview describes heavy workload while Meteor Mite was quiet. Mite’s pings/week fell 79.1% in the same usual area.'
+    };
+    if(reports[name])ev.append(evidenceRow('Customer evidence',reports[name]));
+    ev.append(evidenceRow('To establish why','Historical availability and eligibility, candidate rank and score components, travel-time estimates, and delivery / response timestamps.'));
+  }
+
+  const sorted=[...data].sort((a,b)=>change(a)-change(b));
+  for(const r of sorted) {
+    const tr=el('tr');
+    const nameCell=el('th');nameCell.scope='row';
+    const button=el('button','btn btn-ghost',r.n);button.type='button';button.setAttribute('aria-controls','rr-detail');button.setAttribute('aria-pressed',String(r.n===selected));
+    button.addEventListener('click',()=>select(r.n));buttons.set(r.n,button);nameCell.append(button);
+    const before=el('td','number',(r.o[0][0]/6).toFixed(1));before.setAttribute('data-tooltip',r.o[0][0]+' pings / 6 weeks');
+    const after=el('td','number',(r.o[2][0]/3).toFixed(1));after.setAttribute('data-tooltip',r.o[2][0]+' pings / 3 weeks');
+    tr.append(nameCell,before,after,el('td','number',signed(change(r))));
+    r.w.forEach((week,i)=>{
+      const cell=el('td','heat'+([0,6,7].includes(i)?' boundary':''),week[0]);
+      cell.style.background='color-mix(in srgb,var(--viz-series-1) '+(week[0]/maxPings*48)+'%,transparent)';
+      cell.setAttribute('data-tooltip',r.n+' · week of '+dates[i].replace('*','')+': '+week[0]+' pings, '+week[1]+' taken');
+      tr.append(cell);
+    });
+    q('rr-week-rows').append(tr);
+  }
+
+  for(const r of sorted.filter(r=>change(r)<0)) {
+    const group=el('div','loss');
+    group.append(el('span',null,r.n));
+    group.append(barRow('Pings',-change(r),100,'',signed(change(r))));
+    group.append(barRow('Demand',-demandChange(r),100,'demand',signed(demandChange(r))));
+    group.append(el('span','text-small text-muted',severe.has(r.n)?'Large unexplained gap · routing / timeout hypothesis':'Demand decline may contribute · unconfirmed'));
+    q('rr-losses').append(group);
+  }
+  select(selected);
+})();
+</script>

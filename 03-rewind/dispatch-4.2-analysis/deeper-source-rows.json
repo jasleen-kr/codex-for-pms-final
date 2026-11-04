@@ -1,0 +1,1371 @@
+{
+  "outcomes": [
+    {
+      "responder": "Captain Vantage",
+      "period": "after_full_weeks",
+      "pings": "50",
+      "taken": "37",
+      "turned_down": "8",
+      "missed": "5"
+    },
+    {
+      "responder": "Captain Vantage",
+      "period": "before_full_weeks",
+      "pings": "72",
+      "taken": "53",
+      "turned_down": "17",
+      "missed": "2"
+    },
+    {
+      "responder": "Captain Vantage",
+      "period": "release_week",
+      "pings": "13",
+      "taken": "8",
+      "turned_down": "4",
+      "missed": "1"
+    },
+    {
+      "responder": "Cindermark",
+      "period": "after_full_weeks",
+      "pings": "35",
+      "taken": "25",
+      "turned_down": "6",
+      "missed": "4"
+    },
+    {
+      "responder": "Cindermark",
+      "period": "before_full_weeks",
+      "pings": "54",
+      "taken": "43",
+      "turned_down": "10",
+      "missed": "1"
+    },
+    {
+      "responder": "Cindermark",
+      "period": "release_week",
+      "pings": "10",
+      "taken": "6",
+      "turned_down": "3",
+      "missed": "1"
+    },
+    {
+      "responder": "Corporal Ashgrove",
+      "period": "after_full_weeks",
+      "pings": "22",
+      "taken": "15",
+      "turned_down": "4",
+      "missed": "3"
+    },
+    {
+      "responder": "Corporal Ashgrove",
+      "period": "before_full_weeks",
+      "pings": "60",
+      "taken": "47",
+      "turned_down": "12",
+      "missed": "1"
+    },
+    {
+      "responder": "Corporal Ashgrove",
+      "period": "release_week",
+      "pings": "10",
+      "taken": "6",
+      "turned_down": "3",
+      "missed": "1"
+    },
+    {
+      "responder": "Farlight",
+      "period": "after_full_weeks",
+      "pings": "4",
+      "taken": "0",
+      "turned_down": "1",
+      "missed": "3"
+    },
+    {
+      "responder": "Farlight",
+      "period": "before_full_weeks",
+      "pings": "72",
+      "taken": "53",
+      "turned_down": "16",
+      "missed": "3"
+    },
+    {
+      "responder": "Farlight",
+      "period": "release_week",
+      "pings": "10",
+      "taken": "4",
+      "turned_down": "2",
+      "missed": "4"
+    },
+    {
+      "responder": "Halfmoon",
+      "period": "after_full_weeks",
+      "pings": "25",
+      "taken": "17",
+      "turned_down": "5",
+      "missed": "3"
+    },
+    {
+      "responder": "Halfmoon",
+      "period": "before_full_weeks",
+      "pings": "66",
+      "taken": "48",
+      "turned_down": "18",
+      "missed": "0"
+    },
+    {
+      "responder": "Halfmoon",
+      "period": "release_week",
+      "pings": "11",
+      "taken": "6",
+      "turned_down": "3",
+      "missed": "2"
+    },
+    {
+      "responder": "Ironvale",
+      "period": "after_full_weeks",
+      "pings": "33",
+      "taken": "23",
+      "turned_down": "4",
+      "missed": "6"
+    },
+    {
+      "responder": "Ironvale",
+      "period": "before_full_weeks",
+      "pings": "48",
+      "taken": "37",
+      "turned_down": "10",
+      "missed": "1"
+    },
+    {
+      "responder": "Ironvale",
+      "period": "release_week",
+      "pings": "9",
+      "taken": "5",
+      "turned_down": "3",
+      "missed": "1"
+    },
+    {
+      "responder": "Meteor Mite",
+      "period": "after_full_weeks",
+      "pings": "7",
+      "taken": "1",
+      "turned_down": "2",
+      "missed": "4"
+    },
+    {
+      "responder": "Meteor Mite",
+      "period": "before_full_weeks",
+      "pings": "67",
+      "taken": "46",
+      "turned_down": "19",
+      "missed": "2"
+    },
+    {
+      "responder": "Meteor Mite",
+      "period": "release_week",
+      "pings": "10",
+      "taken": "4",
+      "turned_down": "2",
+      "missed": "4"
+    },
+    {
+      "responder": "Nightwell",
+      "period": "after_full_weeks",
+      "pings": "59",
+      "taken": "42",
+      "turned_down": "11",
+      "missed": "6"
+    },
+    {
+      "responder": "Nightwell",
+      "period": "before_full_weeks",
+      "pings": "90",
+      "taken": "68",
+      "turned_down": "19",
+      "missed": "3"
+    },
+    {
+      "responder": "Nightwell",
+      "period": "release_week",
+      "pings": "16",
+      "taken": "9",
+      "turned_down": "5",
+      "missed": "2"
+    },
+    {
+      "responder": "Sgt. Bulwark",
+      "period": "after_full_weeks",
+      "pings": "32",
+      "taken": "23",
+      "turned_down": "4",
+      "missed": "5"
+    },
+    {
+      "responder": "Sgt. Bulwark",
+      "period": "before_full_weeks",
+      "pings": "54",
+      "taken": "41",
+      "turned_down": "13",
+      "missed": "0"
+    },
+    {
+      "responder": "Sgt. Bulwark",
+      "period": "release_week",
+      "pings": "10",
+      "taken": "5",
+      "turned_down": "3",
+      "missed": "2"
+    },
+    {
+      "responder": "Sgt. Falkirk",
+      "period": "after_full_weeks",
+      "pings": "44",
+      "taken": "31",
+      "turned_down": "7",
+      "missed": "6"
+    },
+    {
+      "responder": "Sgt. Falkirk",
+      "period": "before_full_weeks",
+      "pings": "60",
+      "taken": "48",
+      "turned_down": "10",
+      "missed": "2"
+    },
+    {
+      "responder": "Sgt. Falkirk",
+      "period": "release_week",
+      "pings": "11",
+      "taken": "7",
+      "turned_down": "2",
+      "missed": "2"
+    },
+    {
+      "responder": "Stormwrack",
+      "period": "after_full_weeks",
+      "pings": "53",
+      "taken": "40",
+      "turned_down": "7",
+      "missed": "6"
+    },
+    {
+      "responder": "Stormwrack",
+      "period": "before_full_weeks",
+      "pings": "78",
+      "taken": "62",
+      "turned_down": "16",
+      "missed": "0"
+    },
+    {
+      "responder": "Stormwrack",
+      "period": "release_week",
+      "pings": "14",
+      "taken": "8",
+      "turned_down": "3",
+      "missed": "3"
+    },
+    {
+      "responder": "The Drift",
+      "period": "after_full_weeks",
+      "pings": "23",
+      "taken": "16",
+      "turned_down": "4",
+      "missed": "3"
+    },
+    {
+      "responder": "The Drift",
+      "period": "before_full_weeks",
+      "pings": "37",
+      "taken": "31",
+      "turned_down": "5",
+      "missed": "1"
+    },
+    {
+      "responder": "The Drift",
+      "period": "release_week",
+      "pings": "7",
+      "taken": "4",
+      "turned_down": "1",
+      "missed": "2"
+    },
+    {
+      "responder": "The Gale",
+      "period": "after_full_weeks",
+      "pings": "58",
+      "taken": "42",
+      "turned_down": "10",
+      "missed": "6"
+    },
+    {
+      "responder": "The Gale",
+      "period": "before_full_weeks",
+      "pings": "78",
+      "taken": "61",
+      "turned_down": "14",
+      "missed": "3"
+    },
+    {
+      "responder": "The Gale",
+      "period": "release_week",
+      "pings": "15",
+      "taken": "9",
+      "turned_down": "3",
+      "missed": "3"
+    },
+    {
+      "responder": "The Longcast",
+      "period": "after_full_weeks",
+      "pings": "26",
+      "taken": "18",
+      "turned_down": "4",
+      "missed": "4"
+    },
+    {
+      "responder": "The Longcast",
+      "period": "before_full_weeks",
+      "pings": "43",
+      "taken": "32",
+      "turned_down": "10",
+      "missed": "1"
+    },
+    {
+      "responder": "The Longcast",
+      "period": "release_week",
+      "pings": "8",
+      "taken": "5",
+      "turned_down": "2",
+      "missed": "1"
+    },
+    {
+      "responder": "The Undertow",
+      "period": "after_full_weeks",
+      "pings": "6",
+      "taken": "1",
+      "turned_down": "1",
+      "missed": "4"
+    },
+    {
+      "responder": "The Undertow",
+      "period": "before_full_weeks",
+      "pings": "72",
+      "taken": "56",
+      "turned_down": "15",
+      "missed": "1"
+    },
+    {
+      "responder": "The Undertow",
+      "period": "release_week",
+      "pings": "11",
+      "taken": "4",
+      "turned_down": "2",
+      "missed": "5"
+    },
+    {
+      "responder": "Vesper",
+      "period": "after_full_weeks",
+      "pings": "8",
+      "taken": "1",
+      "turned_down": "2",
+      "missed": "5"
+    },
+    {
+      "responder": "Vesper",
+      "period": "before_full_weeks",
+      "pings": "83",
+      "taken": "68",
+      "turned_down": "12",
+      "missed": "3"
+    },
+    {
+      "responder": "Vesper",
+      "period": "release_week",
+      "pings": "12",
+      "taken": "6",
+      "turned_down": "2",
+      "missed": "4"
+    }
+  ],
+  "area_demand": [
+    {
+      "area": "Eastgate",
+      "period": "after_full_weeks",
+      "callouts": "48"
+    },
+    {
+      "area": "Eastgate",
+      "period": "before_full_weeks",
+      "callouts": "112"
+    },
+    {
+      "area": "Eastgate",
+      "period": "release_week",
+      "callouts": "15"
+    },
+    {
+      "area": "Foundry Row",
+      "period": "after_full_weeks",
+      "callouts": "19"
+    },
+    {
+      "area": "Foundry Row",
+      "period": "before_full_weeks",
+      "callouts": "42"
+    },
+    {
+      "area": "Foundry Row",
+      "period": "release_week",
+      "callouts": "5"
+    },
+    {
+      "area": "Greenway",
+      "period": "after_full_weeks",
+      "callouts": "14"
+    },
+    {
+      "area": "Greenway",
+      "period": "before_full_weeks",
+      "callouts": "34"
+    },
+    {
+      "area": "Greenway",
+      "period": "release_week",
+      "callouts": "4"
+    },
+    {
+      "area": "Harborside",
+      "period": "after_full_weeks",
+      "callouts": "28"
+    },
+    {
+      "area": "Harborside",
+      "period": "before_full_weeks",
+      "callouts": "61"
+    },
+    {
+      "area": "Harborside",
+      "period": "release_week",
+      "callouts": "6"
+    },
+    {
+      "area": "Hillcrest",
+      "period": "after_full_weeks",
+      "callouts": "25"
+    },
+    {
+      "area": "Hillcrest",
+      "period": "before_full_weeks",
+      "callouts": "56"
+    },
+    {
+      "area": "Hillcrest",
+      "period": "release_week",
+      "callouts": "8"
+    },
+    {
+      "area": "Kingsbridge",
+      "period": "after_full_weeks",
+      "callouts": "23"
+    },
+    {
+      "area": "Kingsbridge",
+      "period": "before_full_weeks",
+      "callouts": "52"
+    },
+    {
+      "area": "Kingsbridge",
+      "period": "release_week",
+      "callouts": "7"
+    },
+    {
+      "area": "Lakeshore",
+      "period": "after_full_weeks",
+      "callouts": "16"
+    },
+    {
+      "area": "Lakeshore",
+      "period": "before_full_weeks",
+      "callouts": "33"
+    },
+    {
+      "area": "Lakeshore",
+      "period": "release_week",
+      "callouts": "5"
+    },
+    {
+      "area": "Midtown",
+      "period": "after_full_weeks",
+      "callouts": "32"
+    },
+    {
+      "area": "Midtown",
+      "period": "before_full_weeks",
+      "callouts": "72"
+    },
+    {
+      "area": "Midtown",
+      "period": "release_week",
+      "callouts": "10"
+    },
+    {
+      "area": "Mill District",
+      "period": "after_full_weeks",
+      "callouts": "19"
+    },
+    {
+      "area": "Mill District",
+      "period": "before_full_weeks",
+      "callouts": "43"
+    },
+    {
+      "area": "Mill District",
+      "period": "release_week",
+      "callouts": "6"
+    },
+    {
+      "area": "Northfield",
+      "period": "after_full_weeks",
+      "callouts": "17"
+    },
+    {
+      "area": "Northfield",
+      "period": "before_full_weeks",
+      "callouts": "49"
+    },
+    {
+      "area": "Northfield",
+      "period": "release_week",
+      "callouts": "7"
+    },
+    {
+      "area": "Old Town",
+      "period": "after_full_weeks",
+      "callouts": "34"
+    },
+    {
+      "area": "Old Town",
+      "period": "before_full_weeks",
+      "callouts": "69"
+    },
+    {
+      "area": "Old Town",
+      "period": "release_week",
+      "callouts": "7"
+    },
+    {
+      "area": "Riverside",
+      "period": "after_full_weeks",
+      "callouts": "19"
+    },
+    {
+      "area": "Riverside",
+      "period": "before_full_weeks",
+      "callouts": "39"
+    },
+    {
+      "area": "Riverside",
+      "period": "release_week",
+      "callouts": "6"
+    },
+    {
+      "area": "Southport",
+      "period": "after_full_weeks",
+      "callouts": "32"
+    },
+    {
+      "area": "Southport",
+      "period": "before_full_weeks",
+      "callouts": "64"
+    },
+    {
+      "area": "Southport",
+      "period": "release_week",
+      "callouts": "12"
+    },
+    {
+      "area": "Uptown",
+      "period": "after_full_weeks",
+      "callouts": "27"
+    },
+    {
+      "area": "Uptown",
+      "period": "before_full_weeks",
+      "callouts": "57"
+    },
+    {
+      "area": "Uptown",
+      "period": "release_week",
+      "callouts": "6"
+    },
+    {
+      "area": "Westbury",
+      "period": "after_full_weeks",
+      "callouts": "19"
+    },
+    {
+      "area": "Westbury",
+      "period": "before_full_weeks",
+      "callouts": "54"
+    },
+    {
+      "area": "Westbury",
+      "period": "release_week",
+      "callouts": "6"
+    }
+  ],
+  "affected_weekly": [
+    {
+      "week_start": "2026-06-29T00:00:00.000Z",
+      "responder": "Farlight",
+      "pings": "12",
+      "taken": "9",
+      "turned_down": "3",
+      "missed": "0"
+    },
+    {
+      "week_start": "2026-06-29T00:00:00.000Z",
+      "responder": "Meteor Mite",
+      "pings": "11",
+      "taken": "7",
+      "turned_down": "4",
+      "missed": "0"
+    },
+    {
+      "week_start": "2026-06-29T00:00:00.000Z",
+      "responder": "The Gale",
+      "pings": "13",
+      "taken": "10",
+      "turned_down": "2",
+      "missed": "1"
+    },
+    {
+      "week_start": "2026-06-29T00:00:00.000Z",
+      "responder": "The Undertow",
+      "pings": "12",
+      "taken": "9",
+      "turned_down": "3",
+      "missed": "0"
+    },
+    {
+      "week_start": "2026-06-29T00:00:00.000Z",
+      "responder": "Vesper",
+      "pings": "14",
+      "taken": "11",
+      "turned_down": "3",
+      "missed": "0"
+    },
+    {
+      "week_start": "2026-07-06T00:00:00.000Z",
+      "responder": "Farlight",
+      "pings": "12",
+      "taken": "9",
+      "turned_down": "3",
+      "missed": "0"
+    },
+    {
+      "week_start": "2026-07-06T00:00:00.000Z",
+      "responder": "Meteor Mite",
+      "pings": "12",
+      "taken": "9",
+      "turned_down": "3",
+      "missed": "0"
+    },
+    {
+      "week_start": "2026-07-06T00:00:00.000Z",
+      "responder": "The Gale",
+      "pings": "12",
+      "taken": "9",
+      "turned_down": "3",
+      "missed": "0"
+    },
+    {
+      "week_start": "2026-07-06T00:00:00.000Z",
+      "responder": "The Undertow",
+      "pings": "11",
+      "taken": "9",
+      "turned_down": "2",
+      "missed": "0"
+    },
+    {
+      "week_start": "2026-07-06T00:00:00.000Z",
+      "responder": "Vesper",
+      "pings": "13",
+      "taken": "10",
+      "turned_down": "2",
+      "missed": "1"
+    },
+    {
+      "week_start": "2026-07-13T00:00:00.000Z",
+      "responder": "Farlight",
+      "pings": "11",
+      "taken": "8",
+      "turned_down": "2",
+      "missed": "1"
+    },
+    {
+      "week_start": "2026-07-13T00:00:00.000Z",
+      "responder": "Meteor Mite",
+      "pings": "10",
+      "taken": "6",
+      "turned_down": "4",
+      "missed": "0"
+    },
+    {
+      "week_start": "2026-07-13T00:00:00.000Z",
+      "responder": "The Gale",
+      "pings": "13",
+      "taken": "10",
+      "turned_down": "3",
+      "missed": "0"
+    },
+    {
+      "week_start": "2026-07-13T00:00:00.000Z",
+      "responder": "The Undertow",
+      "pings": "12",
+      "taken": "9",
+      "turned_down": "2",
+      "missed": "1"
+    },
+    {
+      "week_start": "2026-07-13T00:00:00.000Z",
+      "responder": "Vesper",
+      "pings": "15",
+      "taken": "13",
+      "turned_down": "1",
+      "missed": "1"
+    },
+    {
+      "week_start": "2026-07-20T00:00:00.000Z",
+      "responder": "Farlight",
+      "pings": "12",
+      "taken": "9",
+      "turned_down": "2",
+      "missed": "1"
+    },
+    {
+      "week_start": "2026-07-20T00:00:00.000Z",
+      "responder": "Meteor Mite",
+      "pings": "11",
+      "taken": "7",
+      "turned_down": "3",
+      "missed": "1"
+    },
+    {
+      "week_start": "2026-07-20T00:00:00.000Z",
+      "responder": "The Gale",
+      "pings": "14",
+      "taken": "11",
+      "turned_down": "2",
+      "missed": "1"
+    },
+    {
+      "week_start": "2026-07-20T00:00:00.000Z",
+      "responder": "The Undertow",
+      "pings": "13",
+      "taken": "10",
+      "turned_down": "3",
+      "missed": "0"
+    },
+    {
+      "week_start": "2026-07-20T00:00:00.000Z",
+      "responder": "Vesper",
+      "pings": "14",
+      "taken": "11",
+      "turned_down": "3",
+      "missed": "0"
+    },
+    {
+      "week_start": "2026-07-27T00:00:00.000Z",
+      "responder": "Farlight",
+      "pings": "13",
+      "taken": "10",
+      "turned_down": "3",
+      "missed": "0"
+    },
+    {
+      "week_start": "2026-07-27T00:00:00.000Z",
+      "responder": "Meteor Mite",
+      "pings": "12",
+      "taken": "9",
+      "turned_down": "2",
+      "missed": "1"
+    },
+    {
+      "week_start": "2026-07-27T00:00:00.000Z",
+      "responder": "The Gale",
+      "pings": "13",
+      "taken": "11",
+      "turned_down": "1",
+      "missed": "1"
+    },
+    {
+      "week_start": "2026-07-27T00:00:00.000Z",
+      "responder": "The Undertow",
+      "pings": "12",
+      "taken": "10",
+      "turned_down": "2",
+      "missed": "0"
+    },
+    {
+      "week_start": "2026-07-27T00:00:00.000Z",
+      "responder": "Vesper",
+      "pings": "13",
+      "taken": "11",
+      "turned_down": "1",
+      "missed": "1"
+    },
+    {
+      "week_start": "2026-08-03T00:00:00.000Z",
+      "responder": "Farlight",
+      "pings": "12",
+      "taken": "8",
+      "turned_down": "3",
+      "missed": "1"
+    },
+    {
+      "week_start": "2026-08-03T00:00:00.000Z",
+      "responder": "Meteor Mite",
+      "pings": "11",
+      "taken": "8",
+      "turned_down": "3",
+      "missed": "0"
+    },
+    {
+      "week_start": "2026-08-03T00:00:00.000Z",
+      "responder": "The Gale",
+      "pings": "13",
+      "taken": "10",
+      "turned_down": "3",
+      "missed": "0"
+    },
+    {
+      "week_start": "2026-08-03T00:00:00.000Z",
+      "responder": "The Undertow",
+      "pings": "12",
+      "taken": "9",
+      "turned_down": "3",
+      "missed": "0"
+    },
+    {
+      "week_start": "2026-08-03T00:00:00.000Z",
+      "responder": "Vesper",
+      "pings": "14",
+      "taken": "12",
+      "turned_down": "2",
+      "missed": "0"
+    },
+    {
+      "week_start": "2026-08-10T00:00:00.000Z",
+      "responder": "Farlight",
+      "pings": "10",
+      "taken": "4",
+      "turned_down": "2",
+      "missed": "4"
+    },
+    {
+      "week_start": "2026-08-10T00:00:00.000Z",
+      "responder": "Meteor Mite",
+      "pings": "10",
+      "taken": "4",
+      "turned_down": "2",
+      "missed": "4"
+    },
+    {
+      "week_start": "2026-08-10T00:00:00.000Z",
+      "responder": "The Gale",
+      "pings": "15",
+      "taken": "9",
+      "turned_down": "3",
+      "missed": "3"
+    },
+    {
+      "week_start": "2026-08-10T00:00:00.000Z",
+      "responder": "The Undertow",
+      "pings": "11",
+      "taken": "4",
+      "turned_down": "2",
+      "missed": "5"
+    },
+    {
+      "week_start": "2026-08-10T00:00:00.000Z",
+      "responder": "Vesper",
+      "pings": "12",
+      "taken": "6",
+      "turned_down": "2",
+      "missed": "4"
+    },
+    {
+      "week_start": "2026-08-17T00:00:00.000Z",
+      "responder": "Farlight",
+      "pings": "3",
+      "taken": "0",
+      "turned_down": "1",
+      "missed": "2"
+    },
+    {
+      "week_start": "2026-08-17T00:00:00.000Z",
+      "responder": "Meteor Mite",
+      "pings": "4",
+      "taken": "1",
+      "turned_down": "1",
+      "missed": "2"
+    },
+    {
+      "week_start": "2026-08-17T00:00:00.000Z",
+      "responder": "The Gale",
+      "pings": "17",
+      "taken": "12",
+      "turned_down": "3",
+      "missed": "2"
+    },
+    {
+      "week_start": "2026-08-17T00:00:00.000Z",
+      "responder": "The Undertow",
+      "pings": "4",
+      "taken": "1",
+      "turned_down": "1",
+      "missed": "2"
+    },
+    {
+      "week_start": "2026-08-17T00:00:00.000Z",
+      "responder": "Vesper",
+      "pings": "5",
+      "taken": "1",
+      "turned_down": "1",
+      "missed": "3"
+    },
+    {
+      "week_start": "2026-08-24T00:00:00.000Z",
+      "responder": "Farlight",
+      "pings": "1",
+      "taken": "0",
+      "turned_down": "0",
+      "missed": "1"
+    },
+    {
+      "week_start": "2026-08-24T00:00:00.000Z",
+      "responder": "Meteor Mite",
+      "pings": "2",
+      "taken": "0",
+      "turned_down": "1",
+      "missed": "1"
+    },
+    {
+      "week_start": "2026-08-24T00:00:00.000Z",
+      "responder": "The Gale",
+      "pings": "20",
+      "taken": "14",
+      "turned_down": "4",
+      "missed": "2"
+    },
+    {
+      "week_start": "2026-08-24T00:00:00.000Z",
+      "responder": "The Undertow",
+      "pings": "1",
+      "taken": "0",
+      "turned_down": "0",
+      "missed": "1"
+    },
+    {
+      "week_start": "2026-08-24T00:00:00.000Z",
+      "responder": "Vesper",
+      "pings": "2",
+      "taken": "0",
+      "turned_down": "1",
+      "missed": "1"
+    },
+    {
+      "week_start": "2026-08-31T00:00:00.000Z",
+      "responder": "Meteor Mite",
+      "pings": "1",
+      "taken": "0",
+      "turned_down": "0",
+      "missed": "1"
+    },
+    {
+      "week_start": "2026-08-31T00:00:00.000Z",
+      "responder": "The Gale",
+      "pings": "21",
+      "taken": "16",
+      "turned_down": "3",
+      "missed": "2"
+    },
+    {
+      "week_start": "2026-08-31T00:00:00.000Z",
+      "responder": "The Undertow",
+      "pings": "1",
+      "taken": "0",
+      "turned_down": "0",
+      "missed": "1"
+    },
+    {
+      "week_start": "2026-08-31T00:00:00.000Z",
+      "responder": "Vesper",
+      "pings": "1",
+      "taken": "0",
+      "turned_down": "0",
+      "missed": "1"
+    }
+  ],
+  "tickets": [
+    {
+      "ticket_number": 3004,
+      "filed_at": "2026-07-02T13:13:53.000Z",
+      "filed_by": "Desmond Okafor",
+      "about_responder": "The Undertow",
+      "subject": "Spare mask on back order",
+      "body": "The Undertow's spare mask has been on back order for a month. Is there an alternative model that is in stock and rated the same?",
+      "status": "closed"
+    },
+    {
+      "ticket_number": 3006,
+      "filed_at": "2026-07-05T10:32:53.000Z",
+      "filed_by": "Linda Pruitt",
+      "about_responder": "Farlight",
+      "subject": "Bulk callout — how does it work?",
+      "body": "I saw the note about sending one job to more than one responder at once. I cannot find the button. Where is it?",
+      "status": "closed"
+    },
+    {
+      "ticket_number": 3014,
+      "filed_at": "2026-07-14T15:07:43.000Z",
+      "filed_by": "Desmond Okafor",
+      "about_responder": "The Undertow",
+      "subject": "Missed one while out of signal",
+      "body": "The Undertow was in a spot with no signal last night and the ping had moved on by the time he was back in range. Not a complaint, just noting it.",
+      "status": "closed"
+    },
+    {
+      "ticket_number": 3019,
+      "filed_at": "2026-07-18T20:37:43.000Z",
+      "filed_by": "Desmond Okafor",
+      "about_responder": "The Undertow",
+      "subject": "Capability tags jump around",
+      "body": "On the responder detail panel, The Undertow's capability tags come up in a different order each time I open it. Minor, but it makes it harder to check at a glance.",
+      "status": "closed"
+    },
+    {
+      "ticket_number": 3021,
+      "filed_at": "2026-07-20T09:44:30.000Z",
+      "filed_by": "Linda Pruitt",
+      "about_responder": "Farlight",
+      "subject": "Vest plate replacement",
+      "body": "Farlight has a cracked vest plate. I have ordered a replacement, but the priority field on the requisition does not seem to change how quickly it moves. How do I mark something as genuinely urgent?",
+      "status": "closed"
+    },
+    {
+      "ticket_number": 3026,
+      "filed_at": "2026-07-27T14:49:49.000Z",
+      "filed_by": "Desmond Okafor",
+      "about_responder": "The Undertow",
+      "subject": "Responder detail panel covers the map",
+      "body": "The responder detail panel opens on top of the map, so I cannot see where The Undertow is while I am reading his details. Could it open to the side?",
+      "status": "closed"
+    },
+    {
+      "ticket_number": 3027,
+      "filed_at": "2026-07-28T08:10:03.000Z",
+      "filed_by": "Linda Pruitt",
+      "about_responder": "Farlight",
+      "subject": "Cold-weather gloves wearing through",
+      "body": "The cold-weather gloves are wearing through at the fingertips after about a month. Farlight goes through a pair a month. Is there a sturdier option?",
+      "status": "closed"
+    },
+    {
+      "ticket_number": 3049,
+      "filed_at": "2026-08-14T12:24:26.000Z",
+      "filed_by": "Linda Pruitt",
+      "about_responder": "Farlight",
+      "subject": "Password reset email slow",
+      "body": "The password reset email took almost an hour to arrive this morning. I was locked out of the console for all of that time.",
+      "status": "closed"
+    },
+    {
+      "ticket_number": 3051,
+      "filed_at": "2026-08-15T08:18:07.000Z",
+      "filed_by": "Desmond Okafor",
+      "about_responder": "The Undertow",
+      "subject": "Can I export The Undertow's history?",
+      "body": "I would like to download a list of the jobs The Undertow has done this year, for our own records. I can see them one at a time on screen but cannot find a way to save them.",
+      "status": "open"
+    },
+    {
+      "ticket_number": 3060,
+      "filed_at": "2026-08-17T11:03:12.000Z",
+      "filed_by": "Linda Pruitt",
+      "about_responder": "Farlight",
+      "subject": "Farlight's phone has not gone off in 3 days",
+      "body": "Farlight's phone has not gone off in three days, which is not like her at all. I have checked her availability and everything is set to available. Nothing looks wrong on our side. Could someone check yours?",
+      "status": "open"
+    },
+    {
+      "ticket_number": 3066,
+      "filed_at": "2026-08-19T09:48:19.000Z",
+      "filed_by": "Linda Pruitt",
+      "about_responder": "Farlight",
+      "subject": "Saved filters — how do I clear them?",
+      "body": "The console now remembers my filters, which is good, but I cannot find a way to clear them all at once. I have to untick each one.",
+      "status": "closed"
+    },
+    {
+      "ticket_number": 3069,
+      "filed_at": "2026-08-19T20:57:37.000Z",
+      "filed_by": "Desmond Okafor",
+      "about_responder": "The Undertow",
+      "subject": "Request: show when gear is due back",
+      "body": "When The Undertow's equipment is out for maintenance, the console shows that it is away but not when it is due back. A date would save me a phone call each time.",
+      "status": "closed"
+    },
+    {
+      "ticket_number": 3071,
+      "filed_at": "2026-08-20T11:22:34.000Z",
+      "filed_by": "Linda Pruitt",
+      "about_responder": "Farlight",
+      "subject": "Hardly anything for Farlight this week",
+      "body": "Farlight has had four pings in the past seven days. Before the middle of August she was getting about twelve a week. Her availability is set correctly and her tags are all there.",
+      "status": "open"
+    },
+    {
+      "ticket_number": 3073,
+      "filed_at": "2026-08-20T19:26:19.000Z",
+      "filed_by": "Desmond Okafor",
+      "about_responder": "The Undertow",
+      "subject": "Hardly anything for The Undertow this week",
+      "body": "The Undertow has had six pings in the past seven days. Before the middle of August he was getting about twelve a week. His availability is set correctly and his tags are all there.",
+      "status": "open"
+    },
+    {
+      "ticket_number": 3075,
+      "filed_at": "2026-08-21T09:31:46.000Z",
+      "filed_by": "Desmond Okafor",
+      "about_responder": "The Undertow",
+      "subject": "Question about billing",
+      "body": "Our invoice this month lists The Undertow twice. He is one person. Could someone check it?",
+      "status": "closed"
+    },
+    {
+      "ticket_number": 3080,
+      "filed_at": "2026-08-22T14:49:08.000Z",
+      "filed_by": "Desmond Okafor",
+      "about_responder": "The Undertow",
+      "subject": "The Undertow much quieter than usual",
+      "body": "Flagging for the record. The Undertow is getting far fewer jobs than he used to: five pings in the last week against a usual twelve. He is not complaining, but he has noticed, and so have I.",
+      "status": "open"
+    },
+    {
+      "ticket_number": 3081,
+      "filed_at": "2026-08-22T16:55:10.000Z",
+      "filed_by": "Linda Pruitt",
+      "about_responder": "Farlight",
+      "subject": "Farlight much quieter than usual",
+      "body": "Flagging for the record. Farlight is getting far fewer jobs than she used to: two pings in the last week against a usual twelve. She is not complaining, but she has noticed, and so have I.",
+      "status": "open"
+    },
+    {
+      "ticket_number": 3084,
+      "filed_at": "2026-08-23T13:38:20.000Z",
+      "filed_by": "Linda Pruitt",
+      "about_responder": "Farlight",
+      "subject": "Responder detail panel covers the map",
+      "body": "The responder detail panel opens on top of the map, so I cannot see where Farlight is while I am reading her details. Could it open to the side?",
+      "status": "open"
+    },
+    {
+      "ticket_number": 3088,
+      "filed_at": "2026-08-24T15:09:53.000Z",
+      "filed_by": "Desmond Okafor",
+      "about_responder": "The Undertow",
+      "subject": "The Undertow's phone has not gone off in 3 days",
+      "body": "The Undertow's phone has not gone off in three days, which is not like him at all. I have checked his availability and everything is set to available. Nothing looks wrong on our side. Could someone check yours?",
+      "status": "open"
+    },
+    {
+      "ticket_number": 3089,
+      "filed_at": "2026-08-24T16:30:33.000Z",
+      "filed_by": "Linda Pruitt",
+      "about_responder": "Farlight",
+      "subject": "Still very quiet for Farlight",
+      "body": "Still very quiet. Three pings for Farlight in the last seven days. I would like to understand whether something has changed with her account. I would rather know than guess.",
+      "status": "open"
+    },
+    {
+      "ticket_number": 3095,
+      "filed_at": "2026-08-25T20:08:33.000Z",
+      "filed_by": "Desmond Okafor",
+      "about_responder": "The Undertow",
+      "subject": "Equipment catalog search",
+      "body": "Searching the equipment catalog for \"plate\" gives me forty results and most of them have nothing to do with armor. Could we have category filters, or search by what the item is for?",
+      "status": "open"
+    },
+    {
+      "ticket_number": 3096,
+      "filed_at": "2026-08-26T08:59:48.000Z",
+      "filed_by": "Desmond Okafor",
+      "about_responder": "The Undertow",
+      "subject": "Nothing coming through for The Undertow",
+      "body": "Nothing has come through for The Undertow since Friday 21 August. He usually gets several a week. He asked me this morning whether his account is still active. It is, as far as I can see.",
+      "status": "open"
+    },
+    {
+      "ticket_number": 3099,
+      "filed_at": "2026-08-26T13:01:27.000Z",
+      "filed_by": "Linda Pruitt",
+      "about_responder": "Farlight",
+      "subject": "Nothing coming through for Farlight",
+      "body": "Nothing has come through for Farlight since Sunday 23 August. She usually gets several a week. She asked me this morning whether her account is still active. It is, as far as I can see.",
+      "status": "open"
+    },
+    {
+      "ticket_number": 3103,
+      "filed_at": "2026-08-28T08:42:46.000Z",
+      "filed_by": "Linda Pruitt",
+      "about_responder": "Farlight",
+      "subject": "Is Farlight still on the list?",
+      "body": "Following up. It has now been five days since Farlight's phone last went off. She has started asking me every day whether something is broken. I do not know what to tell her.",
+      "status": "open"
+    },
+    {
+      "ticket_number": 3104,
+      "filed_at": "2026-08-28T09:14:16.000Z",
+      "filed_by": "Desmond Okafor",
+      "about_responder": "The Undertow",
+      "subject": "Still very quiet for The Undertow",
+      "body": "Still very quiet. Two pings for The Undertow in the last seven days. I would like to understand whether something has changed with his account. I would rather know than guess.",
+      "status": "open"
+    },
+    {
+      "ticket_number": 3107,
+      "filed_at": "2026-08-28T20:17:13.000Z",
+      "filed_by": "Linda Pruitt",
+      "about_responder": "Farlight",
+      "subject": "Console logs me out too often",
+      "body": "The console signs me out after what feels like twenty minutes of not clicking anything. On a quiet shift I am watching it, not clicking it, and then I have to sign in again at the worst moment.",
+      "status": "open"
+    },
+    {
+      "ticket_number": 3110,
+      "filed_at": "2026-08-29T13:28:20.000Z",
+      "filed_by": "Linda Pruitt",
+      "about_responder": "Farlight",
+      "subject": "First one in 5 days and she missed it",
+      "body": "Separate from my earlier tickets about the quiet stretch. Something finally came in for Farlight last night, the first in five days, and it was gone before she could answer. Given how long she had been waiting, this landed badly. Could someone look at what happened here?",
+      "status": "open"
+    },
+    {
+      "ticket_number": 3111,
+      "filed_at": "2026-08-29T15:02:15.000Z",
+      "filed_by": "Desmond Okafor",
+      "about_responder": "The Undertow",
+      "subject": "Wrong size delivered",
+      "body": "The Undertow's new gloves arrived in the wrong size. The requisition says large, the box says medium. What is the quickest way to swap them?",
+      "status": "open"
+    },
+    {
+      "ticket_number": 3112,
+      "filed_at": "2026-08-30T08:54:09.000Z",
+      "filed_by": "Desmond Okafor",
+      "about_responder": "The Undertow",
+      "subject": "Is The Undertow still on the list?",
+      "body": "Following up. It has now been three days since The Undertow's phone last went off. He has started asking me every day whether something is broken. I do not know what to tell him.",
+      "status": "open"
+    },
+    {
+      "ticket_number": 3114,
+      "filed_at": "2026-08-30T11:28:17.000Z",
+      "filed_by": "Linda Pruitt",
+      "about_responder": "Farlight",
+      "subject": "Hardly anything for Farlight this week",
+      "body": "Farlight has had two pings in the past seven days. Before the middle of August she was getting about twelve a week. Her availability is set correctly and her tags are all there.",
+      "status": "open"
+    },
+    {
+      "ticket_number": 3120,
+      "filed_at": "2026-09-01T08:55:30.000Z",
+      "filed_by": "Linda Pruitt",
+      "about_responder": "Farlight",
+      "subject": "Farlight asked me to pass this on",
+      "body": "Farlight asked me to pass this on in her own words: \"nothing again this week. starting to wonder if im still even in the system.\" It has been four days since her last one.",
+      "status": "open"
+    },
+    {
+      "ticket_number": 3121,
+      "filed_at": "2026-09-01T10:32:45.000Z",
+      "filed_by": "Desmond Okafor",
+      "about_responder": "The Undertow",
+      "subject": "The Undertow asked me to pass this on",
+      "body": "The Undertow asked me to pass this on in his own words: \"nothing again this week. starting to wonder if im still even in the system.\" It has been five days since his last one.",
+      "status": "open"
+    },
+    {
+      "ticket_number": 3126,
+      "filed_at": "2026-09-02T08:48:49.000Z",
+      "filed_by": "Linda Pruitt",
+      "about_responder": "Farlight",
+      "subject": "Maintenance reminder came after the date",
+      "body": "The reminder that Farlight's harness was due for servicing arrived two days after the service date. It would be more useful a week before.",
+      "status": "open"
+    },
+    {
+      "ticket_number": 3130,
+      "filed_at": "2026-09-03T09:44:52.000Z",
+      "filed_by": "Linda Pruitt",
+      "about_responder": "Farlight",
+      "subject": "Farlight's phone has not gone off in 6 days",
+      "body": "Farlight's phone has not gone off in six days, which is not like her at all. I have checked her availability and everything is set to available. Nothing looks wrong on our side. Could someone check yours?",
+      "status": "open"
+    },
+    {
+      "ticket_number": 3131,
+      "filed_at": "2026-09-03T09:53:11.000Z",
+      "filed_by": "Desmond Okafor",
+      "about_responder": "The Undertow",
+      "subject": "The Undertow's phone has not gone off in 7 days",
+      "body": "The Undertow's phone has not gone off in seven days, which is not like him at all. I have checked his availability and everything is set to available. Nothing looks wrong on our side. Could someone check yours?",
+      "status": "open"
+    },
+    {
+      "ticket_number": 3134,
+      "filed_at": "2026-09-04T08:38:56.000Z",
+      "filed_by": "Desmond Okafor",
+      "about_responder": "The Undertow",
+      "subject": "Filters reset after update",
+      "body": "Twice now my saved filters have been wiped overnight. I assume there was an update. I would rather it told me than quietly reset.",
+      "status": "open"
+    },
+    {
+      "ticket_number": 3138,
+      "filed_at": "2026-09-05T09:13:59.000Z",
+      "filed_by": "Desmond Okafor",
+      "about_responder": "The Undertow",
+      "subject": "Nothing coming through for The Undertow",
+      "body": "Nothing has come through for The Undertow since Thursday 27 August. He usually gets several a week. He asked me this morning whether his account is still active. It is, as far as I can see.",
+      "status": "open"
+    },
+    {
+      "ticket_number": 3139,
+      "filed_at": "2026-09-05T17:58:43.000Z",
+      "filed_by": "Linda Pruitt",
+      "about_responder": "Farlight",
+      "subject": "Nothing coming through for Farlight",
+      "body": "Nothing has come through for Farlight since Friday 28 August. She usually gets several a week. She asked me this morning whether her account is still active. It is, as far as I can see.",
+      "status": "open"
+    },
+    {
+      "ticket_number": 3140,
+      "filed_at": "2026-09-05T18:17:47.000Z",
+      "filed_by": "Desmond Okafor",
+      "about_responder": "The Undertow",
+      "subject": "First one in 9 days and he missed it",
+      "body": "Separate from my earlier tickets about the quiet stretch. Something finally came in for The Undertow this afternoon, the first in nine days, and it was gone before he could answer. Given how long he had been waiting, this landed badly. Could someone look at what happened here?",
+      "status": "open"
+    },
+    {
+      "ticket_number": 3145,
+      "filed_at": "2026-09-07T09:23:25.000Z",
+      "filed_by": "Desmond Okafor",
+      "about_responder": "The Undertow",
+      "subject": "Hardly anything for The Undertow this week",
+      "body": "The Undertow has had one ping in the past seven days. Before the middle of August he was getting about twelve a week. His availability is set correctly and his tags are all there.",
+      "status": "open"
+    }
+  ]
+}

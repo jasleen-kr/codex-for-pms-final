@@ -1,0 +1,208 @@
+{
+  "weekly": [
+    {
+      "week_start": "2026-06-29T00:00:00.000Z",
+      "responder": "Farlight",
+      "pings": "12",
+      "taken": "9",
+      "turned_down": "3",
+      "missed": "0"
+    },
+    {
+      "week_start": "2026-06-29T00:00:00.000Z",
+      "responder": "The Gale",
+      "pings": "13",
+      "taken": "10",
+      "turned_down": "2",
+      "missed": "1"
+    },
+    {
+      "week_start": "2026-07-06T00:00:00.000Z",
+      "responder": "Farlight",
+      "pings": "12",
+      "taken": "9",
+      "turned_down": "3",
+      "missed": "0"
+    },
+    {
+      "week_start": "2026-07-06T00:00:00.000Z",
+      "responder": "The Gale",
+      "pings": "12",
+      "taken": "9",
+      "turned_down": "3",
+      "missed": "0"
+    },
+    {
+      "week_start": "2026-07-13T00:00:00.000Z",
+      "responder": "Farlight",
+      "pings": "11",
+      "taken": "8",
+      "turned_down": "2",
+      "missed": "1"
+    },
+    {
+      "week_start": "2026-07-13T00:00:00.000Z",
+      "responder": "The Gale",
+      "pings": "13",
+      "taken": "10",
+      "turned_down": "3",
+      "missed": "0"
+    },
+    {
+      "week_start": "2026-07-20T00:00:00.000Z",
+      "responder": "Farlight",
+      "pings": "12",
+      "taken": "9",
+      "turned_down": "2",
+      "missed": "1"
+    },
+    {
+      "week_start": "2026-07-20T00:00:00.000Z",
+      "responder": "The Gale",
+      "pings": "14",
+      "taken": "11",
+      "turned_down": "2",
+      "missed": "1"
+    },
+    {
+      "week_start": "2026-07-27T00:00:00.000Z",
+      "responder": "Farlight",
+      "pings": "13",
+      "taken": "10",
+      "turned_down": "3",
+      "missed": "0"
+    },
+    {
+      "week_start": "2026-07-27T00:00:00.000Z",
+      "responder": "The Gale",
+      "pings": "13",
+      "taken": "11",
+      "turned_down": "1",
+      "missed": "1"
+    },
+    {
+      "week_start": "2026-08-03T00:00:00.000Z",
+      "responder": "Farlight",
+      "pings": "12",
+      "taken": "8",
+      "turned_down": "3",
+      "missed": "1"
+    },
+    {
+      "week_start": "2026-08-03T00:00:00.000Z",
+      "responder": "The Gale",
+      "pings": "13",
+      "taken": "10",
+      "turned_down": "3",
+      "missed": "0"
+    },
+    {
+      "week_start": "2026-08-10T00:00:00.000Z",
+      "responder": "Farlight",
+      "pings": "10",
+      "taken": "4",
+      "turned_down": "2",
+      "missed": "4"
+    },
+    {
+      "week_start": "2026-08-10T00:00:00.000Z",
+      "responder": "The Gale",
+      "pings": "15",
+      "taken": "9",
+      "turned_down": "3",
+      "missed": "3"
+    },
+    {
+      "week_start": "2026-08-17T00:00:00.000Z",
+      "responder": "Farlight",
+      "pings": "3",
+      "taken": "0",
+      "turned_down": "1",
+      "missed": "2"
+    },
+    {
+      "week_start": "2026-08-17T00:00:00.000Z",
+      "responder": "The Gale",
+      "pings": "17",
+      "taken": "12",
+      "turned_down": "3",
+      "missed": "2"
+    },
+    {
+      "week_start": "2026-08-24T00:00:00.000Z",
+      "responder": "Farlight",
+      "pings": "1",
+      "taken": "0",
+      "turned_down": "0",
+      "missed": "1"
+    },
+    {
+      "week_start": "2026-08-24T00:00:00.000Z",
+      "responder": "The Gale",
+      "pings": "20",
+      "taken": "14",
+      "turned_down": "4",
+      "missed": "2"
+    },
+    {
+      "week_start": "2026-08-31T00:00:00.000Z",
+      "responder": "Farlight",
+      "pings": "0",
+      "taken": "0",
+      "turned_down": "0",
+      "missed": "0"
+    },
+    {
+      "week_start": "2026-08-31T00:00:00.000Z",
+      "responder": "The Gale",
+      "pings": "21",
+      "taken": "16",
+      "turned_down": "3",
+      "missed": "2"
+    }
+  ],
+  "demand": [
+    {
+      "area": "Eastgate",
+      "period": "after",
+      "callouts": "48"
+    },
+    {
+      "area": "Eastgate",
+      "period": "before",
+      "callouts": "112"
+    },
+    {
+      "area": "Eastgate",
+      "period": "mixed",
+      "callouts": "15"
+    },
+    {
+      "area": "Uptown",
+      "period": "after",
+      "callouts": "27"
+    },
+    {
+      "area": "Uptown",
+      "period": "before",
+      "callouts": "57"
+    },
+    {
+      "area": "Uptown",
+      "period": "mixed",
+      "callouts": "6"
+    }
+  ],
+  "responders": [
+    {
+      "name": "Farlight",
+      "handler": "Linda Pruitt",
+      "area": "Uptown"
+    },
+    {
+      "name": "The Gale",
+      "handler": "Kip",
+      "area": "Eastgate"
+    }
+  ]
+}
