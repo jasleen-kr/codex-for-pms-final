@@ -18,6 +18,32 @@ prompt library built from your own questions.
 
 ### 1.
 
+Show me a visual representation of the information above
+
 ### 2.
 
+what happens when a responder misses multiple pings, how are they sent offers in the future
+
 ### 3.
+
+Walk me through the code and in each step tell me what happens, explain in detailed and easy language and show me a visual image of the information
+
+### 4.
+
+Tell me about all the superheroes and what was their journey of pings and what happend to their score. show me visual details of each of the superheroes / repsonders
+
+### 5.
+
+how can a superhero recover from this build back their score
+
+### 6.
+
+What was the main objective of making the ping time change in the release 
+
+### 7.
+
+Show me a visual representation of the answer to Marcus's question
+
+### 8.
+
+give me 3 solutions that ensures that superheroes aren't rewarded much and they can also recover from the ranking system
