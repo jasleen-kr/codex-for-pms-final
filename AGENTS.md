@@ -88,3 +88,9 @@ The prototype has masked concept avatars for all 16 responders, named handler co
 Its rankings lab uses modeled September history scores from the assumed 0.50 start and hypothetical equal eligibility/travel inputs; demo queue positions are not production rankings, and zero history still permits an offer if routing reaches that candidate.
 Interactive proposals include a 14-day half-life toward neutral, timeout penalties of 0.04 for confirmed display and zero for unconfirmed display, and one recovery-first offer in a 10-callout example; all await validation, and no production routing was changed.
 The brief proposes a 20% relative improvement in eligible-callout offer exposure, with +5 seconds p90 assignment time and +1 percentage point unassigned-callout limits; Wen, Ravi, Marcus and Helen still need to validate feasibility, thresholds and rollout.
+
+Both Module 5 Markdown briefs now name the Dispatch Product Manager as accountable owner and include a proposed validate → pilot → review → staged expansion roadmap; target release remains unassigned pending Marcus’s feasibility review and Helen’s priority decision.
+The brief’s metric now matches the pilot spec’s frozen low-offer cohort and eligible responder–callout denominator; expansion waits if comparison pools, telemetry or volume are inadequate.
+Prototype experience validation with Sofia and Nadia is proposed, not completed; ranking examples are explicitly illustrative, and delivery-aware penalties and offer-recency tie-breaking remain future discovery.
+Module 6 added six project skills in `.agents/skills/`: review-checklist, release-readiness, experiment-review, roadmap-review, change-impact-review and release-learning; all passed structural validation using PyYAML in the Git-ignored local `.venv`.
+Only Markdown briefs were revised this session; existing Word/PDF copies and prototypes were not refreshed, so they may differ from the updated brief and pilot scope.
