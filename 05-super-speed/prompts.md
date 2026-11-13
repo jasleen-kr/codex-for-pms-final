@@ -60,3 +60,7 @@ Create Avatars for all superheros and create a view for the superheroes to see t
 ### 12.
 
 add the rankings for the superheros and if they miss a ping what are the next steps for them. Will they receive more pings in future when their rank goes to 0. propose more mockup solutions on how can a superhero improve their ranking and how will the pings be sent to them in future. 
+
+### 13.
+
+Update the prototype visuals to superhero comic styles, also update the avatars as comic superheros

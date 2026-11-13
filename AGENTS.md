@@ -94,3 +94,7 @@ The brief’s metric now matches the pilot spec’s frozen low-offer cohort and 
 Prototype experience validation with Sofia and Nadia is proposed, not completed; ranking examples are explicitly illustrative, and delivery-aware penalties and offer-recency tie-breaking remain future discovery.
 Module 6 added six project skills in `.agents/skills/`: review-checklist, release-readiness, experiment-review, roadmap-review, change-impact-review and release-learning; all passed structural validation using PyYAML in the Git-ignored local `.venv`.
 Only Markdown briefs were revised this session; existing Word/PDF copies and prototypes were not refreshed, so they may differ from the updated brief and pilot scope.
+
+The Module 5 prototype now uses bright comic panels, ink outlines, halftone textures and 16 redrawn full-mask costume portraits; the latest dashboard preview is `05-super-speed/comic-prototype.png`.
+Comic portraits are generated inside the single HTML file and can be downloaded as individual PNGs; their costume details are invented concepts.
+The comic restyle passed browser checks for all 16 avatar renders, downloads, history filtering, ranking recovery, offer acceptance/expiry and mobile layouts; it does not resolve the previously noted brief/prototype scope differences.
