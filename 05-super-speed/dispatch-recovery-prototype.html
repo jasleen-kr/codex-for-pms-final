@@ -1,0 +1,198 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Dispatch · Offer recovery prototype</title>
+<style>
+  :root { color-scheme: light; font-family: "Inter", system-ui, sans-serif; color: #182943; background: #edf2f8; }
+  * { box-sizing: border-box; }
+  body { margin: 0; }
+  header { background: #152740; color: #fff; padding: 32px max(24px, calc((100% - 1040px) / 2)); }
+  h1, h2, h3, p { margin: 0; }
+  h1 { font-size: clamp(1.6rem, 4vw, 2.35rem); margin: 6px 0 12px; }
+  h2 { font-size: 1.2rem; margin-bottom: 12px; }
+  h3 { font-size: 1rem; margin-bottom: 8px; }
+  p, li { line-height: 1.55; }
+  header p { color: #d2dfef; }
+  main { max-width: 1088px; margin: auto; padding: 24px; }
+  .card { padding: 22px; border: 1px solid #cbd7e6; border-radius: 14px; background: #fff; }
+  .grid { display: grid; grid-template-columns: 1.3fr 1fr; gap: 16px; margin: 16px 0; }
+  .phone { background: #f7faff; border: 1px solid #cbd7e6; padding: 16px; border-radius: 14px; }
+  .controls { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px; }
+  button { border: 1px solid #315779; border-radius: 8px; background: #f4f8fd; color: #182943; font: inherit; font-weight: 600; padding: 9px 12px; cursor: pointer; }
+  button:hover:enabled { background: #ddeaf8; }
+  button.primary { color: white; background: #1d5286; }
+  button.primary:hover:enabled { background: #143e67; }
+  button:disabled { opacity: .48; cursor: default; }
+  button:focus-visible, a:focus-visible { outline: 3px solid #a35300; outline-offset: 3px; }
+  small { color: #415976; }
+  #clock { font-variant-numeric: tabular-nums; font-weight: 700; margin: 12px 0 4px; }
+  #timeline { padding-left: 22px; margin: 12px 0 0; }
+  #note { margin-top: 10px; min-height: 1.6em; color: #425771; }
+  a { color: #1d5286; }
+  @media (max-width: 720px) { .grid { grid-template-columns: 1fr; } }
+</style>
+</head>
+<body>
+<header>
+  <p>Rook Industries · Dispatch</p>
+  <h1>Offer recovery prototype</h1>
+  <p>Follow one Eastgate callout from Kip’s console to Meteor Mite’s phone. Each offer has up to 60 seconds from send.</p>
+</header>
+<main>
+  <section class="card" aria-labelledby="scenario-title">
+    <h2 id="scenario-title">Choose a scenario</h2>
+    <p>In this example, both responders are available and qualified. At day 14, Meteor Mite’s history score would move from 0.20 to 0.35, enough to rank first for this callout. Actual rank depends on the other candidates and scoring inputs.</p>
+    <div class="controls">
+      <button id="current" type="button">Current routing</button>
+      <button id="on-time" class="primary" type="button">Proposed · On-time push</button>
+      <button id="late" type="button">Proposed · Push at +45s</button>
+    </div>
+  </section>
+  <div class="grid">
+    <section class="card" aria-labelledby="handler-title">
+      <h2 id="handler-title">Kip · Handler console</h2>
+      <h3>Eastgate · Transit station assistance</h3>
+      <p id="handler-status" aria-live="polite"></p>
+      <ol id="timeline" aria-label="Offer activity"></ol>
+    </section>
+    <section class="card" aria-labelledby="responder-title">
+      <h2 id="responder-title">Meteor Mite · Responder app</h2>
+      <div class="phone">
+        <h3 id="phone-title"></h3>
+        <p id="phone-status" aria-live="polite"></p>
+        <div class="controls">
+          <button id="accept" class="primary" type="button">Accept</button>
+          <button id="decline" type="button">Decline</button>
+        </div>
+      </div>
+    </section>
+  </div>
+  <section class="card" aria-labelledby="simulation-title">
+    <h2 id="simulation-title">Simulation controls</h2>
+    <p>Advance the server clock to test what happens at the deadline. In a real callout the clock runs automatically.</p>
+    <p id="clock"></p>
+    <div class="controls">
+      <button id="advance" type="button">Advance 5 seconds</button>
+      <button id="deadline" type="button">Go to deadline</button>
+      <button id="stale" type="button">Simulate late accept</button>
+      <button id="next" type="button">The Gale accepts</button>
+    </div>
+    <p id="note" role="status"></p>
+    <small>Illustrative scenario · <a href="dispatch-recovery-spec.md">Product spec</a> · <a href="dispatch-4.2-product-brief.md">Director brief</a></small>
+  </section>
+</main>
+<script>
+  const byId = id => document.getElementById(id);
+  const offerWindow = 60;
+  let state;
+
+  function addEvent(message) {
+    state.events.push(`+${state.elapsed}s · ${message}`);
+  }
+
+  function start(scenario) {
+    state = { scenario, elapsed: 0, sentAt: 0, phase: 'mite', events: [], note: '' };
+    if (scenario === 'current') {
+      addEvent('Offer sent to The Gale.');
+      state.elapsed = 8;
+      state.phase = 'gale-assigned';
+      addEvent('The Gale accepted. Callout assigned.');
+    } else {
+      addEvent('Offer sent to Meteor Mite.');
+      if (scenario === 'late') state.elapsed = 45;
+      state.note = 'The countdown starts when Dispatch sends the offer.';
+    }
+    render();
+  }
+
+  function nextOffer(outcome) {
+    addEvent(`Meteor Mite’s offer ${outcome}.`);
+    state.miteOutcome = outcome;
+    state.phase = 'gale';
+    state.sentAt = state.elapsed;
+    addEvent('Offer sent to The Gale.');
+  }
+
+  function advanceTo(seconds) {
+    if (state.phase !== 'mite' && state.phase !== 'gale') return;
+    const deadline = state.sentAt + offerWindow;
+    state.elapsed = Math.min(seconds, deadline);
+    if (state.elapsed === deadline && state.phase === 'mite') {
+      nextOffer('expired');
+      state.note = 'Dispatch moved on at the deadline. The Gale has a new 60-second offer.';
+    } else if (state.elapsed === deadline) {
+      state.phase = 'unassigned';
+      addEvent('The Gale’s offer expired. No responders left in this scenario.');
+      state.note = 'Routing finished without an assignment.';
+    }
+    render();
+  }
+
+  function accept(recipient) {
+    if (state.phase !== recipient || state.elapsed >= state.sentAt + offerWindow) return;
+    const name = recipient === 'mite' ? 'Meteor Mite' : 'The Gale';
+    state.phase = `${recipient}-assigned`;
+    addEvent(`${name} accepted. Callout assigned.`);
+    state.note = 'Dispatch confirmed the assignment and marked the responder engaged.';
+    render();
+  }
+
+  function render() {
+    const offeringMite = state.phase === 'mite';
+    const offeringGale = state.phase === 'gale';
+    const miteAssigned = state.phase === 'mite-assigned';
+    const remaining = state.sentAt + offerWindow - state.elapsed;
+    const handler = {
+      mite: 'Offer sent to Meteor Mite.',
+      gale: 'Routing in progress · Offer sent to The Gale.',
+      'mite-assigned': 'Assigned to Meteor Mite.',
+      'gale-assigned': 'Assigned to The Gale.',
+      unassigned: 'No responder assigned.'
+    };
+    byId('handler-status').textContent = handler[state.phase];
+    byId('timeline').replaceChildren(...state.events.map(message => {
+      const item = document.createElement('li');
+      item.textContent = message;
+      return item;
+    }));
+    byId('phone-title').textContent = offeringMite ? 'Eastgate callout' :
+      miteAssigned ? 'Assigned' :
+      state.miteOutcome === 'expired' ? 'Offer expired' :
+      state.miteOutcome === 'declined' ? 'Offer declined' : 'No current offer';
+    byId('phone-status').textContent = offeringMite ? `${remaining} seconds left to respond.` :
+      miteAssigned ? 'Dispatch confirmed your assignment.' :
+      state.miteOutcome ? 'Dispatch moved on to the next responder.' : 'Meteor Mite received no ping for this callout.';
+    byId('clock').textContent = `Server time since first send · ${state.elapsed}s`;
+    byId('note').textContent = state.note;
+    byId('accept').disabled = !offeringMite;
+    byId('decline').disabled = !offeringMite;
+    byId('next').disabled = !offeringGale;
+    byId('advance').disabled = !offeringMite && !offeringGale;
+    byId('deadline').disabled = byId('advance').disabled;
+    byId('stale').disabled = state.miteOutcome !== 'expired';
+  }
+
+  byId('current').onclick = () => start('current');
+  byId('on-time').onclick = () => start('on-time');
+  byId('late').onclick = () => start('late');
+  byId('advance').onclick = () => advanceTo(state.elapsed + 5);
+  byId('deadline').onclick = () => advanceTo(state.sentAt + offerWindow);
+  byId('accept').onclick = () => accept('mite');
+  byId('next').onclick = () => accept('gale');
+  byId('decline').onclick = () => {
+    if (state.phase !== 'mite') return;
+    nextOffer('declined');
+    state.note = 'Dispatch moved on as soon as Meteor Mite declined.';
+    render();
+  };
+  byId('stale').onclick = () => {
+    if (state.miteOutcome !== 'expired') return;
+    state.note = 'Late accept rejected. Meteor Mite’s offer has expired.';
+    render();
+  };
+  start('current');
+</script>
+</body>
+</html>

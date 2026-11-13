@@ -1,0 +1,990 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Rook Dispatch · Responder offer replay</title>
+<style>
+  :root {
+    color-scheme: dark;
+    font-family: "Inter", system-ui, sans-serif;
+    color: #edf2ff;
+    background: #0c1224;
+    --ink: #edf2ff;
+    --muted: #acb9d4;
+    --line: #364563;
+    --green: #ffd65a;
+    --white: #141f37;
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: radial-gradient(ellipse at 88% 8%, #235b8244, transparent 45%), radial-gradient(ellipse at 6% 40%, #6948a52b, transparent 45%), #0c1224; }
+  h1, h2, h3, p { margin: 0; }
+  button { font: inherit; cursor: pointer; }
+  button:focus-visible, select:focus-visible { outline: 3px solid #67e8ff; outline-offset: 4px; }
+  button:disabled { cursor: default; opacity: .48; }
+  [hidden] { display: none !important; }
+  .shell { width: min(1200px, calc(100% - 48px)); margin: 0 auto; }
+  .mast { border-bottom: 1px solid #364563; background: #0d1427; }
+  .mast .shell { min-height: 70px; display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+  .brand { display: flex; align-items: center; gap: 12px; font-size: 16px; font-weight: 850; letter-spacing: -.02em; }
+  .mark { display: grid; place-items: center; width: 36px; height: 39px; clip-path: polygon(0 0, 100% 0, 100% 70%, 50% 100%, 0 70%); background: #ffd65a; color: #111b30; font-weight: 950; font-size: 23px; padding-bottom: 5px; }
+  .caption { color: var(--muted); font-size: 12px; font-weight: 650; }
+  main { padding: 34px 0 40px; }
+  .hero-banner { position: relative; overflow: hidden; border: 1px solid #405274; border-radius: 5px; background: linear-gradient(105deg, #24385f, #17233f); padding: 29px 32px 26px; box-shadow: 6px 6px 0 #050a15; }
+  .hero-banner::after { content: ""; position: absolute; inset: 0 0 0 60%; background-image: radial-gradient(#7596c35c 1px, transparent 1px); background-size: 8px 8px; transform: skew(-18deg); pointer-events: none; }
+  .hero-banner h1, .hero-banner p { position: relative; z-index: 1; }
+  h1 { font-family: "Archivo Black", "Arial Black", system-ui, sans-serif; font-size: clamp(32px, 4.5vw, 54px); font-weight: 950; letter-spacing: -.045em; line-height: 1.1; color: #ffe58c; max-width: 90%; }
+  .subtitle { margin-top: 12px; color: #c7d6ef; font-size: 15px; line-height: 1.5; }
+  .scenario { display: flex; flex-wrap: wrap; gap: 10px; margin: 25px 0 13px; align-items: center; }
+  .picker { display: flex; align-items: center; flex-wrap: wrap; gap: 10px; }
+  .picker label { font-size: 13px; font-weight: 750; color: #b9c7e0; }
+  .picker select { min-height: 44px; max-width: 100%; padding: 8px 12px; border: 1px solid #657797; border-radius: 4px; background: #17233e; color: #fff; font: inherit; font-size: 14px; font-weight: 700; }
+  .button { min-height: 44px; border: 1px solid #5d6f91; border-radius: 4px; background: #1c2a47; color: #f2f6ff; padding: 9px 14px; font-size: 13px; font-weight: 750; box-shadow: 0 3px 0 #070c16; transition: background .15s, transform .15s; }
+  .button:hover:enabled { background: #2f4165; transform: translateY(-2px); }
+  .button:active:enabled { transform: translateY(1px); box-shadow: none; }
+  .button.primary { background: #ffd65a; border-color: #ffe58c; color: #19213a; }
+  .button.primary:hover:enabled { background: #ffe89a; }
+  .fixture { color: var(--muted); font-size: 12px; line-height: 1.6; margin-bottom: 22px; }
+  .fixture p + p { margin-top: 3px; }
+  #observed { color: #80dce5; font-weight: 650; }
+  .screens { display: grid; grid-template-columns: minmax(0, 1.5fr) minmax(300px, 1fr); gap: 20px; align-items: stretch; }
+  .screen { border: 1px solid #526585; border-radius: 5px; background: #141f37; overflow: hidden; min-width: 0; box-shadow: 5px 5px 0 #060b16; }
+  .screen-head { display: flex; gap: 10px; justify-content: space-between; align-items: center; padding: 16px 22px; border-bottom: 1px solid var(--line); background: #1d2b47; }
+  .screen-head h2 { font-size: 14px; color: #f6df91; font-weight: 850; }
+  .console { padding: 23px; }
+  .console h3 { font-size: 25px; letter-spacing: -.035em; margin: 2px 0 17px; }
+  .console-detail { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; margin: 17px 0 0; }
+  .console-detail > div { border: 1px solid var(--line); border-radius: 4px; padding: 12px 10px; background: #101a30; }
+  .console-detail dt { color: var(--muted); font-size: 11px; font-weight: 650; }
+  .console-detail dd { margin: 7px 0 0; font-size: 14px; font-weight: 750; font-variant-numeric: tabular-nums; }
+  .handler-only .screens { grid-template-columns: 1fr; }
+  .handler-only .device { display: none; }
+  .status { display: inline-block; border-radius: 3px; border: 1px solid #41a49b; background: #163e43; color: #8ff1db; font-size: 12px; font-weight: 750; padding: 8px 10px; }
+  .coverage { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
+  .coverage-card { min-width: 0; padding: 15px 12px; border: 1px solid #3e5072; border-radius: 4px; background: #1b2945; }
+  .coverage-card h4 { margin: 10px 0 5px; font-size: 15px; font-weight: 850; }
+  .coverage-card p { color: #b5c7df; font-size: 12px; line-height: 1.5; }
+  .coverage-card[data-active="true"] { border-color: #ffd65a; background: #2a3047; box-shadow: inset 0 3px 0 #ffd65a; }
+  .hero-emblem { display: grid; place-items: center; width: 37px; height: 40px; clip-path: polygon(0 0, 100% 0, 100% 64%, 50% 100%, 0 64%); color: #0f1930; background: #8dddff; font-weight: 950; font-size: 13px; padding-bottom: 5px; }
+  #backup-emblem { background: #bcb0ff; }
+  .activity-title { font-size: 12px; font-weight: 800; margin: 23px 0 9px; color: #b7c7e3; }
+  .activity { list-style: none; margin: 0; padding: 0; font-size: 12px; }
+  .activity li { padding: 10px 0; border-top: 1px solid var(--line); display: grid; grid-template-columns: 52px 1fr; gap: 7px; line-height: 1.5; }
+  .activity time { color: #83dbe7; font-variant-numeric: tabular-nums; }
+  .device { background: repeating-linear-gradient(135deg, #182039, #182039 8px, #1c2540 8px, #1c2540 9px); }
+  .phone { margin: 24px auto; width: min(88%, 305px); min-height: 310px; padding: 13px; border: 5px solid #607192; border-radius: 28px; background: #0d172c; box-shadow: 0 9px 24px #050a15; }
+  .phone::before { content: ""; display: block; margin: 0 auto 17px; width: 48px; height: 5px; border-radius: 20px; background: #65799b; }
+  .phone-card { padding: 16px 13px; border: 1px solid #34476a; border-radius: 13px; background: #17243f; }
+  .phone-card h3 { font-size: 22px; margin: 10px 0 8px; letter-spacing: -.025em; }
+  .phone-card p { font-size: 13px; line-height: 1.45; color: var(--muted); }
+  .count { margin: 15px 0 9px; color: #ffe58c; font-size: 39px; font-weight: 900; line-height: 1.1; font-variant-numeric: tabular-nums; letter-spacing: -.045em; }
+  .meter { width: 100%; height: 8px; accent-color: #ffd65a; }
+  .phone-actions { display: grid; grid-template-columns: 1fr 1fr; gap: 9px; margin-top: 15px; }
+  .sim { margin-top: 22px; border-top: 1px solid var(--line); padding-top: 17px; }
+  .sim-row { display: flex; align-items: center; flex-wrap: wrap; gap: 9px; }
+  .sim .caption { margin-right: 4px; }
+  .feedback { min-height: 1.5em; margin-top: 12px; font-size: 13px; color: var(--muted); }
+  @media (max-width: 740px) {
+    .shell { width: calc(100% - 28px); }
+    main { padding-top: 23px; }
+    .hero-banner { padding: 22px; }
+    .screens { grid-template-columns: 1fr; }
+    .device { grid-row: 1; }
+  }
+  @media (max-width: 420px) {
+    .console-detail { grid-template-columns: 1fr; }
+    .coverage { gap: 7px; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .button { transition: none; }
+  }
+
+  .tabs { display: flex; gap: 8px; margin-top: 23px; }
+  .tabs button[aria-pressed="true"] { background: #ffd65a; color: #16213a; border-color: #ffe58c; }
+  .avatar-strip { display: flex; gap: 10px; overflow-x: auto; padding: 5px 0 14px; margin: 8px 0 16px; }
+  .avatar-choice { flex: 0 0 102px; background: #17233e; border: 1px solid #405274; border-radius: 8px; color: #cbd7ed; padding: 9px 5px; font-size: 11px; line-height: 1.3; }
+  .avatar-choice img { display: block; width: 60px; height: 60px; margin: 0 auto 7px; border-radius: 50%; }
+  .avatar-choice[aria-pressed="true"] { border: 2px solid #ffd65a; background: #29334d; color: #ffe58c; }
+  .dashboard-profile { display: flex; gap: 18px; align-items: center; margin-bottom: 22px; padding: 22px; border: 1px solid #526585; background: #17243f; border-radius: 6px; }
+  .dashboard-profile img { width: 94px; height: 94px; border-radius: 50%; }
+  .dashboard-profile h2 { font-size: 27px; margin-bottom: 5px; }
+  .dashboard-profile .button { margin-left: auto; }
+  .stats-grid { display: grid; grid-template-columns: repeat(4,minmax(0,1fr)); gap: 12px; margin: 16px 0 22px; }
+  .stat-box { padding: 17px; border: 1px solid #405274; border-radius: 6px; background: #141f37; }
+  .stat-box dt { font-size: 12px; color: #b6c6e1; }
+  .stat-box dd { font-size: 32px; font-weight: 850; margin: 7px 0 0; color: #e8f0ff; }
+  .stat-box.accepted dd { color: #8ff1db; }
+  .stat-box.missed dd { color: #ffa4b5; }
+  .stat-box.declined dd { color: #ffe58c; }
+  .history-panel { border: 1px solid #526585; background: #141f37; border-radius: 6px; padding: 22px; }
+  .history-panel h2 { font-size: 21px; }
+  .history-controls { display: flex; gap: 8px; flex-wrap: wrap; margin: 16px 0 12px; }
+  .history-controls select { padding: 9px; border: 1px solid #657797; border-radius: 4px; background: #17233e; color: white; font: inherit; font-size: 13px; max-width: 100%; }
+  .table-wrap { overflow-x: auto; }
+  table { width: 100%; border-collapse: collapse; font-size: 13px; text-align: left; }
+  th { color: #aebfda; font-size: 12px; font-weight: 600; }
+  th, td { border-bottom: 1px solid #344461; padding: 13px 10px; white-space: nowrap; }
+  td:first-child, th:first-child { padding-left: 0; }
+  .outcome { display: inline-block; font-size: 12px; padding: 5px 8px; border-radius: 4px; background: #223552; }
+  .outcome.accepted { color: #8ff1db; background: #183e42; }
+  .outcome.missed { color: #ffa4b5; background: #45283c; }
+  .outcome.declined { color: #ffe58c; background: #423b2a; }
+  .pagination { display: flex; gap: 10px; align-items: center; justify-content: flex-end; margin-top: 15px; }
+  .history-note { margin-top: 12px; line-height: 1.5; font-size: 12px; color: #acb9d4; }
+  .hero-emblem { width: 52px; height: 52px; border-radius: 50%; clip-path: none; padding: 0; }
+  @media (max-width: 600px) {
+    .stats-grid { grid-template-columns: repeat(2,minmax(0,1fr)); }
+    .dashboard-profile { flex-wrap: wrap; padding: 17px; }
+    .dashboard-profile img { width: 72px; height: 72px; }
+    .dashboard-profile .button { margin-left: 0; }
+    .history-panel { padding: 15px; }
+    .pagination { flex-wrap: wrap; }
+  }
+
+  .recovery-options { display: grid; grid-template-columns: repeat(3,minmax(0,1fr)); gap: 12px; margin-top: 20px; }
+  .recovery-options article { padding: 16px; border: 1px solid #405274; border-radius: 6px; background: #1a2844; display: flex; flex-direction: column; align-items: flex-start; }
+  .recovery-options h3 { font-size: 16px; }
+  .recovery-options p { color: #b7c8e4; font-size: 13px; line-height: 1.6; margin: 9px 0 16px; flex: 1; }
+  .recovery-options .button[aria-pressed="true"] { border-color: #ffe58c; color: #ffe58c; }
+  .lab-callout { margin-top: 18px; }
+  #lab-display { max-width: 100%; border: 1px solid #657797; border-radius: 4px; padding: 9px; background: #17233e; color: white; }
+  #lab-log { margin-top: 14px; }
+  #ranking-rows tr[data-selected="true"] { background: #2b354e; color: #ffe58c; }
+  #lab-reset { margin-top: 16px; }
+  @media (max-width: 740px) { .recovery-options { grid-template-columns: 1fr; } .tabs { flex-wrap: wrap; } }
+</style>
+</head>
+<body>
+<header class="mast">
+  <div class="shell">
+    <div class="brand"><span class="mark" aria-hidden="true">R</span> Rook Dispatch / Mission control</div>
+    <span class="caption">Interactive prototype</span>
+  </div>
+</header>
+<main class="shell">
+  <div class="hero-banner">
+    <h1 id="hero-title">Meteor Mite’s next ping</h1>
+    <p class="subtitle" id="hero-subtitle"></p>
+  </div>
+  <nav class="tabs" aria-label="Prototype views">
+    <button id="dashboard-tab" class="button" type="button" aria-pressed="true">My dashboard</button>
+    <button id="ranking-tab" class="button" type="button" aria-pressed="false">Rankings and recovery</button>
+    <button id="replay-tab" class="button" type="button" aria-pressed="false">Callout replay</button>
+  </nav>
+  <div class="scenario" role="group" aria-label="Replay scenarios">
+    <div class="picker">
+      <label for="hero-picker">Responder</label>
+      <select id="hero-picker"></select>
+    </div>
+    <button data-replay-control id="delayed" class="button primary" type="button">Play pilot · 45s late push</button>
+    <button data-replay-control id="on-time" class="button" type="button">Play pilot · On-time push</button>
+    <button data-replay-control id="baseline" class="button" type="button">Replay 4.2</button>
+    <button data-replay-control id="handler-view" class="button" type="button" aria-pressed="false">Handler view</button>
+  </div>
+
+  <section id="dashboard-panel" aria-label="Responder dashboard">
+    <div class="avatar-strip" id="avatar-roster" aria-label="Choose a responder"></div>
+    <div class="dashboard-profile">
+      <img id="profile-avatar" alt="">
+      <div><h2 id="profile-name"></h2><p class="caption" id="profile-details"></p></div>
+      <button id="download-avatar" class="button" type="button">Download avatar</button>
+    </div>
+    <div class="picker">
+      <label for="history-period">History period</label>
+      <select id="history-period">
+        <option value="all">All recorded dates</option>
+        <option value="before">Before 12 Aug 2026</option>
+        <option value="after">13 Aug – 6 Sep 2026</option>
+      </select>
+    </div>
+    <dl class="stats-grid" aria-label="Ping totals for selected period">
+      <div class="stat-box"><dt>All pings</dt><dd id="total-pings">0</dd></div>
+      <div class="stat-box accepted"><dt>Accepted</dt><dd id="accepted-pings">0</dd></div>
+      <div class="stat-box missed"><dt>Missed</dt><dd id="missed-pings">0</dd></div>
+      <div class="stat-box declined"><dt>Declined</dt><dd id="declined-pings">0</dd></div>
+    </dl>
+    <div class="dashboard-profile">
+      <div><h2 id="dashboard-score"></h2><p class="caption">History replay estimate from an assumed 0.50 start. Explore the demo queue and recovery options.</p></div>
+      <button id="open-ranking" class="button" type="button">View rankings and next steps</button>
+    </div>
+    <section class="history-panel" aria-labelledby="history-title">
+      <h2 id="history-title">My ping history</h2>
+      <div class="history-controls">
+        <label class="picker" for="history-outcome">Show
+          <select id="history-outcome">
+            <option value="all">All outcomes</option>
+            <option value="taken">Accepted</option>
+            <option value="missed">Missed</option>
+            <option value="turned down">Declined</option>
+          </select>
+        </label>
+      </div>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th scope="col">Sent date</th><th scope="col">Sent time</th><th scope="col">Callout</th><th scope="col">Outcome</th></tr></thead>
+          <tbody id="history-rows"></tbody>
+        </table>
+      </div>
+      <div class="pagination">
+        <span class="caption" id="history-count" role="status"></span>
+        <button id="history-prev" class="button" type="button">Previous</button>
+        <button id="history-next" class="button" type="button">Next</button>
+      </div>
+      <p class="history-note">Recorded offers from 29 June–6 September 2026. Times follow the database’s local clock. Totals cover the selected period. Replay actions use an illustrative callout.</p>
+    </section>
+    <p class="history-note">Avatar costumes are fictional concepts.</p>
+  </section>
+
+  <section id="ranking-panel" hidden aria-label="Ranking and recovery lab">
+    <div class="history-panel">
+      <h2 id="ranking-summary"></h2>
+      <p class="history-note">History scores below replay recorded outcomes from an assumed 0.50 start through 6 September 2026. Production scores and rankings require verification. Queue positions here use a hypothetical callout where all 16 responders are available, fully qualified and equally close. Equal scores use roster order for this demonstration.</p>
+      <p class="history-note">The full demo score is 0.60 proximity + 0.15 capability + 0.25 × history. A history score of 0.00 still contributes to an eligible candidate’s place in the queue. If everyone ahead declines or times out, that candidate gets a ping. Dispatch stops as soon as someone accepts.</p>
+      <dl class="stats-grid">
+        <div class="stat-box"><dt>Modeled history</dt><dd id="lab-history"></dd></div>
+        <div class="stat-box"><dt>Demo queue position</dt><dd id="lab-position"></dd></div>
+        <div class="stat-box"><dt>Demo full score</dt><dd id="lab-full"></dd></div>
+        <div class="stat-box"><dt>Next acceptance adds</dt><dd>0.08</dd></div>
+      </dl>
+      <h3>After a missed ping</h3>
+      <p class="history-note">The offer expires at 60 seconds. Dispatch offers the callout to the next eligible responder and applies a 0.12 history deduction, down to a floor of 0.00. Check notification delivery and stated availability with your handler. Each future callout gets a fresh ranking using availability, capability, travel time and history. Accepting a future offer adds 0.08 to history.</p>
+      <div class="recovery-options">
+        <article>
+          <h3>Let old outcomes fade</h3>
+          <p>Move everyone’s history halfway toward 0.50 over 14 days without a new outcome. At 0.00, the example becomes 0.25. New outcomes still affect the score.</p>
+          <button id="lab-decay" class="button" type="button">Advance 14 days</button>
+        </article>
+        <article>
+          <h3>Account for delivery</h3>
+          <p>Try a smaller 0.04 deduction for a displayed offer that expires and zero deduction when display is unconfirmed. An explicit decline costs 0.12.</p>
+          <button id="lab-delivery" class="button" type="button" aria-pressed="false">Enable delivery-aware scoring</button>
+        </article>
+        <article>
+          <h3>Offer a recovery opportunity</h3>
+          <p>Try one first offer for the selected hero in a 10-callout example, with the same capability and travel-time fit. If it expires, Dispatch moves on at 60 seconds. Measure the effect on assignment speed.</p>
+          <button id="lab-recovery" class="button" type="button">Reserve one recovery offer</button>
+        </article>
+      </div>
+      <p class="history-note">These three rules are proposals for a pilot. The offer deadline is 60 seconds from send in every scenario. The history values start from the saved replay model and change as you try outcomes here.</p>
+    </div>
+    <section class="history-panel lab-callout" aria-labelledby="next-callout-title">
+      <h2 id="next-callout-title">Try the next callout</h2>
+      <p class="history-note">Each click chooses an outcome for the current recipient. A miss advances the example clock by 60 seconds and sends the next offer.</p>
+      <div class="history-controls">
+        <button id="lab-send" class="button primary" type="button">Start next callout</button>
+        <button id="lab-accept" class="button" type="button" disabled>Accept this offer</button>
+        <button id="lab-miss" class="button" type="button" disabled>Miss this offer · +60s</button>
+        <button id="lab-decline" class="button" type="button" disabled>Decline this offer</button>
+      </div>
+      <label class="picker" for="lab-display">Device evidence
+        <select id="lab-display"><option value="confirmed">Display confirmed</option><option value="unconfirmed">Display unconfirmed</option></select>
+      </label>
+      <p id="lab-message" class="history-note" role="status"></p>
+      <ol id="lab-log" class="activity" aria-label="Simulated routing activity"></ol>
+    </section>
+    <section class="history-panel lab-callout" aria-labelledby="queue-title">
+      <h2 id="queue-title">Demo offer order for the next callout</h2>
+      <p class="history-note">An active callout keeps the order captured when routing began. The table refreshes for the next callout as outcomes change.</p>
+      <div class="table-wrap"><table>
+        <thead><tr><th scope="col">Position</th><th scope="col">Responder</th><th scope="col">Modeled history</th><th scope="col">Demo full score</th></tr></thead>
+        <tbody id="ranking-rows"></tbody>
+      </table></div>
+      <button id="lab-reset" class="button" type="button">Reset ranking example</button>
+    </section>
+  </section>
+  <div id="replay-panel" hidden>
+  <div class="fixture">
+    <p id="observed"></p>
+    <p id="fixture"></p>
+  </div>
+
+  <div class="screens">
+    <section class="screen" aria-labelledby="handler">
+      <div class="screen-head"><h2 id="handler">Handler console</h2><span class="caption" id="callouts-area"></span></div>
+      <div class="console">
+        <h3 id="callout-title"></h3>
+        <div class="status" id="handler-status" role="status">Ready to route</div>
+        <dl class="console-detail" aria-label="Current callout">
+          <div><dt>Available in replay</dt><dd id="available-count">2 of 2</dd></div>
+          <div><dt>Active offer</dt><dd id="active-recipient">—</dd></div>
+          <div><dt>Offer time left</dt><dd id="handler-remaining">—</dd></div>
+        </dl>
+        <p class="activity-title" id="coverage-title">Coverage</p>
+        <div class="coverage" role="group" aria-labelledby="coverage-title">
+          <article class="coverage-card" id="hero-card">
+            <img class="hero-emblem" id="hero-emblem" alt="">
+            <h4 id="hero-card-name"></h4>
+            <p id="hero-status">Available</p>
+          </article>
+          <article class="coverage-card" id="backup-card">
+            <img class="hero-emblem" id="backup-emblem" alt="">
+            <h4 id="backup-card-name"></h4>
+            <p id="backup-status">Available</p>
+          </article>
+        </div>
+        <p class="activity-title">Offer activity</p>
+        <ol class="activity" id="activity"><li>Awaiting scenario</li></ol>
+      </div>
+    </section>
+    <section class="screen device" aria-labelledby="responder">
+      <div class="screen-head"><h2 id="responder">Responder app</h2><span class="caption" id="phone-owner"></span></div>
+      <div class="phone">
+        <div class="phone-card">
+          <p class="caption">DISPATCH</p>
+          <h3 id="phone-state" aria-live="polite">No current offer</h3>
+          <p id="phone-detail">You’re available for callouts.</p>
+          <div id="phone-timer" hidden>
+            <div class="count" id="remaining"></div>
+            <progress class="meter" id="meter" max="60" value="60" aria-label="Seconds left to respond"></progress>
+          </div>
+          <div class="phone-actions" id="phone-actions" hidden>
+            <button id="accept" class="button primary" type="button">Accept</button>
+            <button id="decline" class="button" type="button">Decline</button>
+          </div>
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <section class="sim" aria-label="Simulation controls">
+    <div class="sim-row">
+      <span class="caption" id="clock">Offer window · 60s from send</span>
+      <button id="skip" class="button" type="button" disabled>Jump to expiry</button>
+      <button id="late-accept" class="button" type="button" hidden>Try a late accept</button>
+      <button id="next-accept" class="button" type="button" hidden>Next responder accepts</button>
+    </div>
+    <p class="feedback" id="feedback" role="status">Choose a replay to see the offer flow.</p>
+  </section>
+  </div>
+</main>
+<script>
+  const byId = id => document.getElementById(id);
+  const roster = [
+    {"name": "Captain Vantage", "handler": "Mr. Ambrose", "area": "Hillcrest", "before": 12.0, "after": 16.7, "largeDrop": false},
+    {"name": "Cindermark", "handler": "Farid Haddad", "area": "Mill District", "before": 9.0, "after": 11.7, "largeDrop": false},
+    {"name": "Corporal Ashgrove", "handler": "Yusuf Demir", "area": "Northfield", "before": 10.0, "after": 7.3, "largeDrop": false},
+    {"name": "Farlight", "handler": "Linda Pruitt", "area": "Uptown", "before": 12.0, "after": 1.3, "largeDrop": true},
+    {"name": "Halfmoon", "handler": "Simone Fischer", "area": "Westbury", "before": 11.0, "after": 8.3, "largeDrop": false},
+    {"name": "Ironvale", "handler": "Teresa Alvarez", "area": "Riverside", "before": 8.0, "after": 11.0, "largeDrop": false},
+    {"name": "Meteor Mite", "handler": "Kip", "area": "Eastgate", "before": 11.2, "after": 2.3, "largeDrop": true},
+    {"name": "Nightwell", "handler": "Marjorie Sung", "area": "Midtown", "before": 15.0, "after": 19.7, "largeDrop": false},
+    {"name": "Sgt. Bulwark", "handler": "Halloran", "area": "Foundry Row", "before": 9.0, "after": 10.7, "largeDrop": false},
+    {"name": "Sgt. Falkirk", "handler": "Owen Bramwell", "area": "Kingsbridge", "before": 10.0, "after": 14.7, "largeDrop": false},
+    {"name": "Stormwrack", "handler": "Renata Kovač", "area": "Southport", "before": 13.0, "after": 17.7, "largeDrop": false},
+    {"name": "The Drift", "handler": "Beatrice Calloway", "area": "Greenway", "before": 6.2, "after": 7.7, "largeDrop": false},
+    {"name": "The Gale", "handler": "Kip", "area": "Eastgate", "before": 13.0, "after": 19.3, "largeDrop": false},
+    {"name": "The Longcast", "handler": "Graham Petrov", "area": "Lakeshore", "before": 7.2, "after": 8.7, "largeDrop": false},
+    {"name": "The Undertow", "handler": "Desmond Okafor", "area": "Harborside", "before": 12.0, "after": 2.0, "largeDrop": true},
+    {"name": "Vesper", "handler": "Aunt Dot", "area": "Old Town", "before": 13.8, "after": 2.7, "largeDrop": true}
+  ];
+  const pingHistory = {"The Longcast":[["2026-09-06T12:01:51","41414","taken"],["2026-09-06T09:42:27","41412","turned down"],["2026-09-05T15:23:20","41396","taken"],["2026-09-05T13:04:16","41390","taken"],["2026-09-04T15:35:48","41371","taken"],["2026-09-04T09:34:23","41360","taken"],["2026-09-03T14:36:11","41346","taken"],["2026-09-01T17:03:54","41315","taken"],["2026-08-31T21:50:58","41303","missed"],["2026-08-30T21:17:07","41292","taken"],["2026-08-30T20:39:21","41290","taken"],["2026-08-30T11:27:09","41274","turned down"],["2026-08-29T18:58:18","41262","taken"],["2026-08-25T21:17:41","41201","taken"],["2026-08-25T14:52:48","41197","taken"],["2026-08-24T19:13:35","41182","turned down"],["2026-08-24T17:03:57","41176","missed"],["2026-08-24T16:52:03","41175","missed"],["2026-08-23T20:16:41","41165","taken"],["2026-08-22T19:31:39","41151","taken"],["2026-08-22T14:55:48","41149","turned down"],["2026-08-21T12:26:55","41126","taken"],["2026-08-21T11:06:11","41125","missed"],["2026-08-21T06:30:35","41123","taken"],["2026-08-19T18:43:40","41102","taken"],["2026-08-17T05:52:42","41048","taken"],["2026-08-15T20:56:04","41034","missed"],["2026-08-15T13:01:48","41023","turned down"],["2026-08-14T16:03:16","41015","taken"],["2026-08-14T02:53:02","41006","turned down"],["2026-08-13T21:36:34","41004","taken"],["2026-08-13T07:37:02","40992","taken"],["2026-08-11T21:18:23","40977","taken"],["2026-08-11T17:41:06","40969","taken"],["2026-08-09T19:36:57","40933","taken"],["2026-08-07T12:07:06","40889","taken"],["2026-08-06T11:01:06","40868","taken"],["2026-08-05T16:49:56","40849","turned down"],["2026-08-05T14:52:31","40844","taken"],["2026-08-05T09:47:42","40836","turned down"],["2026-08-04T20:05:31","40829","taken"],["2026-08-02T21:52:10","40797","turned down"],["2026-08-01T08:16:18","40763","taken"],["2026-07-30T16:46:18","40736","taken"],["2026-07-29T22:59:02","40726","taken"],["2026-07-29T03:31:14","40712","turned down"],["2026-07-27T12:53:55","40675","taken"],["2026-07-27T04:46:51","40668","taken"],["2026-07-26T10:11:35","40650","turned down"],["2026-07-25T18:01:51","40637","taken"],["2026-07-24T12:23:36","40603","taken"],["2026-07-24T04:15:54","40599","taken"],["2026-07-23T07:28:46","40575","taken"],["2026-07-22T07:52:45","40552","taken"],["2026-07-20T21:18:43","40537","turned down"],["2026-07-19T17:33:26","40507","taken"],["2026-07-18T12:31:25","40481","turned down"],["2026-07-18T04:09:02","40477","taken"],["2026-07-16T19:03:12","40448","taken"],["2026-07-15T18:30:38","40429","taken"],["2026-07-15T15:38:20","40426","taken"],["2026-07-14T17:34:28","40412","taken"],["2026-07-13T12:30:10","40392","taken"],["2026-07-12T15:58:53","40371","turned down"],["2026-07-12T00:23:03","40354","taken"],["2026-07-11T19:11:10","40348","taken"],["2026-07-07T02:01:44","40265","taken"],["2026-07-06T21:29:43","40263","taken"],["2026-07-06T08:44:59","40249","missed"],["2026-07-06T02:29:26","40245","taken"],["2026-07-05T23:45:09","40241","taken"],["2026-07-03T20:11:25","40205","taken"],["2026-07-03T19:57:36","40203","taken"],["2026-07-03T19:11:34","40201","taken"],["2026-07-03T07:28:31","40188","turned down"],["2026-07-02T20:03:55","40184","taken"],["2026-06-29T00:05:03","40101","turned down"]],"Vesper":[["2026-09-01T11:42:44","41311","missed"],["2026-08-26T18:09:13","41214","missed"],["2026-08-24T21:40:13","41186","turned down"],["2026-08-23T20:15:38","41165","missed"],["2026-08-23T05:34:55","41155","turned down"],["2026-08-23T00:10:19","41153","missed"],["2026-08-19T18:42:37","41102","missed"],["2026-08-17T08:55:21","41050","taken"],["2026-08-16T16:03:23","41043","taken"],["2026-08-16T14:05:10","41042","missed"],["2026-08-16T10:46:31","41039","missed"],["2026-08-15T20:58:08","41034","taken"],["2026-08-15T15:33:56","41026","turned down"],["2026-08-15T13:02:09","41023","taken"],["2026-08-14T17:10:16","41017","missed"],["2026-08-14T02:53:46","41006","taken"],["2026-08-13T07:34:58","40992","missed"],["2026-08-11T21:00:33","40975","taken"],["2026-08-10T13:33:28","40945","turned down"],["2026-08-10T02:01:40","40938","taken"],["2026-08-08T19:51:57","40921","taken"],["2026-08-07T17:55:23","40900","turned down"],["2026-08-07T17:07:09","40897","taken"],["2026-08-07T12:57:50","40891","taken"],["2026-08-06T17:48:35","40876","taken"],["2026-08-06T12:15:42","40869","turned down"],["2026-08-06T09:43:10","40866","taken"],["2026-08-06T05:48:50","40865","taken"],["2026-08-05T20:25:51","40856","taken"],["2026-08-05T16:50:17","40849","taken"],["2026-08-04T18:04:04","40827","taken"],["2026-08-04T15:16:10","40824","taken"],["2026-08-04T15:09:29","40823","taken"],["2026-08-04T06:44:58","40817","taken"],["2026-08-01T19:12:49","40774","turned down"],["2026-07-31T16:59:59","40752","taken"],["2026-07-31T11:28:08","40748","taken"],["2026-07-30T23:17:13","40743","taken"],["2026-07-30T13:24:32","40732","taken"],["2026-07-30T07:48:26","40729","taken"],["2026-07-30T02:29:21","40727","missed"],["2026-07-29T03:31:38","40712","taken"],["2026-07-28T14:48:20","40699","taken"],["2026-07-28T11:33:09","40696","taken"],["2026-07-28T07:21:36","40693","taken"],["2026-07-27T20:46:37","40687","taken"],["2026-07-27T08:33:21","40670","taken"],["2026-07-26T23:08:01","40662","taken"],["2026-07-26T01:05:13","40645","taken"],["2026-07-25T19:14:51","40638","turned down"],["2026-07-25T15:50:28","40634","taken"],["2026-07-24T01:09:01","40597","taken"],["2026-07-23T16:56:21","40586","taken"],["2026-07-22T18:22:25","40566","taken"],["2026-07-22T16:56:45","40563","taken"],["2026-07-22T11:28:07","40559","taken"],["2026-07-22T11:20:24","40558","taken"],["2026-07-22T01:55:31","40550","taken"],["2026-07-20T21:19:02","40537","taken"],["2026-07-20T10:13:04","40526","turned down"],["2026-07-20T09:46:52","40525","turned down"],["2026-07-19T19:37:56","40508","taken"],["2026-07-19T15:58:37","40505","taken"],["2026-07-19T13:50:44","40502","taken"],["2026-07-17T20:15:14","40474","taken"],["2026-07-17T19:27:31","40472","missed"],["2026-07-17T17:26:30","40466","taken"],["2026-07-16T21:25:42","40454","taken"],["2026-07-16T19:02:51","40448","turned down"],["2026-07-15T19:57:09","40434","taken"],["2026-07-15T19:50:58","40433","taken"],["2026-07-15T12:08:45","40420","taken"],["2026-07-14T19:11:38","40414","taken"],["2026-07-13T18:39:15","40399","taken"],["2026-07-13T18:24:32","40397","taken"],["2026-07-13T02:10:23","40384","taken"],["2026-07-12T16:07:57","40372","taken"],["2026-07-12T10:55:27","40359","taken"],["2026-07-11T21:29:50","40352","turned down"],["2026-07-11T21:20:45","40351","taken"],["2026-07-11T15:03:21","40345","taken"],["2026-07-11T14:16:15","40344","turned down"],["2026-07-11T13:47:05","40342","taken"],["2026-07-09T23:00:48","40327","taken"],["2026-07-08T17:10:39","40301","taken"],["2026-07-07T20:56:40","40285","taken"],["2026-07-07T18:39:49","40280","taken"],["2026-07-07T02:00:13","40265","missed"],["2026-07-06T08:46:30","40249","taken"],["2026-07-05T22:04:58","40239","turned down"],["2026-07-04T14:16:59","40219","taken"],["2026-07-04T01:00:59","40209","taken"],["2026-07-03T20:11:11","40205","turned down"],["2026-07-03T14:51:08","40192","taken"],["2026-07-03T07:28:48","40188","taken"],["2026-07-02T15:38:56","40179","taken"],["2026-07-02T08:43:41","40173","taken"],["2026-07-01T20:17:39","40157","taken"],["2026-07-01T19:25:00","40155","taken"],["2026-07-01T13:29:24","40146","taken"],["2026-06-30T19:17:35","40129","taken"],["2026-06-30T15:05:59","40126","turned down"],["2026-06-29T00:05:14","40101","taken"]],"The Drift":[["2026-09-06T13:37:07","41415","taken"],["2026-09-06T10:45:16","41413","turned down"],["2026-09-03T20:49:05","41353","turned down"],["2026-09-03T20:10:40","41352","taken"],["2026-09-03T09:27:15","41337","taken"],["2026-09-02T20:32:02","41334","missed"],["2026-09-01T17:28:12","41316","taken"],["2026-09-01T13:04:42","41312","taken"],["2026-08-30T20:46:50","41291","taken"],["2026-08-30T17:29:50","41282","missed"],["2026-08-29T21:33:08","41266","turned down"],["2026-08-27T23:19:48","41235","taken"],["2026-08-27T08:08:00","41224","taken"],["2026-08-26T21:23:30","41219","taken"],["2026-08-24T22:04:32","41187","taken"],["2026-08-24T17:27:26","41179","taken"],["2026-08-22T14:42:55","41148","turned down"],["2026-08-21T16:47:10","41130","taken"],["2026-08-20T08:28:15","41109","taken"],["2026-08-20T05:17:31","41108","missed"],["2026-08-19T22:41:18","41107","taken"],["2026-08-19T15:57:45","41095","taken"],["2026-08-17T14:10:43","41054","taken"],["2026-08-16T13:46:42","41041","taken"],["2026-08-15T17:58:51","41030","missed"],["2026-08-15T17:52:04","41028","turned down"],["2026-08-12T19:38:32","40988","taken"],["2026-08-12T11:41:57","40982","missed"],["2026-08-10T15:27:06","40948","taken"],["2026-08-10T08:37:22","40941","taken"],["2026-08-09T10:21:56","40926","taken"],["2026-08-07T22:16:32","40906","taken"],["2026-08-07T16:23:13","40895","taken"],["2026-08-07T07:17:37","40885","taken"],["2026-08-06T21:33:41","40881","taken"],["2026-08-05T18:17:00","40851","missed"],["2026-08-02T20:23:51","40795","turned down"],["2026-08-01T22:02:27","40776","taken"],["2026-07-31T19:23:10","40756","taken"],["2026-07-30T08:35:02","40730","taken"],["2026-07-28T21:51:20","40708","taken"],["2026-07-27T19:41:04","40686","taken"],["2026-07-26T17:53:51","40653","taken"],["2026-07-25T11:34:01","40629","taken"],["2026-07-23T16:41:02","40585","taken"],["2026-07-23T15:11:22","40580","turned down"],["2026-07-22T08:01:11","40553","taken"],["2026-07-21T17:21:03","40545","taken"],["2026-07-19T11:40:05","40499","taken"],["2026-07-18T20:51:57","40491","taken"],["2026-07-18T17:54:06","40486","taken"],["2026-07-17T09:31:19","40461","taken"],["2026-07-13T14:56:27","40394","taken"],["2026-07-13T04:00:49","40385","turned down"],["2026-07-13T01:14:38","40383","taken"],["2026-07-09T08:22:53","40314","taken"],["2026-07-08T13:14:49","40297","taken"],["2026-07-07T20:01:49","40283","taken"],["2026-07-07T18:42:48","40281","taken"],["2026-07-07T08:27:53","40266","taken"],["2026-07-06T20:40:57","40261","turned down"],["2026-07-05T19:37:38","40237","taken"],["2026-07-04T18:50:46","40224","turned down"],["2026-07-04T07:40:30","40213","taken"],["2026-06-30T22:00:29","40134","taken"],["2026-06-29T18:18:46","40116","taken"],["2026-06-29T00:28:52","40102","taken"]],"Sgt. Bulwark":[["2026-09-06T15:23:36","41416","taken"],["2026-09-05T18:20:34","41402","taken"],["2026-09-05T17:12:03","41399","taken"],["2026-09-04T21:48:05","41381","taken"],["2026-09-04T21:47:56","41380","missed"],["2026-09-03T22:37:33","41356","taken"],["2026-09-03T22:25:05","41355","taken"],["2026-09-01T20:01:20","41319","taken"],["2026-08-31T17:43:23","41300","turned down"],["2026-08-31T17:41:23","41299","taken"],["2026-08-31T16:44:51","41297","missed"],["2026-08-30T15:08:32","41277","taken"],["2026-08-30T10:19:05","41273","taken"],["2026-08-30T07:22:24","41270","taken"],["2026-08-29T21:33:09","41267","taken"],["2026-08-29T19:14:08","41263","missed"],["2026-08-28T15:19:30","41241","taken"],["2026-08-27T23:41:31","41236","taken"],["2026-08-27T17:54:44","41228","missed"],["2026-08-27T10:37:45","41225","turned down"],["2026-08-25T13:46:16","41196","taken"],["2026-08-25T11:19:05","41192","turned down"],["2026-08-21T21:21:29","41136","taken"],["2026-08-21T17:09:18","41132","missed"],["2026-08-21T08:11:21","41124","taken"],["2026-08-20T22:41:31","41121","taken"],["2026-08-19T13:30:22","41093","taken"],["2026-08-19T11:07:41","41090","taken"],["2026-08-18T18:21:04","41080","taken"],["2026-08-18T10:47:01","41072","turned down"],["2026-08-18T09:05:15","41071","taken"],["2026-08-17T20:34:11","41064","taken"],["2026-08-16T21:36:50","41046","taken"],["2026-08-16T09:43:51","41036","turned down"],["2026-08-15T19:39:00","41032","missed"],["2026-08-15T15:18:38","41025","turned down"],["2026-08-15T14:10:01","41024","taken"],["2026-08-14T19:43:08","41019","taken"],["2026-08-14T11:44:32","41013","missed"],["2026-08-11T21:13:58","40976","taken"],["2026-08-11T11:38:14","40966","taken"],["2026-08-10T14:04:13","40946","turned down"],["2026-08-08T10:39:12","40913","turned down"],["2026-08-08T07:53:55","40911","turned down"],["2026-08-07T13:56:47","40892","taken"],["2026-08-06T19:39:21","40878","taken"],["2026-08-06T14:31:50","40872","taken"],["2026-08-06T01:14:42","40862","taken"],["2026-08-05T23:18:05","40859","taken"],["2026-08-04T11:59:30","40820","taken"],["2026-08-03T15:44:23","40809","taken"],["2026-08-01T21:32:21","40775","taken"],["2026-08-01T11:43:45","40765","taken"],["2026-07-30T18:51:29","40739","taken"],["2026-07-30T17:09:57","40737","turned down"],["2026-07-29T20:00:39","40725","taken"],["2026-07-29T17:27:26","40723","turned down"],["2026-07-29T11:04:51","40719","taken"],["2026-07-28T22:30:38","40709","turned down"],["2026-07-26T21:49:59","40659","taken"],["2026-07-26T20:43:53","40658","taken"],["2026-07-25T14:25:09","40632","taken"],["2026-07-24T20:11:56","40617","turned down"],["2026-07-24T15:03:12","40608","taken"],["2026-07-24T07:13:52","40601","taken"],["2026-07-23T23:30:30","40596","taken"],["2026-07-23T21:52:22","40595","turned down"],["2026-07-23T21:08:29","40592","taken"],["2026-07-19T22:48:51","40515","taken"],["2026-07-18T01:37:24","40476","taken"],["2026-07-17T18:06:14","40470","taken"],["2026-07-17T15:21:15","40464","taken"],["2026-07-16T20:22:30","40452","taken"],["2026-07-16T18:05:45","40447","taken"],["2026-07-16T13:31:46","40442","turned down"],["2026-07-14T10:40:23","40407","taken"],["2026-07-14T07:33:09","40403","turned down"],["2026-07-13T00:26:21","40381","taken"],["2026-07-12T15:27:38","40369","taken"],["2026-07-11T19:07:59","40347","taken"],["2026-07-11T14:02:16","40343","turned down"],["2026-07-11T06:19:57","40338","taken"],["2026-07-10T18:41:02","40335","turned down"],["2026-07-09T19:42:12","40321","taken"],["2026-07-07T18:25:07","40279","taken"],["2026-07-06T11:40:07","40255","taken"],["2026-07-06T01:41:04","40244","taken"],["2026-07-05T19:37:56","40238","taken"],["2026-07-03T16:08:54","40195","turned down"],["2026-07-02T08:04:29","40170","taken"],["2026-07-01T20:54:41","40159","taken"],["2026-07-01T15:34:19","40149","taken"],["2026-07-01T11:27:17","40142","taken"],["2026-06-30T23:55:16","40135","taken"],["2026-06-30T07:37:28","40122","turned down"],["2026-06-29T02:30:09","40103","taken"]],"The Undertow":[["2026-09-05T15:17:47","41394","missed"],["2026-08-27T23:18:46","41235","missed"],["2026-08-21T16:45:07","41130","missed"],["2026-08-18T16:18:10","41079","missed"],["2026-08-17T19:07:03","41059","taken"],["2026-08-17T14:10:18","41054","turned down"],["2026-08-16T13:46:27","41041","turned down"],["2026-08-14T10:22:29","41011","missed"],["2026-08-14T02:53:00","41005","missed"],["2026-08-13T18:44:20","41003","missed"],["2026-08-13T15:55:03","41000","taken"],["2026-08-13T13:28:09","40996","taken"],["2026-08-13T11:24:44","40994","missed"],["2026-08-12T09:04:56","40981","missed"],["2026-08-11T18:58:01","40970","turned down"],["2026-08-10T19:45:14","40956","taken"],["2026-08-10T18:49:29","40953","taken"],["2026-08-08T13:58:38","40915","taken"],["2026-08-07T23:13:18","40907","taken"],["2026-08-07T22:12:57","40905","taken"],["2026-08-07T19:51:00","40902","taken"],["2026-08-07T10:29:59","40887","taken"],["2026-08-07T04:26:56","40883","turned down"],["2026-08-06T00:49:55","40861","taken"],["2026-08-05T20:54:54","40857","turned down"],["2026-08-05T18:18:33","40851","taken"],["2026-08-05T17:45:09","40850","taken"],["2026-08-04T12:43:31","40822","turned down"],["2026-08-04T10:25:25","40819","taken"],["2026-08-01T18:47:54","40773","taken"],["2026-08-01T14:05:49","40770","taken"],["2026-08-01T08:07:00","40762","turned down"],["2026-07-31T20:07:05","40757","turned down"],["2026-07-31T18:22:30","40755","taken"],["2026-07-29T16:57:08","40722","taken"],["2026-07-29T06:31:41","40715","taken"],["2026-07-29T04:04:29","40713","taken"],["2026-07-28T17:52:18","40701","taken"],["2026-07-28T09:32:59","40694","taken"],["2026-07-27T11:16:35","40673","taken"],["2026-07-27T08:54:53","40671","taken"],["2026-07-26T19:45:10","40654","taken"],["2026-07-26T06:17:17","40648","turned down"],["2026-07-26T00:32:41","40644","taken"],["2026-07-25T12:16:59","40630","taken"],["2026-07-23T19:02:28","40590","taken"],["2026-07-23T15:28:03","40581","taken"],["2026-07-22T22:35:54","40573","taken"],["2026-07-22T18:23:01","40567","taken"],["2026-07-20T18:09:53","40533","taken"],["2026-07-20T18:02:38","40532","taken"],["2026-07-20T16:20:58","40529","taken"],["2026-07-20T06:57:55","40523","turned down"],["2026-07-20T01:36:48","40520","turned down"],["2026-07-18T07:43:41","40478","taken"],["2026-07-17T18:47:57","40471","taken"],["2026-07-17T18:02:47","40469","taken"],["2026-07-17T17:55:48","40468","turned down"],["2026-07-17T17:52:09","40467","turned down"],["2026-07-16T21:35:41","40455","taken"],["2026-07-16T19:56:53","40450","taken"],["2026-07-16T17:44:06","40446","taken"],["2026-07-15T15:53:01","40427","taken"],["2026-07-15T13:04:25","40423","taken"],["2026-07-13T20:21:43","40401","missed"],["2026-07-13T04:01:23","40385","taken"],["2026-07-11T16:10:26","40346","taken"],["2026-07-10T07:39:09","40328","taken"],["2026-07-09T21:32:54","40324","taken"],["2026-07-09T08:37:39","40315","turned down"],["2026-07-09T02:35:09","40311","taken"],["2026-07-08T21:25:46","40309","taken"],["2026-07-08T20:07:15","40306","taken"],["2026-07-07T17:19:59","40277","taken"],["2026-07-07T17:09:39","40275","taken"],["2026-07-07T14:17:51","40271","turned down"],["2026-07-06T16:36:56","40257","taken"],["2026-07-04T12:29:07","40217","taken"],["2026-07-03T17:45:50","40197","taken"],["2026-07-03T17:30:31","40196","taken"],["2026-07-01T19:24:47","40154","taken"],["2026-07-01T10:44:03","40139","taken"],["2026-06-30T08:58:07","40123","turned down"],["2026-06-29T18:18:10","40116","turned down"],["2026-06-29T15:17:23","40113","taken"],["2026-06-29T14:31:58","40112","taken"],["2026-06-29T13:52:31","40111","turned down"],["2026-06-29T07:26:38","40106","taken"],["2026-06-29T05:43:24","40104","taken"]],"The Gale":[["2026-09-05T19:57:47","41406","taken"],["2026-09-05T18:20:14","41402","turned down"],["2026-09-05T17:57:10","41401","taken"],["2026-09-05T16:01:03","41397","taken"],["2026-09-05T13:13:32","41392","taken"],["2026-09-05T12:15:55","41389","taken"],["2026-09-04T21:48:59","41380","taken"],["2026-09-04T16:33:38","41372","taken"],["2026-09-04T08:52:53","41359","taken"],["2026-09-04T07:14:09","41358","taken"],["2026-09-04T06:27:43","41357","taken"],["2026-09-03T22:24:03","41355","missed"],["2026-09-03T16:57:40","41349","taken"],["2026-09-03T12:40:58","41341","taken"],["2026-09-02T15:29:56","41329","taken"],["2026-09-01T20:00:19","41319","missed"],["2026-09-01T18:57:36","41318","taken"],["2026-09-01T17:56:55","41317","taken"],["2026-09-01T07:56:15","41306","taken"],["2026-08-31T17:40:43","41299","turned down"],["2026-08-31T10:37:05","41293","turned down"],["2026-08-30T19:40:55","41286","taken"],["2026-08-30T19:28:42","41285","taken"],["2026-08-30T18:26:43","41283","taken"],["2026-08-30T13:51:24","41275","turned down"],["2026-08-30T07:21:47","41270","turned down"],["2026-08-30T05:06:19","41269","taken"],["2026-08-29T09:17:56","41254","taken"],["2026-08-28T21:16:01","41249","taken"],["2026-08-28T17:28:35","41243","taken"],["2026-08-28T17:04:03","41242","taken"],["2026-08-28T06:39:42","41239","turned down"],["2026-08-28T05:10:44","41238","taken"],["2026-08-26T12:33:56","41212","taken"],["2026-08-26T09:41:10","41210","taken"],["2026-08-25T12:09:25","41193","turned down"],["2026-08-25T11:19:32","41192","taken"],["2026-08-25T01:53:53","41190","taken"],["2026-08-24T19:00:05","41181","missed"],["2026-08-24T17:12:25","41178","missed"],["2026-08-24T17:11:19","41177","taken"],["2026-08-23T18:35:05","41163","taken"],["2026-08-23T10:07:44","41157","taken"],["2026-08-22T20:52:11","41152","missed"],["2026-08-22T12:25:16","41146","taken"],["2026-08-22T11:45:46","41144","taken"],["2026-08-21T21:58:31","41137","taken"],["2026-08-21T17:10:20","41132","taken"],["2026-08-20T12:35:45","41111","turned down"],["2026-08-19T17:29:31","41097","missed"],["2026-08-18T18:20:35","41080","turned down"],["2026-08-18T10:47:53","41072","taken"],["2026-08-18T07:37:13","41070","taken"],["2026-08-17T22:35:48","41067","taken"],["2026-08-17T20:56:36","41065","taken"],["2026-08-17T19:43:35","41061","turned down"],["2026-08-17T19:22:00","41060","taken"],["2026-08-17T17:03:22","41056","taken"],["2026-08-16T23:19:40","41047","taken"],["2026-08-16T21:33:19","41045","turned down"],["2026-08-16T09:45:06","41036","taken"],["2026-08-15T15:18:08","41025","turned down"],["2026-08-14T22:43:52","41022","taken"],["2026-08-14T19:42:51","41019","turned down"],["2026-08-14T11:45:35","41013","taken"],["2026-08-14T07:27:29","41009","taken"],["2026-08-13T15:13:40","40999","taken"],["2026-08-13T13:44:48","40997","missed"],["2026-08-12T19:04:58","40987","missed"],["2026-08-11T19:01:04","40971","taken"],["2026-08-11T14:51:59","40968","missed"],["2026-08-11T11:10:29","40965","taken"],["2026-08-10T14:04:33","40946","taken"],["2026-08-09T23:37:16","40937","taken"],["2026-08-09T23:02:22","40936","taken"],["2026-08-09T22:26:30","40935","taken"],["2026-08-09T14:26:57","40928","taken"],["2026-08-09T06:35:15","40925","taken"],["2026-08-06T19:39:10","40878","turned down"],["2026-08-06T01:21:12","40863","turned down"],["2026-08-05T13:48:23","40841","taken"],["2026-08-04T16:41:04","40826","taken"],["2026-08-04T12:27:38","40821","taken"],["2026-08-03T19:59:51","40814","taken"],["2026-08-03T08:29:43","40804","turned down"],["2026-08-03T01:29:09","40801","taken"],["2026-08-02T19:12:33","40794","taken"],["2026-08-02T15:46:06","40788","turned down"],["2026-08-02T14:20:41","40786","missed"],["2026-08-02T01:31:23","40779","taken"],["2026-08-01T13:08:06","40768","taken"],["2026-07-31T21:24:41","40759","taken"],["2026-07-31T20:14:23","40758","taken"],["2026-07-31T17:55:24","40754","taken"],["2026-07-29T00:27:51","40711","taken"],["2026-07-28T21:42:42","40707","taken"],["2026-07-28T19:47:37","40704","taken"],["2026-07-28T14:38:54","40698","taken"],["2026-07-27T18:48:48","40684","taken"],["2026-07-26T20:39:27","40657","taken"],["2026-07-26T19:53:47","40655","taken"],["2026-07-25T07:06:26","40621","taken"],["2026-07-24T23:04:18","40619","taken"],["2026-07-24T19:13:55","40615","taken"],["2026-07-24T17:04:24","40609","taken"],["2026-07-24T15:01:41","40608","missed"],["2026-07-23T10:43:32","40577","taken"],["2026-07-23T09:49:35","40576","taken"],["2026-07-22T20:35:28","40570","taken"],["2026-07-22T10:22:18","40555","taken"],["2026-07-22T09:43:31","40554","turned down"],["2026-07-21T18:47:46","40547","taken"],["2026-07-21T17:07:51","40543","turned down"],["2026-07-18T08:46:43","40480","taken"],["2026-07-17T21:01:45","40475","turned down"],["2026-07-17T07:30:26","40459","taken"],["2026-07-17T04:05:44","40458","taken"],["2026-07-16T13:31:55","40442","taken"],["2026-07-16T09:05:24","40437","taken"],["2026-07-15T14:37:40","40425","taken"],["2026-07-15T12:34:38","40421","turned down"],["2026-07-14T07:33:59","40403","taken"],["2026-07-13T19:19:32","40400","turned down"],["2026-07-13T11:29:44","40391","taken"],["2026-07-13T11:22:01","40390","taken"],["2026-07-13T00:33:26","40382","taken"],["2026-07-12T11:43:13","40363","taken"],["2026-07-12T10:50:58","40358","taken"],["2026-07-12T08:23:33","40356","taken"],["2026-07-12T07:52:06","40355","taken"],["2026-07-11T20:31:04","40349","taken"],["2026-07-08T18:26:02","40303","taken"],["2026-07-08T15:03:29","40299","turned down"],["2026-07-07T21:36:08","40288","taken"],["2026-07-07T11:43:40","40268","turned down"],["2026-07-06T20:01:21","40260","taken"],["2026-07-06T15:15:02","40256","turned down"],["2026-07-06T08:04:12","40248","taken"],["2026-07-05T14:05:27","40229","taken"],["2026-07-05T12:17:37","40228","turned down"],["2026-07-04T23:33:02","40225","missed"],["2026-07-04T14:47:17","40220","taken"],["2026-07-03T20:04:50","40204","taken"],["2026-07-03T14:07:31","40191","taken"],["2026-07-02T13:53:08","40178","taken"],["2026-07-01T15:00:18","40147","taken"],["2026-06-30T23:54:48","40135","turned down"],["2026-06-29T17:41:12","40114","taken"],["2026-06-29T11:19:23","40109","taken"],["2026-06-29T08:33:37","40107","taken"],["2026-06-29T06:51:38","40105","taken"]],"Corporal Ashgrove":[["2026-09-05T17:28:40","41400","taken"],["2026-09-04T19:07:33","41377","taken"],["2026-09-03T10:44:56","41339","taken"],["2026-09-01T21:39:57","41322","taken"],["2026-09-01T20:06:32","41320","taken"],["2026-09-01T14:34:59","41314","turned down"],["2026-09-01T09:15:44","41307","missed"],["2026-08-30T09:36:04","41271","taken"],["2026-08-29T20:41:44","41265","turned down"],["2026-08-28T10:04:24","41240","taken"],["2026-08-27T20:50:47","41233","taken"],["2026-08-26T22:35:12","41222","taken"],["2026-08-25T01:06:47","41188","taken"],["2026-08-24T07:08:46","41170","missed"],["2026-08-23T18:07:34","41162","taken"],["2026-08-23T16:50:13","41161","taken"],["2026-08-23T11:04:37","41158","turned down"],["2026-08-20T22:36:52","41120","missed"],["2026-08-20T18:37:55","41118","taken"],["2026-08-17T18:59:30","41057","taken"],["2026-08-17T11:33:33","41052","turned down"],["2026-08-17T09:32:02","41051","taken"],["2026-08-16T10:40:35","41038","taken"],["2026-08-15T17:53:23","41029","taken"],["2026-08-14T14:24:57","41014","turned down"],["2026-08-14T06:42:58","41007","missed"],["2026-08-13T18:03:22","41002","turned down"],["2026-08-13T12:24:03","40995","taken"],["2026-08-12T16:14:19","40984","taken"],["2026-08-11T14:39:03","40967","turned down"],["2026-08-10T18:34:42","40951","taken"],["2026-08-10T12:39:07","40944","taken"],["2026-08-09T18:37:12","40931","taken"],["2026-08-08T09:53:19","40912","taken"],["2026-08-07T15:04:17","40894","taken"],["2026-08-06T12:30:23","40871","taken"],["2026-08-05T18:34:20","40852","turned down"],["2026-08-05T09:47:52","40836","turned down"],["2026-08-05T01:50:19","40833","taken"],["2026-08-04T23:11:56","40832","taken"],["2026-08-04T15:49:57","40825","taken"],["2026-08-03T14:45:08","40807","taken"],["2026-08-02T12:02:04","40784","taken"],["2026-08-02T11:25:36","40783","turned down"],["2026-07-31T11:37:28","40749","taken"],["2026-07-30T23:08:22","40742","taken"],["2026-07-30T13:58:08","40734","taken"],["2026-07-30T02:42:52","40728","taken"],["2026-07-29T14:17:31","40720","taken"],["2026-07-29T08:00:05","40716","taken"],["2026-07-27T21:18:23","40689","taken"],["2026-07-27T17:57:32","40682","turned down"],["2026-07-26T08:16:13","40649","taken"],["2026-07-25T17:51:22","40636","taken"],["2026-07-25T10:56:53","40628","taken"],["2026-07-23T16:17:17","40582","taken"],["2026-07-21T21:28:47","40549","taken"],["2026-07-21T19:28:30","40548","taken"],["2026-07-21T13:14:43","40542","turned down"],["2026-07-21T12:25:32","40541","turned down"],["2026-07-20T16:51:14","40531","taken"],["2026-07-19T23:33:39","40517","turned down"],["2026-07-19T23:24:20","40516","taken"],["2026-07-19T22:03:25","40514","taken"],["2026-07-19T21:17:01","40513","taken"],["2026-07-18T17:42:26","40485","taken"],["2026-07-18T17:23:01","40484","turned down"],["2026-07-17T15:19:24","40463","missed"],["2026-07-17T01:15:41","40457","taken"],["2026-07-16T10:11:37","40438","taken"],["2026-07-15T12:39:56","40422","taken"],["2026-07-12T22:54:54","40378","taken"],["2026-07-12T10:49:05","40357","taken"],["2026-07-09T22:53:18","40326","taken"],["2026-07-09T17:37:18","40317","taken"],["2026-07-08T11:00:36","40296","taken"],["2026-07-07T19:57:00","40282","taken"],["2026-07-07T17:23:10","40278","turned down"],["2026-07-07T16:14:36","40274","turned down"],["2026-07-06T22:02:00","40264","taken"],["2026-07-06T20:52:02","40262","taken"],["2026-07-06T11:25:30","40254","taken"],["2026-07-04T17:42:08","40223","taken"],["2026-07-03T15:42:38","40194","taken"],["2026-07-02T19:41:21","40183","taken"],["2026-07-02T18:44:52","40181","taken"],["2026-07-01T20:56:25","40160","turned down"],["2026-07-01T18:56:42","40153","turned down"],["2026-07-01T18:54:08","40151","taken"],["2026-07-01T13:26:39","40145","taken"],["2026-06-30T00:24:53","40120","taken"],["2026-06-29T10:29:44","40108","taken"]],"Sgt. Falkirk":[["2026-09-06T15:22:35","41416","missed"],["2026-09-06T03:26:58","41409","turned down"],["2026-09-05T21:56:47","41408","taken"],["2026-09-04T19:27:07","41378","taken"],["2026-09-03T12:43:04","41342","turned down"],["2026-09-03T10:15:46","41338","taken"],["2026-09-02T18:22:59","41333","missed"],["2026-09-02T14:59:12","41328","taken"],["2026-09-02T11:38:35","41325","taken"],["2026-09-01T21:20:46","41321","taken"],["2026-09-01T20:06:22","41320","turned down"],["2026-09-01T14:22:36","41313","taken"],["2026-08-31T19:51:43","41302","taken"],["2026-08-31T17:43:37","41300","taken"],["2026-08-31T16:45:53","41297","taken"],["2026-08-31T15:03:23","41296","taken"],["2026-08-30T19:50:41","41288","taken"],["2026-08-30T19:47:08","41287","taken"],["2026-08-30T13:59:18","41276","taken"],["2026-08-30T10:18:04","41273","missed"],["2026-08-29T20:41:05","41265","turned down"],["2026-08-29T19:42:22","41264","taken"],["2026-08-29T19:15:09","41263","taken"],["2026-08-29T11:00:00","41256","taken"],["2026-08-27T10:37:58","41225","taken"],["2026-08-26T18:35:03","41215","taken"],["2026-08-26T02:18:38","41206","taken"],["2026-08-26T01:20:37","41205","taken"],["2026-08-25T19:35:37","41200","missed"],["2026-08-24T14:36:36","41174","taken"],["2026-08-24T07:09:48","41170","turned down"],["2026-08-23T16:49:10","41161","missed"],["2026-08-23T11:05:01","41158","taken"],["2026-08-23T00:11:25","41154","taken"],["2026-08-21T20:55:21","41135","taken"],["2026-08-21T16:44:07","41129","missed"],["2026-08-19T21:38:59","41105","taken"],["2026-08-19T13:28:04","41092","turned down"],["2026-08-19T06:49:14","41089","taken"],["2026-08-18T22:14:48","41087","taken"],["2026-08-18T18:47:42","41083","taken"],["2026-08-18T18:32:40","41082","turned down"],["2026-08-18T14:33:01","41075","taken"],["2026-08-17T12:05:02","41053","taken"],["2026-08-15T19:06:52","41031","taken"],["2026-08-14T14:25:09","41014","taken"],["2026-08-13T18:02:19","41002","missed"],["2026-08-13T14:52:32","40998","taken"],["2026-08-13T12:23:00","40995","missed"],["2026-08-13T09:46:40","40993","taken"],["2026-08-12T20:03:25","40990","taken"],["2026-08-12T16:35:28","40985","turned down"],["2026-08-10T21:09:18","40959","taken"],["2026-08-10T18:47:12","40952","taken"],["2026-08-10T18:34:33","40951","turned down"],["2026-08-08T07:11:34","40910","taken"],["2026-08-08T00:23:28","40908","taken"],["2026-08-07T12:35:47","40890","taken"],["2026-08-06T00:15:50","40860","taken"],["2026-08-05T19:44:52","40854","turned down"],["2026-08-05T18:34:58","40852","taken"],["2026-08-05T01:49:50","40833","turned down"],["2026-08-04T21:36:19","40831","taken"],["2026-08-03T15:49:37","40810","taken"],["2026-08-03T10:27:09","40806","taken"],["2026-08-02T22:08:02","40799","taken"],["2026-08-02T11:01:04","40782","taken"],["2026-08-02T10:33:20","40781","taken"],["2026-08-02T09:17:47","40780","turned down"],["2026-07-29T08:38:36","40717","taken"],["2026-07-28T13:08:21","40697","taken"],["2026-07-28T10:44:21","40695","turned down"],["2026-07-27T10:33:30","40672","taken"],["2026-07-27T07:04:24","40669","taken"],["2026-07-26T10:12:50","40651","taken"],["2026-07-25T20:45:56","40641","taken"],["2026-07-24T22:28:24","40618","taken"],["2026-07-24T14:05:15","40607","taken"],["2026-07-24T10:20:50","40602","taken"],["2026-07-23T21:12:43","40593","taken"],["2026-07-22T18:48:41","40568","turned down"],["2026-07-22T17:29:24","40564","taken"],["2026-07-20T18:55:56","40535","taken"],["2026-07-20T07:07:24","40524","turned down"],["2026-07-19T20:05:10","40510","taken"],["2026-07-18T20:31:28","40490","taken"],["2026-07-18T18:35:03","40488","taken"],["2026-07-18T17:23:27","40484","taken"],["2026-07-17T15:20:56","40463","taken"],["2026-07-17T08:15:31","40460","taken"],["2026-07-16T20:21:24","40451","turned down"],["2026-07-16T10:11:08","40438","turned down"],["2026-07-15T13:44:18","40424","turned down"],["2026-07-13T23:22:43","40402","taken"],["2026-07-13T16:10:39","40396","taken"],["2026-07-12T19:03:25","40375","taken"],["2026-07-08T21:26:57","40310","taken"],["2026-07-08T21:10:55","40308","taken"],["2026-07-08T13:49:17","40298","turned down"],["2026-07-08T10:41:25","40295","taken"],["2026-07-08T08:05:01","40292","taken"],["2026-07-07T21:18:10","40286","taken"],["2026-07-07T16:15:04","40274","taken"],["2026-07-07T09:58:27","40267","missed"],["2026-07-06T17:05:43","40258","taken"],["2026-07-05T23:03:41","40240","taken"],["2026-07-05T15:58:42","40231","taken"],["2026-07-04T17:40:36","40223","missed"],["2026-07-04T17:14:56","40221","taken"],["2026-07-03T15:02:14","40193","taken"],["2026-07-02T12:10:02","40176","taken"],["2026-06-30T18:33:32","40128","taken"],["2026-06-30T05:35:31","40121","taken"],["2026-06-29T19:17:36","40117","taken"],["2026-06-29T12:08:36","40110","taken"]],"Stormwrack":[["2026-09-06T20:09:33","41418","missed"],["2026-09-06T13:36:37","41415","turned down"],["2026-09-06T10:45:29","41413","taken"],["2026-09-05T21:43:44","41407","taken"],["2026-09-05T18:49:54","41404","taken"],["2026-09-05T15:18:48","41394","taken"],["2026-09-05T11:12:01","41388","taken"],["2026-09-05T10:52:07","41387","taken"],["2026-09-05T08:41:04","41385","taken"],["2026-09-04T21:22:11","41379","taken"],["2026-09-04T17:05:03","41373","turned down"],["2026-09-04T14:52:11","41368","taken"],["2026-09-04T11:40:17","41362","taken"],["2026-09-03T20:49:22","41353","taken"],["2026-09-03T16:22:29","41348","taken"],["2026-09-02T20:33:03","41334","taken"],["2026-09-02T15:39:32","41330","missed"],["2026-09-01T11:08:42","41308","taken"],["2026-08-31T16:53:24","41298","taken"],["2026-08-30T15:14:10","41278","taken"],["2026-08-29T21:33:25","41266","taken"],["2026-08-29T17:02:34","41261","taken"],["2026-08-29T09:34:26","41255","taken"],["2026-08-28T21:50:58","41251","taken"],["2026-08-28T21:49:26","41250","turned down"],["2026-08-28T03:20:32","41237","taken"],["2026-08-27T14:56:31","41227","taken"],["2026-08-26T12:08:55","41211","taken"],["2026-08-25T15:05:37","41198","turned down"],["2026-08-25T08:00:15","41191","missed"],["2026-08-25T01:20:09","41189","taken"],["2026-08-24T22:03:29","41187","missed"],["2026-08-24T17:42:37","41180","taken"],["2026-08-24T17:27:04","41179","turned down"],["2026-08-24T13:20:15","41173","taken"],["2026-08-24T10:46:04","41172","taken"],["2026-08-24T08:46:24","41171","taken"],["2026-08-23T21:02:22","41167","taken"],["2026-08-23T20:17:43","41166","taken"],["2026-08-23T12:53:56","41159","taken"],["2026-08-21T17:13:05","41133","taken"],["2026-08-21T16:49:58","41131","missed"],["2026-08-21T16:46:08","41130","missed"],["2026-08-21T16:38:57","41128","taken"],["2026-08-20T13:59:16","41112","taken"],["2026-08-20T05:18:32","41108","taken"],["2026-08-19T21:51:12","41106","taken"],["2026-08-19T17:31:54","41098","taken"],["2026-08-18T18:31:31","41081","taken"],["2026-08-18T16:19:12","41079","turned down"],["2026-08-18T00:37:04","41069","taken"],["2026-08-17T22:46:45","41068","taken"],["2026-08-17T21:57:40","41066","turned down"],["2026-08-15T17:59:54","41030","turned down"],["2026-08-15T17:52:27","41028","taken"],["2026-08-15T16:31:25","41027","taken"],["2026-08-14T02:52:27","41005","turned down"],["2026-08-13T13:27:08","40996","missed"],["2026-08-12T22:49:02","40991","missed"],["2026-08-12T19:37:29","40988","missed"],["2026-08-12T11:42:58","40982","taken"],["2026-08-12T09:05:58","40981","taken"],["2026-08-12T00:10:35","40980","taken"],["2026-08-11T20:43:54","40973","turned down"],["2026-08-11T18:58:24","40970","taken"],["2026-08-10T21:41:25","40961","taken"],["2026-08-10T20:54:44","40958","taken"],["2026-08-09T16:41:24","40929","taken"],["2026-08-09T10:21:44","40926","turned down"],["2026-08-08T18:49:02","40920","taken"],["2026-08-08T18:24:01","40918","taken"],["2026-08-07T16:26:11","40896","taken"],["2026-08-07T16:23:07","40895","turned down"],["2026-08-07T04:27:26","40883","taken"],["2026-08-06T19:47:54","40879","taken"],["2026-08-06T16:49:59","40875","taken"],["2026-08-06T10:33:33","40867","taken"],["2026-08-05T20:55:01","40857","taken"],["2026-08-03T09:05:36","40805","taken"],["2026-08-03T05:10:19","40803","turned down"],["2026-08-02T20:24:00","40795","taken"],["2026-08-02T14:24:39","40787","taken"],["2026-08-01T16:47:39","40772","taken"],["2026-08-01T12:36:05","40766","taken"],["2026-08-01T08:07:40","40762","taken"],["2026-07-31T20:07:44","40757","taken"],["2026-07-29T16:56:33","40722","turned down"],["2026-07-28T21:50:42","40708","turned down"],["2026-07-28T16:37:35","40700","taken"],["2026-07-28T09:32:41","40694","turned down"],["2026-07-28T01:40:38","40691","taken"],["2026-07-27T21:18:22","40690","taken"],["2026-07-27T12:56:38","40676","taken"],["2026-07-26T23:00:30","40661","taken"],["2026-07-26T03:15:36","40647","taken"],["2026-07-25T23:58:39","40643","taken"],["2026-07-25T21:59:23","40642","taken"],["2026-07-25T15:25:50","40633","taken"],["2026-07-25T12:23:45","40631","taken"],["2026-07-25T10:01:19","40626","taken"],["2026-07-24T19:01:11","40612","taken"],["2026-07-24T02:06:48","40598","taken"],["2026-07-23T16:24:23","40583","taken"],["2026-07-23T14:25:38","40579","taken"],["2026-07-21T18:34:46","40546","taken"],["2026-07-21T17:20:35","40545","turned down"],["2026-07-20T16:20:43","40529","turned down"],["2026-07-19T08:23:17","40496","taken"],["2026-07-19T06:21:30","40495","taken"],["2026-07-18T20:57:02","40492","taken"],["2026-07-17T18:47:51","40471","turned down"],["2026-07-17T17:55:57","40468","taken"],["2026-07-17T09:30:54","40461","turned down"],["2026-07-16T19:56:21","40450","turned down"],["2026-07-16T14:13:59","40443","taken"],["2026-07-15T19:01:29","40431","taken"],["2026-07-15T16:52:57","40428","taken"],["2026-07-14T22:46:58","40417","taken"],["2026-07-14T10:49:03","40408","taken"],["2026-07-12T14:20:07","40366","taken"],["2026-07-12T13:43:42","40365","taken"],["2026-07-12T10:59:34","40361","taken"],["2026-07-12T10:56:50","40360","taken"],["2026-07-11T21:58:41","40353","taken"],["2026-07-11T20:40:48","40350","taken"],["2026-07-10T21:22:52","40336","taken"],["2026-07-10T17:08:08","40333","turned down"],["2026-07-09T08:38:12","40315","turned down"],["2026-07-08T20:14:20","40307","taken"],["2026-07-08T17:29:14","40302","taken"],["2026-07-07T14:12:27","40270","taken"],["2026-07-06T17:21:58","40259","taken"],["2026-07-05T09:12:38","40226","taken"],["2026-07-04T18:50:27","40224","turned down"],["2026-07-04T07:40:16","40213","turned down"],["2026-07-04T01:14:48","40210","taken"],["2026-07-03T22:33:01","40207","taken"],["2026-07-03T19:11:13","40200","taken"],["2026-07-03T17:30:15","40196","turned down"],["2026-07-03T09:15:01","40189","taken"],["2026-07-02T22:18:35","40186","taken"],["2026-07-02T08:38:48","40172","taken"],["2026-07-02T04:15:09","40167","taken"],["2026-07-01T18:55:51","40152","taken"],["2026-06-29T13:53:01","40111","taken"]],"Ironvale":[["2026-09-05T18:49:24","41404","turned down"],["2026-09-05T15:20:01","41395","taken"],["2026-09-04T22:44:59","41382","missed"],["2026-09-04T18:48:38","41376","missed"],["2026-09-04T17:05:26","41373","taken"],["2026-09-04T15:28:18","41370","taken"],["2026-09-04T14:13:27","41367","taken"],["2026-09-03T13:41:47","41344","taken"],["2026-09-02T16:27:35","41332","taken"],["2026-09-02T13:47:56","41326","taken"],["2026-08-31T23:57:15","41305","taken"],["2026-08-31T23:28:32","41304","taken"],["2026-08-30T20:07:16","41289","taken"],["2026-08-30T16:31:22","41280","taken"],["2026-08-30T10:07:49","41272","missed"],["2026-08-28T22:43:52","41252","taken"],["2026-08-28T21:49:44","41250","taken"],["2026-08-28T19:55:11","41246","taken"],["2026-08-26T21:23:12","41220","turned down"],["2026-08-26T21:22:27","41219","missed"],["2026-08-25T17:10:25","41199","taken"],["2026-08-25T13:22:34","41195","taken"],["2026-08-24T20:14:17","41184","taken"],["2026-08-23T19:05:03","41164","taken"],["2026-08-23T08:08:51","41156","taken"],["2026-08-21T16:38:31","41127","taken"],["2026-08-20T10:20:26","41110","turned down"],["2026-08-19T17:41:14","41099","missed"],["2026-08-19T16:14:53","41096","turned down"],["2026-08-18T22:07:14","41086","missed"],["2026-08-18T16:19:23","41079","taken"],["2026-08-18T15:29:49","41077","taken"],["2026-08-17T19:52:41","41062","taken"],["2026-08-15T20:53:11","41033","taken"],["2026-08-14T11:34:59","41012","turned down"],["2026-08-14T10:23:31","41011","taken"],["2026-08-14T09:04:58","41010","missed"],["2026-08-12T19:51:16","40989","turned down"],["2026-08-12T18:50:45","40986","taken"],["2026-08-10T22:27:46","40962","taken"],["2026-08-10T19:35:50","40955","taken"],["2026-08-10T18:48:57","40953","turned down"],["2026-08-09T20:51:14","40934","taken"],["2026-08-09T18:47:54","40932","turned down"],["2026-08-09T00:13:23","40924","taken"],["2026-08-08T11:33:45","40914","taken"],["2026-08-07T17:50:31","40899","taken"],["2026-08-05T21:36:50","40858","taken"],["2026-08-05T11:37:04","40838","taken"],["2026-08-05T11:36:45","40837","taken"],["2026-08-02T15:56:34","40789","taken"],["2026-08-02T13:55:53","40785","taken"],["2026-07-31T18:20:58","40755","missed"],["2026-07-28T21:29:25","40706","taken"],["2026-07-27T17:33:54","40681","taken"],["2026-07-27T15:46:13","40678","turned down"],["2026-07-27T03:38:33","40667","taken"],["2026-07-26T22:56:29","40660","taken"],["2026-07-26T06:17:25","40648","taken"],["2026-07-25T09:17:24","40624","taken"],["2026-07-25T07:33:50","40622","taken"],["2026-07-24T19:11:13","40613","taken"],["2026-07-24T13:32:05","40606","turned down"],["2026-07-22T19:52:59","40569","turned down"],["2026-07-22T10:46:54","40557","taken"],["2026-07-19T17:07:05","40506","taken"],["2026-07-18T18:21:28","40487","taken"],["2026-07-18T14:47:37","40482","taken"],["2026-07-17T17:53:14","40467","taken"],["2026-07-15T19:43:28","40432","taken"],["2026-07-15T09:40:33","40419","taken"],["2026-07-14T22:15:09","40416","turned down"],["2026-07-14T20:05:02","40415","taken"],["2026-07-13T20:23:15","40401","taken"],["2026-07-12T23:10:53","40379","taken"],["2026-07-12T19:09:14","40376","taken"],["2026-07-12T15:27:03","40368","taken"],["2026-07-09T02:34:45","40311","turned down"],["2026-07-08T20:06:49","40306","turned down"],["2026-07-07T21:30:31","40287","taken"],["2026-07-07T14:18:27","40271","turned down"],["2026-07-06T11:23:47","40253","taken"],["2026-07-05T17:57:30","40233","turned down"],["2026-07-04T06:24:12","40211","taken"],["2026-07-03T04:14:14","40187","taken"],["2026-07-02T20:42:46","40185","taken"],["2026-07-02T06:53:56","40169","taken"],["2026-06-30T08:58:47","40123","taken"],["2026-06-29T19:32:50","40118","taken"],["2026-06-29T15:17:16","40113","turned down"]],"Captain Vantage":[["2026-09-06T20:52:08","41419","taken"],["2026-09-06T09:44:05","41412","taken"],["2026-09-06T08:08:30","41411","missed"],["2026-09-06T07:55:59","41410","turned down"],["2026-09-05T19:54:50","41405","taken"],["2026-09-05T18:30:43","41403","taken"],["2026-09-05T13:12:05","41391","taken"],["2026-09-04T15:16:40","41369","turned down"],["2026-09-04T11:55:40","41364","taken"],["2026-09-04T11:32:25","41361","taken"],["2026-09-03T18:28:14","41350","missed"],["2026-09-03T11:10:31","41340","taken"],["2026-09-02T22:23:31","41336","taken"],["2026-09-02T14:45:33","41327","taken"],["2026-09-02T09:10:02","41324","taken"],["2026-09-01T11:43:47","41311","turned down"],["2026-09-01T11:17:56","41310","taken"],["2026-08-31T21:52:00","41303","taken"],["2026-08-30T13:51:03","41275","turned down"],["2026-08-30T11:27:25","41274","taken"],["2026-08-30T01:15:52","41268","taken"],["2026-08-29T15:55:27","41260","taken"],["2026-08-29T15:16:03","41259","taken"],["2026-08-28T18:58:16","41244","taken"],["2026-08-27T20:03:35","41232","turned down"],["2026-08-27T19:10:23","41230","taken"],["2026-08-27T11:13:06","41226","taken"],["2026-08-26T21:00:05","41218","turned down"],["2026-08-26T18:57:51","41216","taken"],["2026-08-26T09:26:38","41209","taken"],["2026-08-26T07:12:09","41207","taken"],["2026-08-25T13:00:13","41194","missed"],["2026-08-24T20:24:05","41185","taken"],["2026-08-24T20:13:31","41183","taken"],["2026-08-24T17:04:58","41176","taken"],["2026-08-23T00:12:25","41153","taken"],["2026-08-22T17:51:28","41150","turned down"],["2026-08-22T11:52:59","41145","taken"],["2026-08-22T02:25:01","41141","taken"],["2026-08-21T22:55:00","41139","taken"],["2026-08-21T22:45:30","41138","taken"],["2026-08-20T20:41:11","41119","taken"],["2026-08-20T17:52:31","41117","taken"],["2026-08-20T17:25:45","41115","turned down"],["2026-08-20T14:24:05","41113","missed"],["2026-08-19T20:41:37","41104","taken"],["2026-08-19T20:30:41","41103","missed"],["2026-08-19T14:57:57","41094","taken"],["2026-08-18T12:04:21","41073","taken"],["2026-08-17T14:57:47","41055","taken"],["2026-08-16T16:03:13","41043","turned down"],["2026-08-16T14:06:13","41042","taken"],["2026-08-16T10:47:34","41039","taken"],["2026-08-14T20:22:11","41020","taken"],["2026-08-14T17:11:19","41017","taken"],["2026-08-13T17:20:31","41001","taken"],["2026-08-13T13:44:12","40997","turned down"],["2026-08-12T19:03:31","40987","missed"],["2026-08-12T14:02:33","40983","turned down"],["2026-08-11T20:49:32","40974","taken"],["2026-08-11T08:46:31","40964","taken"],["2026-08-10T20:43:20","40957","turned down"],["2026-08-10T19:00:25","40954","taken"],["2026-08-09T11:54:45","40927","turned down"],["2026-08-07T21:22:46","40904","taken"],["2026-08-07T20:50:04","40903","turned down"],["2026-08-07T07:37:37","40886","taken"],["2026-08-07T06:59:11","40884","taken"],["2026-08-05T15:21:58","40847","taken"],["2026-08-05T15:17:16","40846","taken"],["2026-08-05T14:38:25","40843","taken"],["2026-08-05T12:17:45","40839","taken"],["2026-08-04T08:55:06","40818","taken"],["2026-08-03T20:47:40","40815","taken"],["2026-08-03T17:09:59","40812","turned down"],["2026-08-02T21:51:42","40798","turned down"],["2026-08-02T17:50:25","40792","taken"],["2026-08-02T16:44:42","40791","taken"],["2026-08-01T12:43:30","40767","turned down"],["2026-08-01T08:04:29","40761","taken"],["2026-07-31T15:42:02","40751","turned down"],["2026-07-31T08:50:18","40747","taken"],["2026-07-30T23:22:07","40744","taken"],["2026-07-30T16:05:22","40735","taken"],["2026-07-30T02:30:52","40727","taken"],["2026-07-29T14:23:45","40721","taken"],["2026-07-28T20:31:14","40705","taken"],["2026-07-26T17:51:36","40652","taken"],["2026-07-26T01:35:56","40646","taken"],["2026-07-25T19:56:08","40640","taken"],["2026-07-24T19:11:50","40614","turned down"],["2026-07-24T01:05:56","40597","missed"],["2026-07-22T21:30:37","40572","taken"],["2026-07-22T21:29:08","40571","taken"],["2026-07-22T17:39:53","40565","taken"],["2026-07-21T17:14:19","40544","turned down"],["2026-07-21T17:08:25","40543","turned down"],["2026-07-20T10:13:37","40526","taken"],["2026-07-19T23:56:33","40518","taken"],["2026-07-19T19:41:24","40509","taken"],["2026-07-19T15:14:59","40504","turned down"],["2026-07-19T14:10:33","40503","taken"],["2026-07-17T19:42:46","40473","taken"],["2026-07-16T23:07:50","40456","turned down"],["2026-07-16T17:06:40","40445","turned down"],["2026-07-15T18:45:54","40430","taken"],["2026-07-15T12:08:39","40420","turned down"],["2026-07-14T09:05:57","40405","taken"],["2026-07-14T07:44:54","40404","taken"],["2026-07-13T14:06:41","40393","taken"],["2026-07-12T20:34:56","40377","taken"],["2026-07-11T21:20:33","40351","turned down"],["2026-07-10T21:57:56","40337","taken"],["2026-07-09T17:49:42","40318","taken"],["2026-07-09T16:01:55","40316","taken"],["2026-07-09T05:14:32","40312","taken"],["2026-07-08T18:41:31","40304","missed"],["2026-07-08T10:18:26","40294","taken"],["2026-07-07T18:39:11","40280","turned down"],["2026-07-07T15:14:46","40273","taken"],["2026-07-06T11:16:03","40252","taken"],["2026-07-06T10:14:41","40250","taken"],["2026-07-06T01:21:49","40243","taken"],["2026-07-05T19:04:54","40236","taken"],["2026-07-04T07:28:05","40212","taken"],["2026-07-03T21:57:35","40206","taken"],["2026-07-03T19:19:22","40202","taken"],["2026-07-01T21:54:39","40164","taken"],["2026-07-01T21:53:49","40162","taken"],["2026-07-01T11:02:51","40140","turned down"],["2026-06-30T21:21:22","40133","taken"],["2026-06-30T16:05:23","40127","taken"],["2026-06-30T15:06:13","40126","turned down"],["2026-06-30T14:27:13","40125","taken"],["2026-06-29T18:15:12","40115","taken"]],"Halfmoon":[["2026-09-05T16:58:56","41398","taken"],["2026-09-04T18:44:24","41375","taken"],["2026-09-04T11:45:33","41363","taken"],["2026-09-03T20:06:40","41351","taken"],["2026-09-03T14:35:48","41346","turned down"],["2026-09-02T21:04:30","41335","taken"],["2026-09-01T14:35:24","41314","taken"],["2026-09-01T09:16:45","41307","taken"],["2026-08-30T21:16:05","41292","missed"],["2026-08-30T17:09:39","41281","taken"],["2026-08-28T10:03:59","41240","turned down"],["2026-08-27T18:24:07","41229","taken"],["2026-08-26T22:34:48","41222","turned down"],["2026-08-26T22:07:39","41221","taken"],["2026-08-26T17:27:46","41213","taken"],["2026-08-26T09:21:35","41208","taken"],["2026-08-23T20:14:35","41165","missed"],["2026-08-21T11:07:14","41125","taken"],["2026-08-21T06:30:29","41123","turned down"],["2026-08-20T22:37:53","41120","taken"],["2026-08-20T17:28:51","41116","taken"],["2026-08-19T18:41:47","41101","taken"],["2026-08-19T12:48:15","41091","missed"],["2026-08-19T04:22:40","41088","turned down"],["2026-08-17T20:09:15","41063","taken"],["2026-08-16T17:26:45","41044","taken"],["2026-08-16T10:40:07","41038","turned down"],["2026-08-15T17:52:22","41029","missed"],["2026-08-14T19:35:22","41018","taken"],["2026-08-14T07:12:43","41008","taken"],["2026-08-14T06:44:00","41007","taken"],["2026-08-13T07:36:00","40992","missed"],["2026-08-12T16:14:12","40984","turned down"],["2026-08-10T18:33:56","40951","turned down"],["2026-08-10T09:02:03","40942","taken"],["2026-08-10T07:12:36","40940","taken"],["2026-08-08T18:47:47","40919","taken"],["2026-08-08T09:53:12","40912","turned down"],["2026-08-07T17:46:08","40898","taken"],["2026-08-06T20:46:54","40880","taken"],["2026-08-06T18:03:26","40877","taken"],["2026-08-06T14:43:21","40873","taken"],["2026-08-05T13:14:12","40840","taken"],["2026-08-05T09:48:05","40836","taken"],["2026-08-05T01:49:23","40833","turned down"],["2026-08-03T15:14:16","40808","taken"],["2026-08-03T14:45:00","40807","turned down"],["2026-08-02T21:51:47","40797","turned down"],["2026-08-02T11:25:42","40783","taken"],["2026-07-31T13:02:24","40750","taken"],["2026-07-31T11:36:50","40749","turned down"],["2026-07-31T01:33:06","40745","taken"],["2026-07-30T13:57:47","40733","taken"],["2026-07-30T08:57:49","40731","taken"],["2026-07-28T19:35:03","40703","taken"],["2026-07-27T21:08:41","40688","taken"],["2026-07-27T18:50:04","40685","taken"],["2026-07-27T02:11:47","40665","taken"],["2026-07-26T20:25:23","40656","taken"],["2026-07-26T10:11:44","40650","taken"],["2026-07-25T19:47:59","40639","taken"],["2026-07-24T18:02:45","40611","turned down"],["2026-07-23T16:26:32","40584","taken"],["2026-07-23T00:45:50","40574","taken"],["2026-07-22T11:53:04","40560","turned down"],["2026-07-22T07:52:39","40552","turned down"],["2026-07-21T21:28:12","40549","turned down"],["2026-07-21T13:15:21","40542","taken"],["2026-07-21T12:25:41","40541","taken"],["2026-07-20T00:27:22","40519","taken"],["2026-07-19T23:33:49","40517","taken"],["2026-07-18T12:31:39","40481","taken"],["2026-07-18T08:18:10","40479","taken"],["2026-07-18T04:08:41","40477","turned down"],["2026-07-17T15:36:31","40465","turned down"],["2026-07-17T01:15:14","40457","turned down"],["2026-07-16T20:43:43","40453","taken"],["2026-07-15T23:34:47","40436","taken"],["2026-07-14T11:58:39","40409","taken"],["2026-07-13T18:26:38","40398","taken"],["2026-07-13T11:17:28","40389","taken"],["2026-07-12T15:59:18","40371","taken"],["2026-07-12T11:09:54","40362","taken"],["2026-07-10T13:27:55","40332","turned down"],["2026-07-10T10:23:10","40331","turned down"],["2026-07-10T10:07:10","40330","taken"],["2026-07-09T22:13:01","40325","taken"],["2026-07-09T18:18:49","40319","taken"],["2026-07-08T11:00:18","40296","turned down"],["2026-07-07T17:23:48","40278","taken"],["2026-07-07T12:26:29","40269","taken"],["2026-07-05T23:45:00","40241","turned down"],["2026-07-05T17:34:55","40232","turned down"],["2026-07-05T15:35:45","40230","taken"],["2026-07-04T17:17:03","40222","taken"],["2026-07-02T19:12:55","40182","taken"],["2026-07-02T09:54:15","40175","taken"],["2026-07-01T20:56:43","40160","taken"],["2026-07-01T18:53:31","40151","turned down"],["2026-07-01T13:24:49","40144","taken"],["2026-06-30T20:29:36","40131","taken"],["2026-06-29T23:12:47","40119","taken"]],"Farlight":[["2026-08-28T19:28:20","41245","missed"],["2026-08-23T13:51:03","41160","missed"],["2026-08-22T11:13:54","41142","turned down"],["2026-08-19T13:28:40","41092","missed"],["2026-08-14T21:22:33","41021","taken"],["2026-08-14T16:32:44","41016","missed"],["2026-08-13T14:51:31","40998","missed"],["2026-08-13T09:45:33","40993","missed"],["2026-08-12T20:02:48","40990","turned down"],["2026-08-12T19:51:25","40989","missed"],["2026-08-12T16:36:14","40985","taken"],["2026-08-10T21:08:38","40959","turned down"],["2026-08-10T17:34:47","40950","taken"],["2026-08-10T15:38:46","40949","taken"],["2026-08-08T20:19:44","40922","turned down"],["2026-08-08T10:39:19","40913","taken"],["2026-08-08T00:21:56","40908","missed"],["2026-08-07T18:42:49","40901","taken"],["2026-08-07T12:35:24","40890","turned down"],["2026-08-06T12:20:05","40870","taken"],["2026-08-05T19:45:15","40854","taken"],["2026-08-05T16:26:11","40848","taken"],["2026-08-05T09:45:43","40835","taken"],["2026-08-05T05:29:14","40834","taken"],["2026-08-04T20:01:19","40828","taken"],["2026-08-03T15:44:11","40809","turned down"],["2026-08-02T20:54:05","40796","taken"],["2026-08-02T18:44:46","40793","taken"],["2026-08-02T11:00:32","40782","turned down"],["2026-08-02T09:18:03","40780","taken"],["2026-08-01T23:30:17","40777","turned down"],["2026-08-01T15:48:41","40771","taken"],["2026-08-01T01:08:57","40760","taken"],["2026-07-31T08:00:14","40746","taken"],["2026-07-30T21:50:54","40741","taken"],["2026-07-29T17:27:48","40723","taken"],["2026-07-28T22:54:02","40710","turned down"],["2026-07-27T13:19:10","40677","taken"],["2026-07-27T12:33:13","40674","taken"],["2026-07-25T00:04:51","40620","taken"],["2026-07-24T19:37:14","40616","taken"],["2026-07-24T13:31:16","40605","turned down"],["2026-07-24T04:51:18","40600","taken"],["2026-07-23T23:30:21","40596","turned down"],["2026-07-23T21:52:31","40595","taken"],["2026-07-22T18:48:58","40568","taken"],["2026-07-22T17:27:51","40564","missed"],["2026-07-21T10:50:29","40540","taken"],["2026-07-21T07:44:48","40538","taken"],["2026-07-20T11:31:35","40528","taken"],["2026-07-20T10:34:25","40527","taken"],["2026-07-18T23:18:23","40494","taken"],["2026-07-18T21:17:00","40493","taken"],["2026-07-18T19:34:52","40489","taken"],["2026-07-18T18:34:47","40488","turned down"],["2026-07-17T08:15:15","40460","turned down"],["2026-07-16T19:06:18","40449","taken"],["2026-07-16T14:20:00","40444","taken"],["2026-07-15T23:26:14","40435","taken"],["2026-07-15T05:05:21","40418","taken"],["2026-07-13T23:21:10","40402","missed"],["2026-07-13T15:31:38","40395","taken"],["2026-07-12T15:37:37","40370","taken"],["2026-07-11T14:02:44","40343","taken"],["2026-07-11T08:46:11","40339","taken"],["2026-07-09T21:21:45","40323","taken"],["2026-07-09T20:11:28","40322","turned down"],["2026-07-09T19:41:48","40321","turned down"],["2026-07-09T18:47:56","40320","taken"],["2026-07-09T08:16:40","40313","taken"],["2026-07-08T13:49:31","40298","taken"],["2026-07-08T00:09:15","40290","turned down"],["2026-07-07T09:59:58","40267","taken"],["2026-07-06T04:25:01","40246","taken"],["2026-07-04T00:50:50","40208","taken"],["2026-07-03T16:09:25","40195","taken"],["2026-07-02T09:03:53","40174","taken"],["2026-07-02T08:34:27","40171","taken"],["2026-07-01T21:54:08","40163","taken"],["2026-07-01T21:17:01","40161","taken"],["2026-07-01T20:52:54","40158","taken"],["2026-07-01T11:30:28","40143","turned down"],["2026-07-01T11:27:10","40142","turned down"],["2026-07-01T08:52:11","40138","taken"],["2026-06-30T23:54:21","40135","turned down"],["2026-06-30T07:37:38","40122","taken"]],"Nightwell":[["2026-09-06T09:43:02","41412","missed"],["2026-09-06T08:09:33","41411","taken"],["2026-09-06T07:56:34","41410","taken"],["2026-09-05T15:07:22","41393","taken"],["2026-09-05T09:41:42","41386","taken"],["2026-09-05T07:23:07","41383","taken"],["2026-09-04T18:13:45","41374","taken"],["2026-09-04T15:16:55","41369","taken"],["2026-09-04T12:46:10","41366","taken"],["2026-09-04T11:55:04","41364","turned down"],["2026-09-03T18:29:16","41350","taken"],["2026-09-03T16:10:43","41347","taken"],["2026-09-03T13:08:36","41343","taken"],["2026-09-02T14:45:10","41327","turned down"],["2026-09-02T09:09:42","41324","turned down"],["2026-09-02T08:44:19","41323","taken"],["2026-09-01T11:44:10","41311","taken"],["2026-09-01T11:16:55","41310","missed"],["2026-09-01T11:15:28","41309","taken"],["2026-09-01T07:55:35","41306","turned down"],["2026-08-31T18:42:23","41301","taken"],["2026-08-30T18:45:05","41284","turned down"],["2026-08-30T13:51:51","41275","taken"],["2026-08-29T15:54:25","41260","missed"],["2026-08-29T14:46:23","41258","taken"],["2026-08-29T13:50:31","41257","taken"],["2026-08-29T09:16:54","41254","missed"],["2026-08-29T08:15:00","41253","taken"],["2026-08-28T20:25:06","41248","taken"],["2026-08-28T20:18:02","41247","taken"],["2026-08-28T17:03:49","41242","turned down"],["2026-08-28T06:39:06","41239","turned down"],["2026-08-27T20:03:44","41232","turned down"],["2026-08-27T19:42:45","41231","taken"],["2026-08-27T11:12:30","41226","turned down"],["2026-08-27T06:12:05","41223","taken"],["2026-08-26T21:00:34","41218","taken"],["2026-08-26T19:05:37","41217","taken"],["2026-08-26T00:14:03","41204","taken"],["2026-08-24T17:13:27","41178","taken"],["2026-08-24T16:53:04","41175","taken"],["2026-08-23T21:41:27","41168","taken"],["2026-08-23T05:35:27","41155","taken"],["2026-08-23T00:11:22","41153","missed"],["2026-08-22T20:54:15","41152","taken"],["2026-08-22T17:51:35","41150","taken"],["2026-08-22T11:42:25","41143","taken"],["2026-08-21T23:30:03","41140","taken"],["2026-08-21T17:26:16","41134","taken"],["2026-08-21T03:37:16","41122","taken"],["2026-08-20T17:52:21","41117","turned down"],["2026-08-20T14:25:07","41113","taken"],["2026-08-19T20:31:42","41103","taken"],["2026-08-19T17:50:39","41100","taken"],["2026-08-18T21:36:12","41085","taken"],["2026-08-18T15:29:30","41076","taken"],["2026-08-18T10:47:30","41072","turned down"],["2026-08-17T19:44:15","41061","taken"],["2026-08-17T08:54:20","41050","missed"],["2026-08-16T21:33:35","41045","taken"],["2026-08-16T11:17:20","41040","turned down"],["2026-08-16T10:06:28","41037","turned down"],["2026-08-16T09:44:04","41036","missed"],["2026-08-15T20:57:07","41034","missed"],["2026-08-15T15:34:13","41026","taken"],["2026-08-15T13:01:38","41023","turned down"],["2026-08-14T02:53:24","41006","turned down"],["2026-08-13T13:45:51","40997","taken"],["2026-08-12T19:05:59","40987","taken"],["2026-08-12T14:02:48","40983","taken"],["2026-08-11T19:05:23","40972","taken"],["2026-08-11T19:00:50","40971","turned down"],["2026-08-10T20:43:51","40957","taken"],["2026-08-10T09:30:41","40943","taken"],["2026-08-10T02:19:11","40939","taken"],["2026-08-08T17:23:05","40917","taken"],["2026-08-08T16:54:47","40916","turned down"],["2026-08-08T07:10:20","40909","taken"],["2026-08-07T20:50:36","40903","taken"],["2026-08-07T17:55:29","40900","taken"],["2026-08-07T14:09:13","40893","taken"],["2026-08-07T10:32:07","40888","taken"],["2026-08-06T12:16:18","40869","taken"],["2026-08-06T05:02:17","40864","taken"],["2026-08-05T19:54:09","40855","taken"],["2026-08-05T13:47:28","40841","turned down"],["2026-08-03T17:10:25","40812","taken"],["2026-08-03T15:56:23","40811","taken"],["2026-08-03T01:28:56","40801","turned down"],["2026-08-03T00:45:33","40800","taken"],["2026-08-02T21:52:18","40798","taken"],["2026-08-02T16:09:13","40790","taken"],["2026-08-01T19:13:17","40774","taken"],["2026-08-01T12:43:59","40767","taken"],["2026-08-01T10:14:14","40764","turned down"],["2026-07-31T17:54:55","40754","turned down"],["2026-07-31T17:03:39","40753","taken"],["2026-07-31T15:42:42","40751","taken"],["2026-07-31T08:49:56","40747","turned down"],["2026-07-30T17:12:40","40738","taken"],["2026-07-29T18:04:53","40724","taken"],["2026-07-29T00:27:43","40711","turned down"],["2026-07-28T03:50:25","40692","taken"],["2026-07-27T16:29:13","40680","taken"],["2026-07-27T03:28:22","40666","taken"],["2026-07-25T19:15:09","40638","taken"],["2026-07-25T09:33:56","40625","taken"],["2026-07-24T17:04:06","40609","turned down"],["2026-07-24T01:07:28","40597","missed"],["2026-07-23T18:51:00","40589","taken"],["2026-07-23T18:14:55","40588","turned down"],["2026-07-23T17:57:15","40587","taken"],["2026-07-23T13:51:42","40578","taken"],["2026-07-22T16:04:21","40562","taken"],["2026-07-22T14:54:35","40561","taken"],["2026-07-22T09:43:41","40554","taken"],["2026-07-21T17:14:29","40544","taken"],["2026-07-21T17:08:47","40543","taken"],["2026-07-20T18:21:23","40534","turned down"],["2026-07-20T09:47:31","40525","taken"],["2026-07-20T03:56:24","40521","taken"],["2026-07-19T20:59:39","40512","taken"],["2026-07-19T15:15:23","40504","taken"],["2026-07-19T13:38:11","40501","turned down"],["2026-07-18T17:15:37","40483","taken"],["2026-07-17T19:29:03","40472","taken"],["2026-07-16T23:08:06","40456","taken"],["2026-07-16T17:06:57","40445","taken"],["2026-07-16T12:01:36","40441","taken"],["2026-07-16T10:48:30","40439","taken"],["2026-07-16T09:04:49","40437","turned down"],["2026-07-14T17:46:20","40413","taken"],["2026-07-14T17:34:07","40411","taken"],["2026-07-14T13:04:23","40410","taken"],["2026-07-14T10:34:10","40406","taken"],["2026-07-14T09:04:24","40405","missed"],["2026-07-12T23:59:54","40380","taken"],["2026-07-12T15:19:47","40367","taken"],["2026-07-11T21:30:01","40352","taken"],["2026-07-11T14:16:43","40344","taken"],["2026-07-11T10:14:55","40340","taken"],["2026-07-10T18:18:05","40334","turned down"],["2026-07-08T18:43:03","40304","taken"],["2026-07-08T18:25:40","40303","turned down"],["2026-07-08T16:31:38","40300","taken"],["2026-07-08T15:03:38","40299","taken"],["2026-07-07T15:14:20","40273","turned down"],["2026-07-06T20:00:55","40260","turned down"],["2026-07-06T10:22:27","40251","taken"],["2026-07-06T00:51:38","40242","taken"],["2026-07-05T18:56:18","40235","taken"],["2026-07-05T14:05:20","40229","turned down"],["2026-07-05T11:16:03","40227","taken"],["2026-07-04T14:16:19","40219","turned down"],["2026-07-04T11:56:27","40216","taken"],["2026-07-03T13:45:33","40190","taken"],["2026-07-02T13:36:44","40177","taken"],["2026-07-02T01:13:37","40165","turned down"],["2026-07-01T20:02:01","40156","taken"],["2026-07-01T17:40:33","40150","taken"],["2026-07-01T15:18:23","40148","taken"],["2026-07-01T07:09:56","40136","taken"],["2026-06-30T21:08:20","40132","missed"],["2026-06-30T15:06:42","40126","taken"],["2026-06-30T09:58:05","40124","taken"]],"Cindermark":[["2026-09-06T17:45:33","41417","taken"],["2026-09-06T15:21:32","41416","missed"],["2026-09-05T08:16:46","41384","taken"],["2026-09-04T12:18:48","41365","taken"],["2026-09-03T21:58:12","41354","taken"],["2026-09-03T13:53:39","41345","taken"],["2026-09-03T12:43:43","41342","taken"],["2026-09-02T15:53:36","41331","taken"],["2026-08-31T19:51:18","41302","turned down"],["2026-08-31T17:42:58","41300","turned down"],["2026-08-31T13:53:20","41295","taken"],["2026-08-31T10:57:05","41294","taken"],["2026-08-30T16:21:23","41279","taken"],["2026-08-30T10:08:52","41272","taken"],["2026-08-29T19:13:06","41263","missed"],["2026-08-28T19:54:08","41246","missed"],["2026-08-28T19:29:21","41245","taken"],["2026-08-27T22:17:38","41234","taken"],["2026-08-27T10:37:29","41225","turned down"],["2026-08-26T21:23:47","41220","taken"],["2026-08-25T23:51:02","41203","taken"],["2026-08-25T22:26:35","41202","turned down"],["2026-08-25T19:36:38","41200","taken"],["2026-08-24T03:27:52","41169","taken"],["2026-08-23T13:52:05","41160","taken"],["2026-08-23T08:08:45","41156","turned down"],["2026-08-22T14:23:17","41147","turned down"],["2026-08-22T11:14:14","41142","taken"],["2026-08-21T16:37:30","41127","missed"],["2026-08-20T10:20:49","41110","taken"],["2026-08-18T21:34:26","41084","taken"],["2026-08-18T15:47:17","41078","taken"],["2026-08-18T14:25:06","41074","taken"],["2026-08-17T19:01:06","41058","taken"],["2026-08-17T08:43:29","41049","taken"],["2026-08-16T07:59:00","41035","taken"],["2026-08-15T20:52:09","41033","missed"],["2026-08-14T16:33:45","41016","taken"],["2026-08-14T11:35:21","41012","taken"],["2026-08-13T09:46:34","40993","turned down"],["2026-08-12T19:52:27","40989","taken"],["2026-08-12T16:35:58","40985","turned down"],["2026-08-11T21:57:37","40979","taken"],["2026-08-11T21:51:59","40978","turned down"],["2026-08-10T14:08:22","40947","taken"],["2026-08-09T18:48:08","40932","taken"],["2026-08-09T17:20:57","40930","taken"],["2026-08-08T20:20:17","40922","taken"],["2026-08-08T11:33:07","40914","turned down"],["2026-08-06T23:49:52","40882","taken"],["2026-08-05T18:43:28","40853","taken"],["2026-08-05T14:09:36","40842","taken"],["2026-08-04T00:38:32","40816","taken"],["2026-08-03T04:24:27","40802","taken"],["2026-08-02T13:55:16","40785","turned down"],["2026-08-02T00:29:42","40778","taken"],["2026-08-01T15:48:08","40771","turned down"],["2026-08-01T13:56:15","40769","taken"],["2026-07-29T11:00:33","40718","taken"],["2026-07-29T06:26:03","40714","taken"],["2026-07-28T22:54:41","40710","taken"],["2026-07-27T15:46:27","40678","taken"],["2026-07-27T02:07:08","40664","taken"],["2026-07-26T22:56:22","40660","turned down"],["2026-07-25T16:03:35","40635","taken"],["2026-07-22T19:53:32","40569","taken"],["2026-07-22T18:48:23","40568","turned down"],["2026-07-22T10:27:16","40556","taken"],["2026-07-22T06:33:28","40551","taken"],["2026-07-21T10:49:56","40540","turned down"],["2026-07-21T09:59:43","40539","taken"],["2026-07-20T19:08:00","40536","taken"],["2026-07-20T05:46:45","40522","taken"],["2026-07-19T20:16:31","40511","taken"],["2026-07-19T12:14:02","40500","taken"],["2026-07-18T18:19:56","40487","missed"],["2026-07-17T17:52:37","40467","turned down"],["2026-07-17T14:12:25","40462","taken"],["2026-07-16T11:53:47","40440","taken"],["2026-07-14T22:15:34","40416","taken"],["2026-07-13T08:58:25","40386","taken"],["2026-07-12T16:37:03","40373","taken"],["2026-07-12T15:37:05","40370","turned down"],["2026-07-11T10:35:21","40341","taken"],["2026-07-10T07:47:54","40329","taken"],["2026-07-09T20:11:55","40322","taken"],["2026-07-08T01:52:21","40291","taken"],["2026-07-07T20:28:33","40284","taken"],["2026-07-07T14:51:41","40272","taken"],["2026-07-06T06:38:23","40247","taken"],["2026-07-04T14:07:55","40218","taken"],["2026-07-04T07:49:13","40214","taken"],["2026-07-03T18:37:35","40199","taken"],["2026-07-02T16:58:37","40180","taken"],["2026-07-02T03:47:58","40166","taken"],["2026-07-01T21:16:44","40161","turned down"],["2026-07-01T11:30:41","40143","turned down"],["2026-07-01T11:25:53","40141","taken"],["2026-06-30T19:18:08","40130","taken"]],"Meteor Mite":[["2026-09-05T15:06:20","41393","missed"],["2026-08-29T09:15:52","41254","missed"],["2026-08-27T20:03:12","41232","turned down"],["2026-08-22T20:53:13","41152","missed"],["2026-08-20T16:41:50","41114","missed"],["2026-08-19T17:30:34","41097","taken"],["2026-08-18T07:37:03","41070","turned down"],["2026-08-16T11:16:17","41040","missed"],["2026-08-15T19:40:01","41032","taken"],["2026-08-15T15:18:48","41025","taken"],["2026-08-14T07:26:28","41009","missed"],["2026-08-13T15:12:38","40999","missed"],["2026-08-13T13:43:10","40997","missed"],["2026-08-12T19:04:32","40987","turned down"],["2026-08-11T06:41:14","40963","taken"],["2026-08-10T21:15:00","40960","taken"],["2026-08-10T14:03:36","40946","turned down"],["2026-08-08T20:43:45","40923","taken"],["2026-08-08T16:55:19","40916","taken"],["2026-08-08T07:54:09","40911","taken"],["2026-08-06T16:20:56","40874","taken"],["2026-08-06T05:02:01","40864","turned down"],["2026-08-06T01:21:33","40863","taken"],["2026-08-06T01:14:32","40862","turned down"],["2026-08-05T14:53:04","40845","taken"],["2026-08-05T13:47:54","40841","turned down"],["2026-08-04T20:34:08","40830","taken"],["2026-08-03T19:34:01","40813","taken"],["2026-08-02T19:12:14","40794","turned down"],["2026-08-02T15:46:42","40788","taken"],["2026-08-01T10:14:28","40764","taken"],["2026-07-30T21:25:11","40740","taken"],["2026-07-30T18:51:08","40739","turned down"],["2026-07-30T17:10:19","40737","taken"],["2026-07-28T22:30:59","40709","taken"],["2026-07-28T19:46:04","40704","missed"],["2026-07-28T19:06:04","40702","taken"],["2026-07-27T18:13:01","40683","taken"],["2026-07-27T16:10:33","40679","taken"],["2026-07-27T00:47:55","40663","taken"],["2026-07-25T10:36:35","40627","taken"],["2026-07-25T09:08:32","40623","taken"],["2026-07-24T19:13:38","40615","turned down"],["2026-07-24T17:16:09","40610","turned down"],["2026-07-24T12:33:04","40604","taken"],["2026-07-23T21:19:36","40594","taken"],["2026-07-23T19:32:17","40591","taken"],["2026-07-23T10:42:52","40577","turned down"],["2026-07-23T09:48:02","40576","missed"],["2026-07-20T18:21:50","40534","taken"],["2026-07-20T16:25:44","40530","taken"],["2026-07-19T22:48:11","40515","turned down"],["2026-07-19T20:59:04","40512","turned down"],["2026-07-19T09:10:13","40498","taken"],["2026-07-19T08:46:41","40497","taken"],["2026-07-17T21:01:54","40475","taken"],["2026-07-15T12:34:51","40421","taken"],["2026-07-14T07:33:38","40403","turned down"],["2026-07-13T19:20:06","40400","taken"],["2026-07-13T10:47:56","40388","turned down"],["2026-07-13T09:14:08","40387","taken"],["2026-07-12T23:59:37","40380","turned down"],["2026-07-12T18:51:07","40374","taken"],["2026-07-12T13:21:34","40364","taken"],["2026-07-11T20:30:50","40349","turned down"],["2026-07-10T18:41:32","40335","taken"],["2026-07-10T18:18:36","40334","turned down"],["2026-07-08T19:44:26","40305","taken"],["2026-07-08T08:48:28","40293","taken"],["2026-07-07T22:59:50","40289","taken"],["2026-07-07T17:17:53","40276","taken"],["2026-07-07T11:44:18","40268","taken"],["2026-07-06T15:15:25","40256","taken"],["2026-07-05T18:17:48","40234","taken"],["2026-07-05T12:18:08","40228","taken"],["2026-07-04T23:34:33","40225","taken"],["2026-07-04T14:47:06","40220","turned down"],["2026-07-04T11:56:19","40216","turned down"],["2026-07-04T08:57:14","40215","turned down"],["2026-07-03T18:22:11","40198","taken"],["2026-07-02T05:44:48","40168","taken"],["2026-07-02T01:13:57","40165","taken"],["2026-07-01T15:00:12","40147","turned down"],["2026-07-01T08:42:54","40137","taken"]]};
+  const offerSeconds = 60;
+  const backupScore = 0.30;
+  const neutralScore = 0.50;
+  const halfLifeDays = 14;
+  const daysSinceOutcome = 14;
+  const picker = byId('hero-picker');
+  let hero;
+  let backup;
+  let state;
+
+  function historyScore(pilot) {
+    const lastScore = hero.largeDrop ? 0.20 : 0.70;
+    if (!pilot) return lastScore;
+    return neutralScore + (lastScore - neutralScore) * 2 ** (-daysSinceOutcome / halfLifeDays);
+  }
+
+  function selectHero(name) {
+    hero = roster.find(entry => entry.name === name);
+    backup = hero.handler === 'Kip'
+      ? roster.find(entry => entry.handler === 'Kip' && entry.name !== name).name
+      : 'Backup responder';
+    byId('hero-title').textContent = `${hero.name}’s next ping`;
+    byId('hero-subtitle').textContent = `One ${hero.area} callout, as seen by ${hero.handler} and on ${hero.name}’s phone.`;
+    byId('handler').textContent = `${hero.handler}’s handler console`;
+    byId('callouts-area').textContent = `Callouts / ${hero.area}`;
+    byId('callout-title').textContent = `${hero.area} · Assistance callout`;
+    byId('hero-card-name').textContent = hero.name;
+    byId('backup-card-name').textContent = backup;
+    byId('phone-owner').textContent = hero.name;
+    byId('hero-emblem').src = avatars[hero.name];
+    byId('backup-emblem').src = avatars[backup] || backupAvatar;
+    byId('profile-avatar').src = avatars[hero.name];
+    byId('profile-name').textContent = hero.name;
+    byId('profile-details').textContent = `${hero.area} · Handler ${hero.handler}`;
+    for (const button of byId('avatar-roster').children) {
+      button.setAttribute('aria-pressed', String(button.dataset.hero === hero.name));
+    }
+    historyPage = 0;
+    renderDashboard();
+    resetRankingCallout();
+    renderRanking();
+    byId('next-accept').textContent = `${backup} accepts`;
+    byId('observed').textContent = `Observed pings per week · ${hero.before.toFixed(1)} before 4.2 → ${hero.after.toFixed(1)} after (full weeks).`;
+    const order = hero.largeDrop
+      ? `${backup} gets the first ping in 4.2. ${hero.name} goes first in the pilot.`
+      : `${hero.name} gets the first ping in both scenarios.`;
+    byId('fixture').textContent = `Illustrative callout with equal travel times and two eligible responders. Example history score after 14 days with no new outcome · ${historyScore(false).toFixed(2)} in 4.2 → ${historyScore(true).toFixed(2)} in the pilot. ${order}`;
+    resetReplay();
+    updateView();
+    byId('feedback').textContent = 'Choose a replay to see the offer flow.';
+    render();
+  }
+
+  function resetReplay() {
+    state = { phase: 'ready', result: null, startedAt: null, sentAt: 0, elapsed: 0 };
+    byId('activity').replaceChildren();
+  }
+
+  function record(second, description) {
+    const item = document.createElement('li');
+    const timestamp = document.createElement('time');
+    timestamp.textContent = `+${second}s`;
+    const message = document.createElement('span');
+    message.textContent = description;
+    item.append(timestamp, message);
+    byId('activity').append(item);
+  }
+
+  function start(pilot, displayDelay) {
+    resetReplay();
+    if (historyScore(pilot) > backupScore) {
+      state.phase = 'hero-offered';
+      state.startedAt = performance.now() - displayDelay * 1000;
+      state.elapsed = displayDelay;
+      record(0, `Offer sent to ${hero.name}.`);
+      record(displayDelay, `Offer displayed on ${hero.name}’s phone.`);
+      byId('feedback').textContent = 'The countdown starts at send.';
+    } else {
+      record(0, `Offer sent to ${backup}.`);
+      state.phase = 'backup-assigned';
+      state.elapsed = 8;
+      record(8, `${backup} accepted. Callout assigned.`);
+      byId('feedback').textContent = `${hero.name} was eligible. Routing ended at the first acceptance.`;
+    }
+    render();
+  }
+
+  function tick() {
+    if (state.startedAt === null) return;
+    state.elapsed = (performance.now() - state.startedAt) / 1000;
+    const deadline = state.sentAt + offerSeconds;
+    if (state.elapsed >= deadline) expire(deadline);
+    renderClock();
+  }
+
+  function expire(deadline) {
+    state.elapsed = deadline;
+    if (state.phase === 'hero-offered') {
+      state.startedAt = performance.now() - deadline * 1000;
+      advanceToBackup('expired');
+      return;
+    }
+    state.phase = 'unassigned';
+    state.startedAt = null;
+    record(Math.floor(deadline), `${backup}’s offer expired. No eligible responders remain.`);
+    byId('feedback').textContent = 'Routing ended without an assignment.';
+    render();
+  }
+
+  function advanceToBackup(result) {
+    const second = Math.floor(state.elapsed);
+    state.result = result;
+    state.phase = 'backup-offered';
+    state.sentAt = state.elapsed;
+    record(second, `${hero.name}’s offer ${result}.`);
+    record(second, `Offer sent to ${backup}.`);
+    byId('feedback').textContent = 'Dispatch advanced to the next responder.';
+    render();
+  }
+
+  function reply(recipient, response) {
+    tick();
+    if (state.phase !== `${recipient}-offered`) {
+      if (recipient === 'hero' && response === 'accept' && state.result === 'expired') {
+        byId('feedback').textContent = `Late accept rejected. ${hero.name}’s offer expired at +60s.`;
+      }
+      return;
+    }
+    if (response === 'decline') {
+      advanceToBackup('declined');
+      return;
+    }
+    state.startedAt = null;
+    state.phase = `${recipient}-assigned`;
+    const name = recipient === 'hero' ? hero.name : backup;
+    record(Math.floor(state.elapsed), `${name} accepted. Callout assigned.`);
+    byId('feedback').textContent = 'Dispatch confirmed the assignment.';
+    render();
+  }
+
+  function renderClock() {
+    const offerOpen = state.phase === 'hero-offered' || state.phase === 'backup-offered';
+    const remaining = Math.max(0, Math.ceil(state.sentAt + offerSeconds - state.elapsed));
+    byId('handler-remaining').textContent = offerOpen ? `${remaining}s of ${offerSeconds}s` : '—';
+    if (state.phase === 'hero-offered') {
+      byId('remaining').textContent = `${remaining}s left`;
+      byId('meter').value = remaining;
+    }
+    byId('clock').textContent = state.phase === 'ready' ? 'Offer window · 60s from send' : `Replay clock · +${Math.floor(state.elapsed)}s`;
+  }
+
+  function render() {
+    const handlerStatus = {
+      ready: 'Ready to route',
+      'hero-offered': `Offer sent · ${hero.name}`,
+      'backup-offered': `Routing · Offer sent to ${backup}`,
+      'hero-assigned': `Assigned · ${hero.name}`,
+      'backup-assigned': `Assigned · ${backup}`,
+      unassigned: 'No responder assigned'
+    };
+    const hasOffer = state.phase === 'hero-offered';
+    const assigned = state.phase === 'hero-assigned';
+    const backupOffered = state.phase === 'backup-offered';
+    const backupAssigned = state.phase === 'backup-assigned';
+    const title = hasOffer ? 'Assistance callout' : assigned ? 'Assigned' :
+      state.result === 'expired' ? 'Offer expired' : state.result === 'declined' ? 'Offer declined' : 'No current offer';
+    byId('handler-status').textContent = handlerStatus[state.phase];
+    byId('available-count').textContent = assigned || backupAssigned ? '1 of 2' : '2 of 2';
+    byId('active-recipient').textContent = hasOffer ? hero.name : backupOffered ? backup : '—';
+    byId('hero-status').textContent = hasOffer ? 'Available · Offer sent' :
+      assigned ? 'Engaged · Assigned' :
+      state.result ? `Available · Offer ${state.result}` :
+      backupAssigned ? 'Available · No ping for this callout' : 'Available';
+    byId('backup-status').textContent = backupOffered ? 'Available · Offer sent' :
+      backupAssigned ? 'Engaged · Assigned' :
+      state.phase === 'unassigned' ? 'Available · Offer expired' : 'Available';
+    byId('hero-card').dataset.active = hasOffer || assigned;
+    byId('backup-card').dataset.active = backupOffered || backupAssigned;
+    byId('phone-state').textContent = title;
+    byId('phone-detail').textContent = hasOffer ? `${hero.area} · Callout offer` : assigned ? 'Your assignment is confirmed.' :
+      state.result ? 'Dispatch moved on to the next responder.' : 'You’re available for callouts.';
+    byId('phone-timer').hidden = !hasOffer;
+    byId('phone-actions').hidden = !hasOffer;
+    byId('late-accept').hidden = state.result !== 'expired';
+    byId('next-accept').hidden = !backupOffered;
+    byId('skip').disabled = state.startedAt === null;
+    renderClock();
+  }
+
+
+  const initialModeledScores = {"Captain Vantage": 0.92, "Cindermark": 0.96, "Corporal Ashgrove": 1.0, "Farlight": 0.0, "Halfmoon": 1.0, "Ironvale": 0.72, "Meteor Mite": 0.0, "Nightwell": 0.88, "Sgt. Bulwark": 1.0, "Sgt. Falkirk": 0.76, "Stormwrack": 0.76, "The Drift": 0.84, "The Gale": 0.96, "The Longcast": 0.96, "The Undertow": 0.0, "Vesper": 0.0};
+
+  const lab = {
+    scores: { ...initialModeledScores },
+    active: false,
+    queue: [],
+    index: 0,
+    elapsed: 0,
+    deliveryAware: false,
+    recoveryPending: false,
+    recoveryUsed: false
+  };
+
+  function rankedCandidates() {
+    const candidates = roster.map(entry => ({
+      name: entry.name,
+      history: lab.scores[entry.name],
+      full: 0.75 + 0.25 * lab.scores[entry.name]
+    }));
+    candidates.sort((a, b) => b.full - a.full);
+    if (lab.recoveryPending) {
+      const selected = candidates.findIndex(entry => entry.name === hero.name);
+      const [entry] = candidates.splice(selected, 1);
+      candidates.unshift(entry);
+    }
+    return candidates;
+  }
+
+  function resetRankingCallout() {
+    lab.active = false;
+    lab.queue = [];
+    lab.index = 0;
+    lab.elapsed = 0;
+    lab.recoveryPending = false;
+    byId('lab-log').replaceChildren();
+    byId('lab-message').textContent = 'Start a callout to see who gets the first offer.';
+  }
+
+  function labRecord(message) {
+    const row = document.createElement('li');
+    const time = document.createElement('time');
+    time.textContent = `+${lab.elapsed}s`;
+    const text = document.createElement('span');
+    text.textContent = message;
+    row.append(time, text);
+    byId('lab-log').append(row);
+  }
+
+  function renderRanking() {
+    const candidates = rankedCandidates();
+    const selected = candidates.find(entry => entry.name === hero.name);
+    byId('ranking-summary').textContent = `${hero.name} · History and future offers`;
+    byId('lab-history').textContent = selected.history.toFixed(2);
+    byId('dashboard-score').textContent = `Modeled history score · ${selected.history.toFixed(2)} / 1.00`;
+    byId('lab-position').textContent = `${candidates.indexOf(selected) + 1} / 16`;
+    byId('lab-full').textContent = selected.full.toFixed(3);
+    byId('ranking-rows').replaceChildren(...candidates.map((entry, index) => {
+      const row = document.createElement('tr');
+      row.dataset.selected = String(entry.name === hero.name);
+      for (const value of [index + 1, entry.name, entry.history.toFixed(2), entry.full.toFixed(3)]) {
+        const cell = document.createElement('td');
+        cell.textContent = value;
+        row.append(cell);
+      }
+      return row;
+    }));
+    for (const id of ['lab-accept', 'lab-miss', 'lab-decline']) {
+      byId(id).disabled = !lab.active;
+    }
+    byId('lab-send').disabled = lab.active;
+    byId('lab-decay').disabled = lab.active;
+    byId('lab-delivery').disabled = lab.active;
+    byId('lab-recovery').disabled = lab.active || lab.recoveryUsed || lab.recoveryPending;
+    byId('lab-display').disabled = !lab.active;
+    byId('lab-delivery').setAttribute('aria-pressed', String(lab.deliveryAware));
+    byId('lab-delivery').textContent = lab.deliveryAware ? 'Delivery-aware scoring enabled' : 'Enable delivery-aware scoring';
+    byId('lab-recovery').textContent = lab.recoveryPending ? 'Recovery offer reserved' :
+      lab.recoveryUsed ? 'Recovery slot used in this example' : 'Reserve one recovery offer';
+  }
+
+  function startRankingCallout() {
+    if (lab.active) return;
+    lab.queue = rankedCandidates().map(entry => entry.name);
+    lab.index = 0;
+    lab.elapsed = 0;
+    lab.active = true;
+    if (lab.recoveryPending) {
+      lab.recoveryUsed = true;
+      lab.recoveryPending = false;
+    }
+    byId('lab-log').replaceChildren();
+    labRecord(`Offer sent to ${lab.queue[0]}. Deadline +60s.`);
+    byId('lab-message').textContent = `Current offer · ${lab.queue[0]}. Choose the outcome for this responder.`;
+    renderRanking();
+  }
+
+  function resolveRankingOffer(outcome) {
+    if (!lab.active) return;
+    const name = lab.queue[lab.index];
+    const before = lab.scores[name];
+    let change = outcome === 'accepted' ? 0.08 : -0.12;
+    if (outcome === 'missed') {
+      lab.elapsed += offerSeconds;
+      if (lab.deliveryAware) {
+        change = byId('lab-display').value === 'confirmed' ? -0.04 : 0;
+      }
+    }
+    lab.scores[name] = Math.round(Math.max(0, Math.min(1, before + change)) * 10000) / 10000;
+    labRecord(`${name} ${outcome}. History ${before.toFixed(2)} → ${lab.scores[name].toFixed(2)}.`);
+    if (outcome === 'accepted') {
+      lab.active = false;
+      byId('lab-message').textContent = `Assigned to ${name}. Dispatch ends routing. Start a new callout to try the updated order.`;
+    } else {
+      lab.index += 1;
+      if (lab.index === lab.queue.length) {
+        lab.active = false;
+        byId('lab-message').textContent = 'No responder assigned. Every eligible candidate received an offer in this example.';
+      } else {
+        const next = lab.queue[lab.index];
+        labRecord(`Offer sent to ${next}. Deadline +${lab.elapsed + offerSeconds}s.`);
+        byId('lab-message').textContent = `Current offer · ${next}. Choose the outcome for this responder.`;
+      }
+    }
+    renderRanking();
+  }
+
+  byId('ranking-tab').onclick = () => {
+    activeView = 'ranking';
+    renderRanking();
+    updateView();
+  };
+  byId('open-ranking').onclick = () => byId('ranking-tab').click();
+  byId('lab-send').onclick = startRankingCallout;
+  byId('lab-accept').onclick = () => resolveRankingOffer('accepted');
+  byId('lab-miss').onclick = () => resolveRankingOffer('missed');
+  byId('lab-decline').onclick = () => resolveRankingOffer('declined');
+  byId('lab-decay').onclick = () => {
+    if (lab.active) return;
+    for (const entry of roster) {
+      lab.scores[entry.name] = 0.50 + (lab.scores[entry.name] - 0.50) * 0.50;
+    }
+    byId('lab-message').textContent = 'Advanced 14 days with no new outcomes for anyone. Scores moved halfway toward neutral. Start a callout to try the new order.';
+    renderRanking();
+  };
+  byId('lab-delivery').onclick = () => {
+    if (lab.active) return;
+    lab.deliveryAware = !lab.deliveryAware;
+    byId('lab-message').textContent = 'Choose device evidence during the next offer and simulate a miss to try the scoring rule.';
+    renderRanking();
+  };
+  byId('lab-recovery').onclick = () => {
+    if (lab.active || lab.recoveryUsed || lab.recoveryPending) return;
+    lab.recoveryPending = true;
+    byId('lab-message').textContent = `Reserved a first offer for ${hero.name} on the next example callout. Only an acceptance earns history credit.`;
+    renderRanking();
+  };
+  byId('lab-reset').onclick = () => {
+    Object.assign(lab, {
+      scores: { ...initialModeledScores },
+      deliveryAware: false,
+      recoveryUsed: false
+    });
+    resetRankingCallout();
+    renderRanking();
+  };
+
+  let activeView = 'dashboard';
+  let historyPage = 0;
+  const pageSize = 8;
+  const palette = [
+    '#54c8f2', '#ff985d', '#a4d090', '#ffe58c',
+    '#bda2ff', '#91b5d0', '#ff8aa6', '#8c9cf1',
+    '#f2bf67', '#77bfc1', '#b393ea', '#b9d78d',
+    '#66e1c6', '#c0a6eb', '#6ac2d6', '#bb91ff'
+  ];
+
+  function createAvatar(index, name) {
+    const canvas = document.createElement('canvas');
+    canvas.width = canvas.height = 256;
+    const ctx = canvas.getContext('2d');
+    const accent = palette[index % palette.length];
+    const backdrop = ctx.createRadialGradient(110, 90, 15, 128, 128, 165);
+    backdrop.addColorStop(0, '#34466b');
+    backdrop.addColorStop(1, '#101a30');
+    ctx.fillStyle = backdrop;
+    ctx.fillRect(0, 0, 256, 256);
+    ctx.strokeStyle = accent;
+    ctx.lineWidth = 2;
+    ctx.beginPath();
+    ctx.arc(128, 126, 108, 0, Math.PI * 2);
+    ctx.stroke();
+    // All portraits use sealed masks and invented costume details.
+    ctx.fillStyle = accent;
+    ctx.beginPath();
+    ctx.moveTo(82, 167);
+    ctx.lineTo(174, 167);
+    ctx.lineTo(238, 256);
+    ctx.lineTo(18, 256);
+    ctx.closePath();
+    ctx.fill();
+    ctx.fillStyle = '#1d2a45';
+    ctx.beginPath();
+    ctx.moveTo(96, 169);
+    ctx.lineTo(160, 169);
+    ctx.lineTo(192, 256);
+    ctx.lineTo(64, 256);
+    ctx.fill();
+    ctx.fillStyle = accent;
+    ctx.beginPath();
+    ctx.ellipse(128, 109, 53, 65, 0, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.fillStyle = '#1d2a45';
+    ctx.beginPath();
+    ctx.ellipse(128, 118, 40, 47, 0, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.fillStyle = '#091425';
+    ctx.fillRect(77, 96, 102, 30);
+    ctx.fillStyle = '#e5f8ff';
+    ctx.beginPath();
+    ctx.moveTo(89, 106);
+    ctx.lineTo(120, 111 + index % 3);
+    ctx.lineTo(115, 118);
+    ctx.lineTo(92, 115);
+    ctx.fill();
+    ctx.beginPath();
+    ctx.moveTo(167, 106);
+    ctx.lineTo(136, 111 + index % 3);
+    ctx.lineTo(141, 118);
+    ctx.lineTo(164, 115);
+    ctx.fill();
+    ctx.fillStyle = accent;
+    const crest = index % 4;
+    if (crest === 0) {
+      ctx.fillRect(122, 40, 12, 51);
+    } else if (crest === 1) {
+      ctx.beginPath();
+      ctx.moveTo(100, 66);
+      ctx.lineTo(128, 43);
+      ctx.lineTo(155, 66);
+      ctx.fill();
+    } else if (crest === 2) {
+      ctx.fillRect(70, 81, 13, 57);
+      ctx.fillRect(173, 81, 13, 57);
+    } else {
+      ctx.beginPath();
+      ctx.arc(128, 69, 10, 0, Math.PI * 2);
+      ctx.fill();
+    }
+    ctx.strokeStyle = accent;
+    ctx.lineWidth = 3;
+    ctx.beginPath();
+    ctx.moveTo(108, 145);
+    ctx.lineTo(128, 155);
+    ctx.lineTo(148, 145);
+    ctx.stroke();
+    ctx.fillStyle = accent;
+    ctx.font = 'bold 22px system-ui';
+    ctx.textAlign = 'center';
+    const initials = name.split(' ').map(word => word[0]).join('').slice(0, 2);
+    ctx.fillText(initials, 128, 223);
+    return canvas.toDataURL('image/png');
+  }
+
+  const avatars = Object.fromEntries(roster.map((entry, index) => [entry.name, createAvatar(index, entry.name)]));
+  const backupAvatar = createAvatar(5, 'Backup responder');
+
+  function updateView() {
+    for (const view of ['dashboard', 'ranking', 'replay']) {
+      byId(`${view}-panel`).hidden = activeView !== view;
+      byId(`${view}-tab`).setAttribute('aria-pressed', String(activeView === view));
+    }
+    for (const button of document.querySelectorAll('[data-replay-control]')) {
+      button.hidden = activeView !== 'replay';
+    }
+    const titles = { dashboard: 'dashboard', ranking: 'ranking lab', replay: 'next ping' };
+    const subtitles = {
+      dashboard: 'Your offers, outcomes and callout history.',
+      ranking: 'Explore how history affects the next offer and try proposed recovery rules.',
+      replay: `One ${hero.area} callout, as seen by ${hero.handler} and on ${hero.name}’s phone.`
+    };
+    byId('hero-title').textContent = `${hero.name}’s ${titles[activeView]}`;
+    byId('hero-subtitle').textContent = subtitles[activeView];
+  }
+
+  function periodHistory() {
+    const period = byId('history-period').value;
+    return pingHistory[hero.name].filter(entry => {
+      const date = entry[0].slice(0, 10);
+      if (period === 'before') return date < '2026-08-12';
+      if (period === 'after') return date > '2026-08-12';
+      return true;
+    });
+  }
+
+  function renderDashboard() {
+    const events = periodHistory();
+    const counts = { taken: 0, missed: 0, 'turned down': 0 };
+    for (const event of events) counts[event[2]] += 1;
+    byId('total-pings').textContent = events.length;
+    byId('accepted-pings').textContent = counts.taken;
+    byId('missed-pings').textContent = counts.missed;
+    byId('declined-pings').textContent = counts['turned down'];
+    const filter = byId('history-outcome').value;
+    const matching = events.filter(event => filter === 'all' || event[2] === filter);
+    const pages = Math.max(1, Math.ceil(matching.length / pageSize));
+    historyPage = Math.min(historyPage, pages - 1);
+    const first = historyPage * pageSize;
+    const visible = matching.slice(first, first + pageSize);
+    const labels = { taken: 'Accepted', missed: 'Missed', 'turned down': 'Declined' };
+    const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+    const tableRows = visible.map(event => {
+      const [date, time] = event[0].split('T');
+      const [year, month, day] = date.split('-');
+      const row = document.createElement('tr');
+      const values = [`${day} ${months[Number(month) - 1]} ${year}`, time, `#${event[1]}`];
+      for (const value of values) {
+        const cell = document.createElement('td');
+        cell.textContent = value;
+        row.append(cell);
+      }
+      const outcomeCell = document.createElement('td');
+      const badge = document.createElement('span');
+      badge.className = `outcome ${labels[event[2]].toLowerCase()}`;
+      badge.textContent = labels[event[2]];
+      outcomeCell.append(badge);
+      row.append(outcomeCell);
+      return row;
+    });
+    if (tableRows.length === 0) {
+      const row = document.createElement('tr');
+      const cell = document.createElement('td');
+      cell.colSpan = 4;
+      cell.textContent = 'No pings match these filters.';
+      row.append(cell);
+      tableRows.push(row);
+    }
+    byId('history-rows').replaceChildren(...tableRows);
+    byId('history-count').textContent = matching.length
+      ? `${first + 1}–${Math.min(first + pageSize, matching.length)} of ${matching.length} pings`
+      : '0 pings';
+    byId('history-prev').disabled = historyPage === 0;
+    byId('history-next').disabled = historyPage >= pages - 1;
+  }
+
+  for (const entry of roster) {
+    const button = document.createElement('button');
+    button.type = 'button';
+    button.className = 'avatar-choice';
+    button.dataset.hero = entry.name;
+    button.setAttribute('aria-pressed', 'false');
+    const image = document.createElement('img');
+    image.src = avatars[entry.name];
+    image.alt = '';
+    button.append(image, document.createTextNode(entry.name));
+    button.onclick = () => {
+      picker.value = entry.name;
+      selectHero(entry.name);
+    };
+    byId('avatar-roster').append(button);
+  }
+  byId('dashboard-tab').onclick = () => {
+    resetReplay();
+    render();
+    activeView = 'dashboard';
+    updateView();
+  };
+  byId('replay-tab').onclick = () => {
+    activeView = 'replay';
+    updateView();
+  };
+  for (const identity of ['history-period', 'history-outcome']) {
+    byId(identity).onchange = () => {
+      historyPage = 0;
+      renderDashboard();
+    };
+  }
+  byId('history-prev').onclick = () => {
+    if (historyPage > 0) historyPage -= 1;
+    renderDashboard();
+  };
+  byId('history-next').onclick = () => {
+    historyPage += 1;
+    renderDashboard();
+  };
+  byId('download-avatar').onclick = () => {
+    const link = document.createElement('a');
+    link.href = avatars[hero.name];
+    link.download = hero.name.toLowerCase().replace(/[^a-z0-9]+/g, '-') + '-avatar.png';
+    link.click();
+  };
+
+  for (const entry of roster) {
+    const option = document.createElement('option');
+    option.value = entry.name;
+    option.textContent = entry.name;
+    picker.append(option);
+  }
+  picker.value = 'Meteor Mite';
+  picker.onchange = () => selectHero(picker.value);
+  byId('delayed').onclick = () => start(true, 45);
+  byId('on-time').onclick = () => start(true, 0);
+  byId('baseline').onclick = () => start(false, 0);
+  byId('handler-view').onclick = () => {
+    const handlerOnly = document.body.classList.toggle('handler-only');
+    byId('handler-view').setAttribute('aria-pressed', String(handlerOnly));
+    byId('handler-view').textContent = handlerOnly ? 'Show both screens' : 'Handler view';
+  };
+  byId('accept').onclick = () => reply('hero', 'accept');
+  byId('decline').onclick = () => reply('hero', 'decline');
+  byId('late-accept').onclick = () => reply('hero', 'accept');
+  byId('next-accept').onclick = () => reply('backup', 'accept');
+  byId('skip').onclick = () => {
+    if (state.startedAt !== null) expire(state.sentAt + offerSeconds);
+  };
+  setInterval(tick, 100);
+  selectHero(picker.value);
+  start(false, 0);
+</script>
+</body>
+</html>
